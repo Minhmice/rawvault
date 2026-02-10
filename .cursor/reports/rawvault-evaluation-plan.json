@@ -1,0 +1,290 @@
+{
+  "type": "plan",
+  "content": {
+    "summary": "Đánh giá toàn diện ứng dụng RawVault - Drive-lite cho ảnh RAW. Phân tích bao gồm: Frontend/UI, Backend/API, Security, Performance, và các tính năng còn thiếu so với PRD.",
+    "evaluation": {
+      "overall_score": "7/10",
+      "strengths": [
+        "Kiến trúc Next.js 15 + React 19 hiện đại với App Router",
+        "Supabase integration tốt với RLS (Row Level Security)",
+        "API design theo chuẩn RESTful với error handling nhất quán",
+        "Structured logging với requestId",
+        "Rate limiting cơ bản cho sign/share endpoints",
+        "Validation với Zod schema",
+        "UI dark theme premium với Tailwind CSS v4",
+        "Accessibility cơ bản (aria labels, keyboard navigation)"
+      ],
+      "weaknesses": [
+        "Nhiều tính năng MVP chưa hoàn thiện (Recent, Trash, Settings)",
+        "Thiếu preview pipeline (Edge Function chưa có)",
+        "Không có virtualization cho list lớn",
+        "Thiếu drag & drop upload",
+        "Thiếu multi-select và batch operations",
+        "Không có keyboard shortcuts đầy đủ",
+        "Mobile responsive chưa tối ưu",
+        "Thiếu error boundary và fallback UI",
+        "Thiếu loading states cho một số operations"
+      ]
+    },
+    "improvements": {
+      "critical": [
+        {
+          "id": "imp-1",
+          "area": "Backend",
+          "title": "Implement Preview Pipeline",
+          "description": "Tạo Edge Function hoặc background job để generate thumbnail (256px) và preview (1600px) cho ảnh RAW. Hiện tại preview_status luôn là 'pending' vì không có worker xử lý.",
+          "impact": "high",
+          "effort": "high"
+        },
+        {
+          "id": "imp-2",
+          "area": "Frontend",
+          "title": "Implement Trash Page",
+          "description": "Trash page hiện chỉ là placeholder. Cần: list deleted files, restore functionality, permanent delete, empty trash.",
+          "impact": "medium",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-3",
+          "area": "Frontend",
+          "title": "Implement Recent Page",
+          "description": "Recent page cần tracking file access history và hiển thị files gần đây. Có thể cần thêm table/column để track last_accessed_at.",
+          "impact": "medium",
+          "effort": "medium"
+        }
+      ],
+      "high_priority": [
+        {
+          "id": "imp-4",
+          "area": "Frontend/UX",
+          "title": "Drag & Drop Upload",
+          "description": "Thêm drag & drop zone cho upload files, cải thiện UX đáng kể. Hiện chỉ có button click.",
+          "impact": "medium",
+          "effort": "low"
+        },
+        {
+          "id": "imp-5",
+          "area": "Frontend",
+          "title": "Multi-select và Batch Operations",
+          "description": "Cho phép chọn nhiều files cùng lúc và thực hiện batch delete, move, download.",
+          "impact": "medium",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-6",
+          "area": "Frontend",
+          "title": "Folder Navigation Improvements",
+          "description": "Nested folders (hiện chỉ 1 level), breadcrumb navigation đầy đủ, folder tree view trong sidebar.",
+          "impact": "medium",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-7",
+          "area": "Frontend",
+          "title": "Error Boundary & Fallback UI",
+          "description": "Thêm React Error Boundary để catch errors gracefully, hiển thị fallback UI thay vì crash.",
+          "impact": "medium",
+          "effort": "low"
+        },
+        {
+          "id": "imp-8",
+          "area": "Performance",
+          "title": "Virtualized List for Large Datasets",
+          "description": "Implement virtualization (react-window hoặc @tanstack/virtual) khi có >500 items để tránh performance issues.",
+          "impact": "medium",
+          "effort": "medium"
+        }
+      ],
+      "medium_priority": [
+        {
+          "id": "imp-9",
+          "area": "Frontend/UX",
+          "title": "Keyboard Shortcuts",
+          "description": "Thêm keyboard shortcuts: Delete (del), Select all (Ctrl+A), Upload (Ctrl+U), Search focus (/), Navigation (arrows).",
+          "impact": "low",
+          "effort": "low"
+        },
+        {
+          "id": "imp-10",
+          "area": "Frontend",
+          "title": "File Context Menu",
+          "description": "Right-click context menu với các actions: Open, Download, Share, Rename, Move, Delete.",
+          "impact": "low",
+          "effort": "low"
+        },
+        {
+          "id": "imp-11",
+          "area": "Frontend",
+          "title": "Rename Folder/File Inline",
+          "description": "Cho phép rename trực tiếp trong grid/list view thay vì phải vào modal.",
+          "impact": "low",
+          "effort": "low"
+        },
+        {
+          "id": "imp-12",
+          "area": "Frontend",
+          "title": "Starred/Favorites Feature",
+          "description": "PRD có mention 'Starred' nhưng chưa implement. Cần thêm starred column và UI.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-13",
+          "area": "Backend/API",
+          "title": "Pagination với Cursor",
+          "description": "Hiện dùng offset pagination. Cursor-based pagination sẽ hiệu quả hơn cho large datasets.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-14",
+          "area": "Frontend",
+          "title": "Settings Page Implementation",
+          "description": "Implement settings: theme toggle, default view mode, notification preferences, storage quota display.",
+          "impact": "low",
+          "effort": "medium"
+        }
+      ],
+      "nice_to_have": [
+        {
+          "id": "imp-15",
+          "area": "Frontend",
+          "title": "Dark/Light Theme Toggle",
+          "description": "Hiện chỉ có dark theme. Thêm light theme option và system preference detection.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-16",
+          "area": "Frontend",
+          "title": "Image Gallery Mode",
+          "description": "Viewer với arrow navigation giữa các images, slideshow mode.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-17",
+          "area": "Frontend",
+          "title": "EXIF Metadata Display",
+          "description": "Hiển thị EXIF data (camera, lens, ISO, aperture, shutter speed) trong viewer. PRD có mention nhưng chưa implement.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-18",
+          "area": "Backend",
+          "title": "Search API Enhancement",
+          "description": "Hiện search chỉ client-side filter. Cần server-side search với full-text search support.",
+          "impact": "low",
+          "effort": "medium"
+        },
+        {
+          "id": "imp-19",
+          "area": "Security",
+          "title": "CSRF Protection",
+          "description": "Thêm CSRF token cho các mutation endpoints.",
+          "impact": "low",
+          "effort": "low"
+        },
+        {
+          "id": "imp-20",
+          "area": "DevOps",
+          "title": "Health Check Endpoint",
+          "description": "Thêm /api/health endpoint để monitoring.",
+          "impact": "low",
+          "effort": "low"
+        }
+      ]
+    },
+    "security_review": {
+      "status": "acceptable_for_mvp",
+      "findings": [
+        {
+          "severity": "low",
+          "issue": "In-memory rate limiting",
+          "recommendation": "Chuyển sang Redis-based rate limiting cho production multi-instance deployment"
+        },
+        {
+          "severity": "low",
+          "issue": "Missing CSRF protection",
+          "recommendation": "Thêm CSRF token cho state-changing operations"
+        },
+        {
+          "severity": "info",
+          "issue": "RLS policies đã implement đúng",
+          "recommendation": "Tiếp tục maintain RLS cho tất cả tables"
+        }
+      ]
+    },
+    "code_quality": {
+      "typescript": "Pass - No errors",
+      "structure": "Good - Clean separation of concerns",
+      "patterns": "Good - Consistent API error handling, logging",
+      "suggestions": [
+        "Thêm unit tests cho API routes",
+        "Thêm integration tests cho upload flow",
+        "Consider adding Storybook cho UI components"
+      ]
+    },
+    "tasks": [
+      {
+        "id": "task1",
+        "description": "Implement Preview Pipeline (Edge Function hoặc background worker)",
+        "reasoning": "Core feature của app - hiện thumbnails không hoạt động",
+        "estimatedComplexity": "high",
+        "dependencies": []
+      },
+      {
+        "id": "task2",
+        "description": "Implement Trash page với restore/delete functionality",
+        "reasoning": "MVP requirement theo PRD",
+        "estimatedComplexity": "medium",
+        "dependencies": []
+      },
+      {
+        "id": "task3",
+        "description": "Implement Recent page với file access tracking",
+        "reasoning": "MVP requirement theo PRD",
+        "estimatedComplexity": "medium",
+        "dependencies": []
+      },
+      {
+        "id": "task4",
+        "description": "Add Drag & Drop upload support",
+        "reasoning": "UX improvement quan trọng",
+        "estimatedComplexity": "low",
+        "dependencies": []
+      },
+      {
+        "id": "task5",
+        "description": "Add multi-select và batch operations",
+        "reasoning": "UX improvement cho power users",
+        "estimatedComplexity": "medium",
+        "dependencies": []
+      },
+      {
+        "id": "task6",
+        "description": "Improve folder navigation (nested folders, breadcrumbs)",
+        "reasoning": "PRD mentions 1-2 cấp folders với breadcrumbs",
+        "estimatedComplexity": "medium",
+        "dependencies": []
+      },
+      {
+        "id": "task7",
+        "description": "Add Error Boundary components",
+        "reasoning": "Production stability",
+        "estimatedComplexity": "low",
+        "dependencies": []
+      },
+      {
+        "id": "task8",
+        "description": "Implement keyboard shortcuts",
+        "reasoning": "A11y và UX improvement",
+        "estimatedComplexity": "low",
+        "dependencies": []
+      }
+    ],
+    "requiresSubAgents": false,
+    "subAgents": []
+  }
+}
