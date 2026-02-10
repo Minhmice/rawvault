@@ -1,0 +1,6 @@
+{"message":"DATABASE_URL parsed (no secrets)","data":{"host":"localhost","port":5432,"hasUrl":true},"hypothesisId":"H2","timestamp":1770737180064,"location":"scripts/check-db-connection.mjs"}
+{"message":"TCP connect to DATABASE_URL host:port","data":{"host":"localhost","port":5432,"ok":false,"error":"ECONNREFUSED"},"hypothesisId":"H1","timestamp":1770737180091,"location":"scripts/check-db-connection.mjs"}
+{"message":"TCP connect to localhost:5435 (local-db)","data":{"ok":false,"error":"ECONNREFUSED"},"hypothesisId":"H3","timestamp":1770737180095,"location":"scripts/check-db-connection.mjs"}
+{"message":"DATABASE_URL parsed (no secrets)","data":{"host":"localhost","port":5435,"hasUrl":true},"hypothesisId":"H2","timestamp":1770737306969,"location":"scripts/check-db-connection.mjs"}
+{"message":"TCP connect to DATABASE_URL host:port","data":{"host":"localhost","port":5435,"ok":false,"error":"ECONNREFUSED"},"hypothesisId":"H1","timestamp":1770737307000,"location":"scripts/check-db-connection.mjs"}
+{"message":"TCP connect to localhost:5435 (local-db)","data":{"ok":false,"error":"ECONNREFUSED"},"hypothesisId":"H3","timestamp":1770737307001,"location":"scripts/check-db-connection.mjs"}

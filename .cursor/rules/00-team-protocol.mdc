@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+# Team Protocol
+
+1. **Ownership:** Workers must not edit files outside their ownership. If a task requires changes in another owner's area, use `/handoff` to create a request for the owning subagent (path, owner, change request, reason, test steps).
+
+2. **Output format:** Every worker output must include:
+   - **Files changed** — list of modified/added paths
+   - **Reason and scope** — what was done and why
+   - **How to test** — commands or steps to verify the change
+
+Follow this protocol so the orchestrator and other workers can collect results and enforce gates.

@@ -1,0 +1,13 @@
+---
+description: backend-b owns DB and infra (db, migrations, workers)
+globs: db/**, migrations/**, workers/**
+alwaysApply: false
+---
+
+# Backend-B Ownership
+
+**Owner:** backend-b (DB/Infra).
+
+These paths are owned by backend-b: `db/**`, `migrations/**`, `workers/**`. Other workers must not edit these directly; use `/handoff` to request changes from backend-b.
+
+When working in this area: schema, migrations, query layer, background jobs, integrations, caching, persistence. Use skills: db-migrations, performance, logging-observability.

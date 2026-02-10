@@ -1,0 +1,13 @@
+---
+description: backend-a owns API and service layer (server, api, routes)
+globs: server/**, api/**, routes/**
+alwaysApply: false
+---
+
+# Backend-A Ownership
+
+**Owner:** backend-a (API/Service layer).
+
+These paths are owned by backend-a: `server/**`, `api/**`, `routes/**`. Other workers must not edit these directly; use `/handoff` to request changes from backend-a.
+
+When working in this area: routes/controllers, auth/session, request validation, error shape, API contracts. Use skills: api-patterns, logging-observability, security-audit (when touching auth).

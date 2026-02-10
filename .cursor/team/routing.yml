@@ -1,0 +1,92 @@
+version: 1
+
+routes:
+  - id: api_endpoint
+    match:
+      keywords: ["api", "endpoint", "route", "controller", "auth", "session", "validation", "error shape", "API contract"]
+      paths: ["server/**", "api/**", "routes/**", "src/app/api/**"]
+    owner: backend-a
+    skills_required: ["api-patterns", "logging-observability"]
+    skills_suggested: ["security-audit"]
+    gates_required: ["qa", "security", "docs"]
+
+  - id: db_change
+    match:
+      keywords: ["migration", "schema", "db", "index", "query", "transaction", "persistence", "cache", "worker", "background job"]
+      paths: ["db/**", "migrations/**", "workers/**", "prisma/**", "src/lib/db/**"]
+    owner: backend-b
+    skills_required: ["db-migrations", "performance", "logging-observability"]
+    skills_suggested: []
+    gates_required: ["qa", "docs"]
+
+  - id: ui_feature
+    match:
+      keywords: ["ui", "page", "component", "form", "layout", "ux", "frontend", "client validation", "state"]
+      paths: ["app/**", "src/app/**", "components/**", "ui/**", "web/**"]
+    owner: frontend
+    skills_required: ["ui-patterns", "test-playbook"]
+    skills_suggested: ["api-patterns"]
+    gates_required: ["qa", "docs"]
+
+  - id: qa
+    match:
+      keywords: ["test", "test plan", "regression", "definition of done", "DoD", "e2e", "unit test", "fixture"]
+      paths: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**", "e2e/**"]
+    owner: qa
+    skills_required: ["test-playbook", "release-checklist"]
+    skills_suggested: []
+    gates_required: ["qa", "docs"]
+
+  - id: security
+    match:
+      keywords: ["security", "authZ", "authN", "validation", "secrets", "SSRF", "dependency", "vulnerability"]
+      paths: []
+    owner: security
+    skills_required: ["security-audit", "api-patterns"]
+    skills_suggested: []
+    gates_required: ["security", "docs"]
+
+  - id: docs
+    match:
+      keywords: ["README", "API docs", "CHANGELOG", "how to test", "migration notes", "documentation"]
+      paths: ["**/*.md", "docs/**"]
+    owner: docs
+    skills_required: ["release-checklist", "api-patterns"]
+    skills_suggested: []
+    gates_required: ["docs"]
+
+  - id: devops
+    match:
+      keywords: ["docker", "compose", "CI", "runbook", "deploy", "env", "build", "pipeline"]
+      paths: [".github/**", ".gitlab-ci*", "Dockerfile*", "docker-compose*", "*.yml"]
+    owner: devops
+    skills_required: ["release-checklist", "logging-observability"]
+    skills_suggested: []
+    gates_required: ["docs", "devops"]
+
+  - id: refactor
+    match:
+      keywords: ["refactor", "cleanup", "complexity", "duplication", "boundaries", "performance fix"]
+      paths: []
+    owner: refactor
+    skills_required: ["performance", "api-patterns", "ui-patterns"]
+    skills_suggested: []
+    gates_required: ["qa", "docs"]
+
+  - id: product_spec
+    match:
+      keywords: ["acceptance criteria", "user story", "edge case", "non-goal", "spec", "requirement", "scope"]
+      paths: []
+    owner: product-spec
+    skills_required: ["release-checklist"]
+    skills_suggested: []
+    gates_required: ["docs"]
+
+  - id: data
+    match:
+      keywords: ["query", "data migration", "report", "event tracking", "analytics", "data pipeline"]
+      paths: ["db/**", "migrations/**", "scripts/**"]
+    owner: data
+    skills_required: ["db-migrations", "logging-observability"]
+    skills_suggested: []
+    gates_required: ["qa", "docs"]

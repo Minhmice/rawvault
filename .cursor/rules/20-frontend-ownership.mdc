@@ -1,0 +1,13 @@
+---
+description: frontend owns UI and app layer (web, app, components, ui)
+globs: web/**, app/**, components/**, ui/**
+alwaysApply: false
+---
+
+# Frontend Ownership
+
+**Owner:** frontend (UI/App).
+
+These paths are owned by frontend: `web/**`, `app/**`, `components/**`, `ui/**`. Other workers must not edit these directly; use `/handoff` to request changes from frontend.
+
+When working in this area: pages, components, state, client validation, UX flows, error UI. Use skills: ui-patterns, test-playbook (frontend tests), api-patterns (when syncing contract).
