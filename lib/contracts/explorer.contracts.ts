@@ -142,7 +142,7 @@ export const explorerFileItemSchema = explorerItemBaseSchema.extend({
   ext: z.string().min(1).max(20).nullable(),
   mime: mimeSchema.nullable(),
   sizeBytes: sizeBytesSchema,
-  storageProvider: accountProviderSchema,
+  provider: accountProviderSchema,
   storageAccountId: z.string().uuid().nullable(),
   previewStatus: filePreviewStatusSchema,
   syncStatus: fileSyncStatusSchema,

@@ -58,7 +58,7 @@ function parseInput<T>(schema: z.ZodSchema<T>, input: unknown): T {
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     throw new ApiError(400, "VALIDATION_ERROR", "Invalid request query.", {
-      fields: z.flattenError(parsed.error).fieldErrors,
+      fields: parsed.error.flatten().fieldErrors,
     });
   }
   return parsed.data;
@@ -96,7 +96,7 @@ function normalizeFile(row: FileRow) {
     storageAccountId: row.storage_account_id,
     previewStatus: row.preview_status,
     syncStatus: row.sync_status,
-    errorCode: row.error_code,
+    errorCode: row.error_code?.trim() || null,
     createdAt: normalizeTimestamp(row.created_at),
     updatedAt: normalizeTimestamp(row.updated_at),
   };
@@ -109,7 +109,7 @@ export function parseFoldersQuery(searchParams: URLSearchParams): ListFoldersQue
 }
 
 export function parseFilesQuery(searchParams: URLSearchParams): ListFilesQuery {
-  return parseInput(listFilesQuerySchema, {
+  const parsed = listFilesQuerySchema.safeParse({
     folderId: searchParams.get("folderId") ?? undefined,
     search: searchParams.get("search") ?? undefined,
     provider: searchParams.get("provider") ?? undefined,
@@ -117,6 +117,12 @@ export function parseFilesQuery(searchParams: URLSearchParams): ListFilesQuery {
     sortBy: searchParams.get("sortBy") ?? undefined,
     sortOrder: searchParams.get("sortOrder") ?? undefined,
   });
+  if (!parsed.success) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Invalid request query.", {
+      fields: parsed.error.flatten().fieldErrors,
+    });
+  }
+  return parsed.data;
 }
 
 export async function listExplorerFolders(

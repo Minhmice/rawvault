@@ -376,6 +376,25 @@ a {
   padding: 0.75rem;
 }
 
+.rv-detail-panel {
+  border: 1px solid var(--rv-border);
+  border-radius: 0.65rem;
+  background: #fff;
+  padding: 0.75rem;
+}
+
+.rv-detail-panel-empty {
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+}
+
+.rv-detail-deferrals {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 900px) {
   .rv-explorer-grid {
     grid-template-columns: 1fr;

@@ -27,7 +27,7 @@ function parseInput<T>(schema: z.ZodSchema<T>, input: unknown): T {
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     throw new ApiError(400, "VALIDATION_ERROR", "Invalid request payload.", {
-      fields: z.flattenError(parsed.error).fieldErrors,
+      fields: parsed.error.flatten().fieldErrors,
     });
   }
 

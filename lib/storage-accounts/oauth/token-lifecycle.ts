@@ -16,6 +16,16 @@ import {
 
 const REFRESH_BUFFER_MS = 5 * 60 * 1000;
 
+const PHASE4_SELECT =
+  "id, user_id, provider, access_token_encrypted, refresh_token_encrypted, expires_at, token_invalid_at";
+const LEGACY_SELECT =
+  "id, user_id, provider, access_token_encrypted, refresh_token_encrypted, expires_at";
+
+function isMissingPhase4ColumnError(err: { message?: string }): boolean {
+  const msg = err?.message ?? "";
+  return msg.includes("token_invalid_at does not exist");
+}
+
 type LinkedAccountTokenRow = {
   id: string;
   user_id: string;
@@ -23,7 +33,7 @@ type LinkedAccountTokenRow = {
   access_token_encrypted: string | null;
   refresh_token_encrypted: string | null;
   expires_at: string | null;
-  token_invalid_at: string | null;
+  token_invalid_at?: string | null;
 };
 
 export type UsableTokenResult = {
@@ -36,19 +46,43 @@ export async function getUsableProviderToken(
   userId: string,
   accountId: string,
 ): Promise<UsableTokenResult> {
-  const { data: row, error } = await supabase
+  let row: LinkedAccountTokenRow | null = null;
+  let loadError: string | null = null;
+
+  const result1 = await supabase
     .from("linked_accounts")
-    .select("id, user_id, provider, access_token_encrypted, refresh_token_encrypted, expires_at, token_invalid_at")
+    .select(PHASE4_SELECT)
     .eq("id", accountId)
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error) {
+  if (result1.error) {
+    if (isMissingPhase4ColumnError(result1.error)) {
+      const result2 = await supabase
+        .from("linked_accounts")
+        .select(LEGACY_SELECT)
+        .eq("id", accountId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (result2.error) {
+        loadError = result2.error.message;
+      } else {
+        row = result2.data as LinkedAccountTokenRow | null;
+        if (row) row.token_invalid_at = null;
+      }
+    } else {
+      loadError = result1.error.message;
+    }
+  } else {
+    row = result1.data as LinkedAccountTokenRow | null;
+  }
+
+  if (loadError) {
     throw new ApiError(
       500,
       "TOKEN_LOAD_FAILED",
-      "Failed to load linked account for token access.",
-      error.message,
+      `Failed to load linked account for token access. ${loadError}`,
+      loadError,
     );
   }
 
@@ -56,7 +90,7 @@ export async function getUsableProviderToken(
     throw new ApiError(404, "ACCOUNT_NOT_FOUND", "Linked account not found.");
   }
 
-  const account = row as LinkedAccountTokenRow;
+  const account = row;
 
   if (account.token_invalid_at) {
     throw new ApiError(

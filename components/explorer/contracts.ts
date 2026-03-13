@@ -106,7 +106,7 @@ function toFileItem(file: ExplorerFile): ExplorerFileItem {
     ext: file.ext,
     mime: file.mime,
     sizeBytes: file.sizeBytes,
-    storageProvider: file.provider,
+    provider: file.provider,
     storageAccountId: file.storageAccountId,
     previewStatus: file.previewStatus,
     syncStatus: file.syncStatus,

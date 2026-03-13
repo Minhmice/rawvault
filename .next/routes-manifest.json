@@ -1,7 +1,6 @@
 {
   "version": 3,
   "pages404": true,
-  "appType": "app",
   "caseSensitive": false,
   "basePath": "",
   "redirects": [
@@ -9,7 +8,6 @@
       "source": "/:path+/",
       "destination": "/:path+",
       "internal": true,
-      "priority": true,
       "statusCode": 308,
       "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
     }
@@ -30,12 +28,28 @@
       "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/api/files/[id]/download",
+      "regex": "^/api/files/([^/]+?)/download(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)/download(?:/)?$"
+    },
+    {
       "page": "/api/files/[id]/restore",
       "regex": "^/api/files/([^/]+?)/restore(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)/restore(?:/)?$"
+    },
+    {
+      "page": "/api/files/[id]/stream",
+      "regex": "^/api/files/([^/]+?)/stream(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)/stream(?:/)?$"
     },
     {
       "page": "/api/folders/[id]",
@@ -70,118 +84,10 @@
       "namedRegex": "^/(?:/)?$"
     },
     {
-      "page": "/_global-error",
-      "regex": "^/_global\\-error(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/_global\\-error(?:/)?$"
-    },
-    {
       "page": "/_not-found",
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
-    },
-    {
-      "page": "/api/auth/dev/seeded-signin",
-      "regex": "^/api/auth/dev/seeded\\-signin(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/dev/seeded\\-signin(?:/)?$"
-    },
-    {
-      "page": "/api/auth/session",
-      "regex": "^/api/auth/session(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/session(?:/)?$"
-    },
-    {
-      "page": "/api/auth/session/persist",
-      "regex": "^/api/auth/session/persist(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/session/persist(?:/)?$"
-    },
-    {
-      "page": "/api/auth/signin",
-      "regex": "^/api/auth/signin(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/signin(?:/)?$"
-    },
-    {
-      "page": "/api/auth/signout",
-      "regex": "^/api/auth/signout(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/signout(?:/)?$"
-    },
-    {
-      "page": "/api/auth/signup",
-      "regex": "^/api/auth/signup(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/signup(?:/)?$"
-    },
-    {
-      "page": "/api/auth/user",
-      "regex": "^/api/auth/user(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/auth/user(?:/)?$"
-    },
-    {
-      "page": "/api/files",
-      "regex": "^/api/files(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/files(?:/)?$"
-    },
-    {
-      "page": "/api/folders",
-      "regex": "^/api/folders(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/folders(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts",
-      "regex": "^/api/storage/accounts(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts/connect",
-      "regex": "^/api/storage/accounts/connect(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts/connect(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts/connect/callback",
-      "regex": "^/api/storage/accounts/connect/callback(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts/connect/callback(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts/link",
-      "regex": "^/api/storage/accounts/link(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts/link(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts/set-active",
-      "regex": "^/api/storage/accounts/set\\-active(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts/set\\-active(?:/)?$"
-    },
-    {
-      "page": "/api/storage/accounts/unlink",
-      "regex": "^/api/storage/accounts/unlink(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/storage/accounts/unlink(?:/)?$"
-    },
-    {
-      "page": "/api/uploads/dispatch",
-      "regex": "^/api/uploads/dispatch(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/uploads/dispatch(?:/)?$"
-    },
-    {
-      "page": "/api/uploads/execute",
-      "regex": "^/api/uploads/execute(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/uploads/execute(?:/)?$"
     }
   ],
   "dataRoutes": [],
@@ -192,11 +98,10 @@
     "didPostponeHeader": "x-nextjs-postponed",
     "contentTypeHeader": "text/x-component",
     "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
     "prefetchSegmentHeader": "next-router-segment-prefetch",
     "prefetchSegmentSuffix": ".segment.rsc",
-    "prefetchSegmentDirSuffix": ".segments",
-    "clientParamParsing": false,
-    "dynamicRSCPrerender": false
+    "prefetchSegmentDirSuffix": ".segments"
   },
   "rewriteHeaders": {
     "pathHeader": "x-nextjs-rewritten-path",

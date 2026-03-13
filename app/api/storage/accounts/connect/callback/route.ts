@@ -39,18 +39,21 @@ export async function GET(request: Request) {
       return ok(result.response);
     }
 
-    return NextResponse.redirect(
-      buildProviderConnectCallbackRedirectUrl(result.returnTo, result.response.callback),
-      302,
+    const relativePath = buildProviderConnectCallbackRedirectUrl(
+      result.returnTo,
+      result.response.callback,
     );
+    const absoluteUrl = new URL(relativePath, request.url).toString();
+    return NextResponse.redirect(absoluteUrl, 302);
   } catch (error) {
     if (!wantsJson(request)) {
-      const redirectUrl = buildProviderConnectCallbackErrorRedirectUrl(
+      const relativePath = buildProviderConnectCallbackErrorRedirectUrl(
         callbackInput.state,
         error,
       );
-      if (redirectUrl) {
-        return NextResponse.redirect(redirectUrl, 302);
+      if (relativePath) {
+        const absoluteUrl = new URL(relativePath, request.url).toString();
+        return NextResponse.redirect(absoluteUrl, 302);
       }
     }
 

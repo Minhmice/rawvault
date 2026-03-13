@@ -91,7 +91,12 @@ async function ensureProviderResponse(
       ? "OAUTH_TOKEN_EXCHANGE_FAILED"
       : "OAUTH_PROVIDER_METADATA_FETCH_FAILED";
 
-  throw new ApiError(status, code, `Failed during ${provider} OAuth ${stage} step.`, {
+  const message =
+    providerMessage !== `${provider} ${stage} call failed`
+      ? `Failed during ${provider} OAuth ${stage} step: ${providerMessage}`
+      : `Failed during ${provider} OAuth ${stage} step.`;
+
+  throw new ApiError(status, code, message, {
     provider,
     stage,
     providerMessage,

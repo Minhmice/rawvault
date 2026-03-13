@@ -276,9 +276,10 @@ export function UploadDispatchPrepSection() {
             <input
               className="rv-input"
               value={form.fileName}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, fileName: event.currentTarget.value }))
-              }
+              onChange={(event) => {
+                const value = event.currentTarget?.value ?? "";
+                setForm((current) => ({ ...current, fileName: value }));
+              }}
             />
           </label>
 
@@ -289,12 +290,13 @@ export function UploadDispatchPrepSection() {
               type="number"
               min={0}
               value={String(form.sizeBytes)}
-              onChange={(event) =>
+              onChange={(event) => {
+                const value = event.currentTarget?.value ?? "0";
                 setForm((current) => ({
                   ...current,
-                  sizeBytes: Number(event.currentTarget.value) || 0,
-                }))
-              }
+                  sizeBytes: Number(value) || 0,
+                }));
+              }}
             />
           </label>
 
@@ -303,12 +305,13 @@ export function UploadDispatchPrepSection() {
             <input
               className="rv-input"
               value={form.mime ?? ""}
-              onChange={(event) =>
+              onChange={(event) => {
+                const value = event.currentTarget?.value ?? "";
                 setForm((current) => ({
                   ...current,
-                  mime: event.currentTarget.value || undefined,
-                }))
-              }
+                  mime: value || undefined,
+                }));
+              }}
             />
           </label>
 
@@ -317,12 +320,13 @@ export function UploadDispatchPrepSection() {
             <select
               className="rv-select"
               value={form.preferredProvider ?? "none"}
-              onChange={(event) =>
+              onChange={(event) => {
+                const value = event.currentTarget?.value ?? "none";
                 setForm((current) => {
                   const nextProvider =
-                    event.currentTarget.value === "none"
+                    value === "none"
                       ? undefined
-                      : (event.currentTarget.value as NonNullable<
+                      : (value as NonNullable<
                           UploadDispatchRequest["preferredProvider"]
                         >);
                   const nextSelectableAccounts = nextProvider
@@ -341,8 +345,8 @@ export function UploadDispatchPrepSection() {
                       ? current.preferredAccountId
                       : undefined,
                   };
-                })
-              }
+                });
+              }}
             >
               <option value="none">No preference</option>
               <option value="gdrive">Google Drive</option>
@@ -356,13 +360,13 @@ export function UploadDispatchPrepSection() {
               className="rv-select"
               value={selectedPreferredAccountId ?? "none"}
               disabled={accountsState === "loading" || selectableAccounts.length === 0}
-              onChange={(event) =>
+              onChange={(event) => {
+                const value = event.currentTarget?.value ?? "none";
                 setForm((current) => ({
                   ...current,
-                  preferredAccountId:
-                    event.currentTarget.value === "none" ? undefined : event.currentTarget.value,
-                }))
-              }
+                  preferredAccountId: value === "none" ? undefined : value,
+                }));
+              }}
             >
               <option value="none">No account preference</option>
               {selectableAccounts.map((account) => (

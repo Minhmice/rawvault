@@ -187,7 +187,7 @@ function FileRow({
         <div className="rv-stack" style={{ gap: "0.35rem" }}>
           <div className="rv-inline">
             <strong>{file.name}</strong>
-            <ProviderBadge provider={file.storageProvider} />
+            <ProviderBadge provider={file.provider} />
             <Badge tone={previewTone(file.previewStatus)}>{previewLabel(file.previewStatus)}</Badge>
             {loading ? <span aria-live="polite"> …</span> : null}
           </div>
@@ -235,6 +235,17 @@ function FileRow({
               Move
             </Button>
           ) : null}
+          <a
+            href={`/api/files/${file.id}/download`}
+            className="rv-link"
+            download={file.name}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Download ${file.name}`}
+          >
+            Download
+          </a>
           {onDeleteFile ? (
             <Button
               type="button"

@@ -45,7 +45,7 @@ export async function createServerSupabaseClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookieList) {
+        setAll(cookieList: { name: string; value: string; options?: Record<string, unknown> }[]) {
           for (const { name, value, options } of cookieList) {
             cookieStore.set(name, value, options);
           }

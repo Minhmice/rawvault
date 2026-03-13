@@ -8,11 +8,11 @@ import type {
   FileSortBy,
   SortOrder,
 } from "@/lib/contracts";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { ExplorerControls } from "./explorer-controls";
+import { FileDetailPanel } from "./file-detail-panel";
 import { FileList } from "./file-list";
 import { FolderTree } from "./folder-tree";
 import {
@@ -290,6 +290,14 @@ export function UnifiedExplorerSection() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!selectedFileIdInView) {
+      setSelectedFileDetail(null);
+      setFileDetailState("idle");
+      setFileDetailError(null);
+    }
+  }, [selectedFileIdInView]);
+
   const selectedFolderPath = useMemo(() => {
     if (!selectedFolderId) {
       return "All files";
@@ -307,9 +315,6 @@ export function UnifiedExplorerSection() {
     previewStatus !== "all" ||
     sortBy !== defaultSortBy ||
     sortOrder !== defaultSortOrder;
-  const hasLoadedBaseExplorer = filesState === "success" && foldersState === "success";
-  const hasAnyExplorerData = folders.length > 0 || files.length > 0;
-  const showSeedCheck = hasLoadedBaseExplorer && selectedFolderId === null && !hasActiveFilters;
   const emptyStateMessage = hasActiveFilters
     ? "No files found for current filters."
     : "No files available in explorer.";
@@ -322,10 +327,10 @@ export function UnifiedExplorerSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Unified explorer shell</CardTitle>
+        <CardTitle>Unified explorer</CardTitle>
         <CardDescription>
-          Read-only explorer composed from frozen slice-2 contracts (`/api/folders`, `/api/files`)
-          with provider and preview visibility.
+          Browse folders and files from one unified library. Provider badges and preview status
+          shown per file. File detail fetched from /api/files/:id.
         </CardDescription>
       </CardHeader>
       <CardContent className="rv-stack">
@@ -348,24 +353,6 @@ export function UnifiedExplorerSection() {
             setSortOrder(defaultSortOrder);
           }}
         />
-
-        {showSeedCheck ? (
-          <section className="rv-row" aria-label="Explorer seed visibility">
-            <div className="rv-inline">
-              <strong>Seed check:</strong>
-              <Badge tone={hasAnyExplorerData ? "success" : "muted"}>
-                {hasAnyExplorerData ? "Seeded data detected" : "No seeded data detected"}
-              </Badge>
-            </div>
-            <p className="rv-muted">
-              {hasAnyExplorerData
-                ? `${folders.length} folder${folders.length === 1 ? "" : "s"} and ${files.length} file${
-                    files.length === 1 ? "" : "s"
-                  } loaded in base explorer view.`
-                : "Base explorer view is empty. Run seed flow before verification."}
-            </p>
-          </section>
-        ) : null}
 
         <div className="rv-inline">
           <strong>Path:</strong>
@@ -413,6 +400,7 @@ export function UnifiedExplorerSection() {
             onMoveFolder={handleMoveFolder}
             onDeleteFolder={handleDeleteFolder}
             actionLoading={actionLoading}
+            actionError={actionError}
           />
           <div className="rv-stack">
             {showFileLoading ? (
@@ -443,68 +431,13 @@ export function UnifiedExplorerSection() {
               />
             ) : null}
 
-            <section className="rv-row" aria-label="File detail panel">
-              <div className="rv-inline">
-                <strong>File detail:</strong>
-                <Badge tone={selectedFileIdInView ? "success" : "muted"}>
-                  {selectedFileIdInView ? "Selected file" : "No file selected"}
-                </Badge>
-                {selectedFileIdInView ? (
-                  <Button
-                    variant="link"
-                    type="button"
-                    onClick={async () => {
-                      requestSelectedFileDetail(selectedFileIdInView);
-                    }}
-                  >
-                    Refresh detail
-                  </Button>
-                ) : null}
-              </div>
-
-              {!selectedFileIdInView ? (
-                <p className="rv-muted">
-                  Select a file from the list to fetch canonical detail from `/api/files/:id`.
-                </p>
-              ) : null}
-
-              {selectedFileIdInView && fileDetailState === "loading" ? (
-                <div className="rv-list" aria-busy="true" aria-live="polite">
-                  <Skeleton height={72} />
-                </div>
-              ) : null}
-
-              {selectedFileIdInView && fileDetailState === "error" && fileDetailError ? (
-                <div className="rv-alert" role="alert">
-                  <p>{fileDetailError}</p>
-                  <Button
-                    variant="link"
-                    type="button"
-                    onClick={async () => {
-                      requestSelectedFileDetail(selectedFileIdInView);
-                    }}
-                  >
-                    Retry detail
-                  </Button>
-                </div>
-              ) : null}
-
-              {selectedFileIdInView && fileDetailState === "success" && selectedFileDetail ? (
-                <div className="rv-meta">
-                  <span>Name: {selectedFileDetail.name}</span>
-                  <span>File ID: {selectedFileDetail.id}</span>
-                  <span>Folder ID: {selectedFileDetail.folderId ?? "root"}</span>
-                  <span>Provider account ID: {selectedFileDetail.storageAccountId ?? "n/a"}</span>
-                  <span>MIME: {selectedFileDetail.mime ?? "n/a"}</span>
-                  <span>Extension: {selectedFileDetail.ext ?? "n/a"}</span>
-                  <span>Size: {selectedFileDetail.sizeBytes} bytes</span>
-                  <span>Preview status: {selectedFileDetail.previewStatus}</span>
-                  <span>Sync status: {selectedFileDetail.syncStatus}</span>
-                  <span>Preview error code: {selectedFileDetail.errorCode ?? "none"}</span>
-                  <span>Updated: {new Date(selectedFileDetail.updatedAt).toLocaleString()}</span>
-                </div>
-              ) : null}
-            </section>
+            <FileDetailPanel
+              selectedFileId={selectedFileIdInView}
+              fileDetail={selectedFileDetail}
+              detailState={fileDetailState}
+              detailError={fileDetailError}
+              onRetry={() => selectedFileIdInView && requestSelectedFileDetail(selectedFileIdInView)}
+            />
           </div>
         </div>
       </CardContent>

@@ -37,7 +37,7 @@ export function handleRouteError(error: unknown): NextResponse {
           message: "Invalid request.",
           details:
             process.env.NODE_ENV === "development"
-              ? { fields: z.flattenError(error).fieldErrors }
+              ? { fields: error.flatten().fieldErrors }
               : undefined,
         },
       },
