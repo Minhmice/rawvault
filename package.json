@@ -6,26 +6,31 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "seed:slice2:dev": "RAWVAULT_SEED_ALLOW=true node --env-file=.env.local scripts/seed-slice2-dev.mjs seed",
+    "seed:slice2:reset": "RAWVAULT_SEED_ALLOW=true RAWVAULT_SEED_ALLOW_RESET=true node --env-file=.env.local scripts/seed-slice2-dev.mjs reset",
+    "seed:slice2:reseed": "npm run seed:slice2:reset && npm run seed:slice2:dev",
+    "qa:verify-auth-slice2": "node scripts/verify-authenticated-slice2.mjs"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.0",
-    "@supabase/supabase-js": "^2.47.0",
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.1",
+    "next": "^16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sharp": "^0.34.5",
-    "zod": "^3.23.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "^15.0.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.18",
-    "typescript": "^5.0.0"
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.8",
+    "shadcn": "^4.0.6",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3"
   }
 }
