@@ -2,27 +2,62 @@ import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { ThemePanel } from "../theme-editor/ThemePanel";
+import type { AuthUser, BreadcrumbItem, LinkedAccount } from "@/lib/contracts";
 
-export function DashboardLayout({ children }: { children: ReactNode }) {
+type DashboardLayoutProps = {
+  children: ReactNode;
+  user: AuthUser | null;
+  accounts: LinkedAccount[];
+  breadcrumb: BreadcrumbItem[];
+  search: string;
+  onSearchChange: (value: string) => void;
+  onOpenRoot: () => void;
+  onSignOut: () => void;
+  onSetActiveAccount: (accountId: string) => void;
+  onUnlinkAccount: (accountId: string) => void;
+  accountActionId: string | null;
+};
+
+export function DashboardLayout({
+  children,
+  user,
+  accounts,
+  breadcrumb,
+  search,
+  onSearchChange,
+  onOpenRoot,
+  onSignOut,
+  onSetActiveAccount,
+  onUnlinkAccount,
+  accountActionId,
+}: DashboardLayoutProps) {
   return (
-    <div className="flex h-screen w-full bg-rv-bg overflow-hidden text-rv-text transition-colors duration-300">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="flex h-screen w-full bg-background overflow-hidden text-foreground">
+      <Sidebar
+        user={user}
+        accounts={accounts}
+        onSetActiveAccount={onSetActiveAccount}
+        onUnlinkAccount={onUnlinkAccount}
+        accountActionId={accountActionId}
+      />
       
-      {/* Main Content Area */}
       <div className="flex flex-col flex-1 relative overflow-hidden">
-        {/* Topbar */}
-        <Topbar />
+        <Topbar
+          user={user}
+          breadcrumb={breadcrumb}
+          search={search}
+          onSearchChange={onSearchChange}
+          onOpenRoot={onOpenRoot}
+          onSignOut={onSignOut}
+        />
         
-        {/* Dynamic Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-rv-bg p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl h-full">
             {children}
           </div>
         </main>
       </div>
 
-      {/* Theme Editor Panel (Overlay/Drawer) */}
       <ThemePanel />
     </div>
   );

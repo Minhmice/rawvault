@@ -1,10 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Palette, UserCircle, Bell } from "lucide-react";
-import { Input } from "../core/Input";
+import { Search, Palette, UserCircle, Bell, LogOut } from "lucide-react";
+import { useThemeComponents } from "../themes";
+import type { AuthUser, BreadcrumbItem } from "@/lib/contracts";
 
-export function Topbar() {
+type TopbarProps = {
+  user: AuthUser | null;
+  breadcrumb: BreadcrumbItem[];
+  search: string;
+  onSearchChange: (value: string) => void;
+  onOpenRoot: () => void;
+  onSignOut: () => void;
+};
+
+export function Topbar({
+  user,
+  breadcrumb,
+  search,
+  onSearchChange,
+  onOpenRoot,
+  onSignOut,
+}: TopbarProps) {
+  const { ThemeButton: Button, ThemeInput: Input } = useThemeComponents();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -28,49 +46,73 @@ export function Topbar() {
     <header
       className={`
         h-16 flex items-center justify-between px-4 md:px-6 z-10
-        transition-all duration-300
-        ${scrolled ? "bg-rv-surface/80 backdrop-blur-md border-b border-rv-border shadow-sm" : "bg-transparent"}
+        transition-colors duration-100
+        ${scrolled ? "bg-background border-b border-border" : "bg-transparent"}
       `}
     >
-      {/* Breadcrumbs or Path */}
       <div className="flex-1 flex items-center">
-        <div className="hidden md:flex items-center gap-2 text-sm font-medium text-rv-text-muted">
-          <span>My Vault</span>
-          <span>/</span>
-          <span className="text-rv-text">Photography 2024</span>
+        <div className="hidden md:flex items-center gap-2 text-sm font-medium font-mono uppercase tracking-wider text-muted-foreground">
+          <button type="button" onClick={onOpenRoot} className="hover:text-foreground">
+            My Vault
+          </button>
+          {breadcrumb.map((item) => (
+            <div key={item.id} className="flex items-center gap-2">
+              <span className="font-bold">/</span>
+              <span className="border-b-2 border-foreground text-foreground">{item.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Search */}
       <div className="flex-1 max-w-md mx-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-rv-text-muted" />
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 stroke-[1.5px] text-muted-foreground group-focus-within:text-foreground transition-colors duration-100" />
           <Input 
-            placeholder="Search in Vault..." 
-            className="pl-9 bg-rv-surface-muted border-transparent focus:border-rv-primary focus:bg-rv-surface h-9 rounded-full"
+            placeholder="SEARCH IN VAULT..." 
+            className="pl-9 font-mono uppercase tracking-wider text-xs border-b-2"
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
           />
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex-1 flex items-center justify-end gap-2 md:gap-4">
-        <button 
+        {user ? (
+          <span className="hidden text-xs font-mono uppercase tracking-widest text-muted-foreground lg:inline">
+            {user.email}
+          </span>
+        ) : null}
+        <Button 
+          variant="ghost" size="icon"
           onClick={toggleThemePanel}
-          className="p-2 rounded-full text-rv-text-muted hover:bg-rv-surface-muted hover:text-rv-primary transition-colors focus:outline-none focus:ring-2 focus:ring-rv-primary"
           title="Customize Workspace"
+          className="rounded-none border-2 border-transparent hover:border-foreground"
         >
-          <Palette className="h-5 w-5" />
-        </button>
-        <button 
-          className="p-2 rounded-full text-rv-text-muted hover:bg-rv-surface-muted transition-colors focus:outline-none focus:ring-2 focus:ring-rv-primary"
+          <Palette className="h-5 w-5 stroke-[1.5px]" />
+        </Button>
+        <Button 
+          variant="ghost" size="icon"
+          className="rounded-none border-2 border-transparent hover:border-foreground"
         >
-          <Bell className="h-5 w-5" />
-        </button>
-        <button 
-          className="p-1 rounded-full text-rv-text-muted hover:text-rv-primary transition-colors focus:outline-none focus:ring-2 focus:ring-rv-primary"
+          <Bell className="h-5 w-5 stroke-[1.5px]" />
+        </Button>
+        <Button 
+          variant="ghost" size="icon"
+          className="rounded-none border-2 border-transparent hover:border-foreground p-0"
         >
-          <UserCircle className="h-8 w-8" />
-        </button>
+          <UserCircle className="h-6 w-6 stroke-[1.5px]" />
+        </Button>
+        {user ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onSignOut}
+            title="Sign out"
+            className="rounded-none border-2 border-transparent hover:border-foreground"
+          >
+            <LogOut className="h-5 w-5 stroke-[1.5px]" />
+          </Button>
+        ) : null}
       </div>
     </header>
   );

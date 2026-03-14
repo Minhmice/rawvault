@@ -1,14 +1,56 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter, Outfit, Geist } from "next/font/google";
+import {
+  Inter,
+  Outfit,
+  Playfair_Display,
+  Source_Serif_4,
+  JetBrains_Mono,
+  Space_Grotesk,
+} from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider/ThemeProvider";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { TooltipProvider } from "@/components/theme/shadcn/tooltip";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+// ── Vivid fonts ──────────────────────────────────
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  weight: ["400", "500", "700", "900"],
+  display: "swap",
+});
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+// ── Monochrome fonts ─────────────────────────────
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  display: "swap",
+});
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+
+// ── Bauhaus font ─────────────────────────────────
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "RawVault - Workspace",
@@ -16,11 +58,23 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const fontVars = [
+    inter.variable,
+    outfit.variable,
+    playfair.variable,
+    sourceSerif.variable,
+    jetbrainsMono.variable,
+    spaceGrotesk.variable,
+  ].join(" ");
+
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
-      <body className={`${inter.variable} ${outfit.variable} antialiased font-sans`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${fontVars} antialiased`}>
         <ThemeProvider>
-          {children}
+          <TooltipProvider>
+            <LoadingScreen />
+            {children}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

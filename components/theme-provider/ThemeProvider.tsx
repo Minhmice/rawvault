@@ -2,43 +2,91 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
+export type ThemeName = "vivid" | "monochrome" | "bauhaus" | "linear";
+
 export type ThemeConfig = {
+  name: ThemeName;
+  label: string;
   mode: "light" | "dark";
   primaryColor: string;
-  borderRadius: string;
-  fontFamily: "sans" | "mono"; // Simple font toggle for demo
+  borderRadius: number; // 0–24 (pixels)
+  fontFamily: "sans" | "serif" | "mono";
+  animation: "vivid" | "monochrome" | "bauhaus" | "linear";
 };
 
 type ThemeContextType = {
   theme: ThemeConfig;
   setTheme: (theme: Partial<ThemeConfig>) => void;
+  applyPreset: (name: ThemeName) => void;
 };
 
-const defaultTheme: ThemeConfig = {
-  mode: "light",
-  primaryColor: "#3b82f6",
-  borderRadius: "1rem",
-  fontFamily: "sans",
+// ─── Preset definitions ──────────────────────────────────────────────────────
+export const THEME_PRESETS: Record<ThemeName, ThemeConfig> = {
+  vivid: {
+    name: "vivid",
+    label: "Vivid",
+    mode: "light",
+    primaryColor: "#3b82f6",
+    borderRadius: 12,
+    fontFamily: "sans",
+    animation: "vivid",
+  },
+  monochrome: {
+    name: "monochrome",
+    label: "Minimalist Monochrome",
+    mode: "light",
+    primaryColor: "#000000",
+    borderRadius: 0,
+    fontFamily: "serif",
+    animation: "monochrome",
+  },
+  bauhaus: {
+    name: "bauhaus",
+    label: "Bauhaus",
+    mode: "light",
+    primaryColor: "#D02020",
+    borderRadius: 0,
+    fontFamily: "sans",
+    animation: "bauhaus",
+  },
+  linear: {
+    name: "linear",
+    label: "Linear Cinematic",
+    mode: "dark",
+    primaryColor: "#5E6AD2",
+    borderRadius: 8,
+    fontFamily: "sans",
+    animation: "linear",
+  },
 };
 
+const defaultTheme: ThemeConfig = THEME_PRESETS.vivid;
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeConfig>(defaultTheme);
-  const [mounted, setMounted] = useState(false);
+function readInitialTheme(): ThemeConfig {
+  if (typeof window === "undefined") {
+    return defaultTheme;
+  }
 
-  useEffect(() => {
-    // Load from local storage on mount
-    const saved = localStorage.getItem("rv-theme");
-    if (saved) {
-      try {
-        setThemeState(JSON.parse(saved));
-      } catch (e) {
-        // ignore
-      }
+  const saved = window.localStorage.getItem("rv-theme");
+  if (!saved) {
+    return defaultTheme;
+  }
+
+  try {
+    const parsed = JSON.parse(saved) as Partial<ThemeConfig> & { borderRadius?: number | string };
+    if (typeof parsed.borderRadius === "string") {
+      const nextRadius = parseFloat(parsed.borderRadius) * 16;
+      parsed.borderRadius = Number.isNaN(nextRadius) ? 12 : nextRadius;
     }
-    setMounted(true);
-  }, []);
+    return { ...defaultTheme, ...parsed };
+  } catch {
+    return defaultTheme;
+  }
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<ThemeConfig>(readInitialTheme);
 
   const setTheme = (updates: Partial<ThemeConfig>) => {
     setThemeState((prev) => {
@@ -48,38 +96,44 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const applyPreset = (name: ThemeName) => {
+    const preset = THEME_PRESETS[name];
+    setThemeState(() => {
+      localStorage.setItem("rv-theme", JSON.stringify(preset));
+      return preset;
+    });
+  };
+
   useEffect(() => {
-    if (!mounted) return;
     const root = document.documentElement;
-    
-    // Apply dark mode
+
+    // Dark mode class
     if (theme.mode === "dark") {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
 
-    // Apply primary color and border radius dynamically
+    // Named theme class (theme-vivid | theme-monochrome | theme-bauhaus)
+    root.className = root.className.replace(/\btheme-[^\s]+\b/g, "");
+    root.classList.add(`theme-${theme.name}`);
+
+    // Animation class
+    root.className = root.className.replace(/\banim-[^\s]+\b/g, "");
+    root.classList.add(`anim-${theme.animation}`);
+
+    // Dynamic CSS variables
     root.style.setProperty("--rv-primary", theme.primaryColor);
-    root.style.setProperty("--rv-radius-lg", theme.borderRadius);
-
-    // Provide scaled corner radii
-    const radiusVal = parseFloat(theme.borderRadius);
-    const unit = theme.borderRadius.replace(/[0-9.]/g, '');
-    if (!isNaN(radiusVal)) {
-      root.style.setProperty("--rv-radius-md", `${radiusVal * 0.75}${unit}`);
-      root.style.setProperty("--rv-radius-sm", `${radiusVal * 0.5}${unit}`);
-    }
-
-  }, [theme, mounted]);
+    const r = theme.borderRadius;
+    root.style.setProperty("--rv-radius-lg", `${r}px`);
+    root.style.setProperty("--rv-radius-md", `${r * 0.75}px`);
+    root.style.setProperty("--rv-radius-sm", `${r * 0.5}px`);
+    root.style.setProperty("--radius", `${r}px`);
+  }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {!mounted ? (
-        <div style={{ visibility: "hidden", minHeight: "100vh" }}>{children}</div>
-      ) : (
-        children
-      )}
+    <ThemeContext.Provider value={{ theme, setTheme, applyPreset }}>
+      {children}
     </ThemeContext.Provider>
   );
 }
