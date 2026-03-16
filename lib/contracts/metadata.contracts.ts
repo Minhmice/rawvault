@@ -22,7 +22,7 @@ const nameSchema = z.string().trim().min(1).max(255);
 
 export const createFolderRequestSchema = z.object({
   name: nameSchema,
-  parentId: z.string().uuid().optional(),
+  parentId: z.string().uuid().nullish(),
 });
 
 export const createFolderResponseSchema = z.object({
@@ -78,8 +78,11 @@ export const fileMutationResponseSchema = restoreFileResponseSchema;
 // ---- Breadcrumb ----
 
 export const breadcrumbItemSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().optional(),
   name: z.string().min(1).max(255),
+  /** Explorer mode: segment points to (accountId, providerFolderId). Null = root (My Drive). */
+  accountId: z.string().uuid().nullable().optional(),
+  providerFolderId: z.string().min(1).nullable().optional(),
 });
 
 export const getBreadcrumbResponseSchema = z.object({

@@ -17,6 +17,9 @@ export const UPLOAD_EXECUTE_FORM_KEYS = {
   folderId: "folderId",
   preferredProvider: "preferredProvider",
   preferredAccountId: "preferredAccountId",
+  /** Explorer context: upload into this provider folder. */
+  accountId: "accountId",
+  providerFolderId: "providerFolderId",
 } as const;
 
 /**
@@ -30,6 +33,9 @@ export const uploadExecuteRequestSchema = z.object({
   folderId: z.string().uuid().optional(),
   preferredProvider: accountProviderSchema.optional(),
   preferredAccountId: z.string().uuid().optional(),
+  /** When set, upload into this provider folder (unified explorer context). */
+  accountId: z.string().uuid().optional(),
+  providerFolderId: z.string().min(1).nullable().optional(),
 });
 
 /**
@@ -67,6 +73,7 @@ export const uploadExecuteErrorCodeSchema = z.enum([
   "NO_LINKED_ACCOUNTS",
   "NO_ELIGIBLE_ACCOUNT",
   "PREFERRED_ACCOUNT_NOT_FOUND",
+  "PARENT_NOT_FOUND",
   "UPLOAD_DISPATCH_LOOKUP_FAILED",
   "ACTIVITY_LOG_WRITE_FAILED",
   "PROVIDER_UNAVAILABLE",

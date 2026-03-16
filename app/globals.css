@@ -118,11 +118,21 @@
   /* ═══════════════════════════════════════════
      THEME: VIVID
      Fonts: Outfit (headings) + Inter (body)
+     shadcn: Uses default tokens + sidebar overrides
      ═══════════════════════════════════════════ */
   .theme-vivid {
     --font-heading: var(--font-outfit, 'Outfit', sans-serif);
     --font-sans:    var(--font-inter, 'Inter', sans-serif);
     --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.205 0 0);
+    --sidebar-primary: oklch(0.55 0.2 250);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.55 0.2 250 / 50%);
   }
 
   /* ═══════════════════════════════════════════
@@ -168,6 +178,15 @@
     --font-heading: var(--font-playfair, 'Playfair Display', Georgia, serif);
     --font-sans:    var(--font-source-serif, 'Source Serif 4', Georgia, serif);
     --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.145 0 0);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.145 0 0);
+    --sidebar-border: oklch(0.145 0 0);
+    --sidebar-ring: oklch(0.145 0 0);
   }
 
   .theme-monochrome.dark {
@@ -244,6 +263,15 @@
     --font-heading: var(--font-space-grotesk, 'Space Grotesk', 'Outfit', sans-serif);
     --font-sans:    var(--font-space-grotesk, 'Space Grotesk', 'Outfit', sans-serif);
     --font-mono:    var(--font-space-grotesk, 'Space Grotesk', monospace);
+
+    --sidebar: #F0F0F0;
+    --sidebar-foreground: #121212;
+    --sidebar-primary: #D02020;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #E0E0E0;
+    --sidebar-accent-foreground: #121212;
+    --sidebar-border: #121212;
+    --sidebar-ring: #D02020;
   }
 
   /* ═══════════════════════════════════════════
@@ -295,6 +323,15 @@
     --border: oklch(1 0 0 / 6%);
     --input: oklch(1 0 0 / 10%);
     --ring: oklch(0.55 0.16 260 / 50%);
+
+    --sidebar: oklch(0.18 0 0);
+    --sidebar-foreground: oklch(0.96 0 0);
+    --sidebar-primary: oklch(0.55 0.16 260);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(1 0 0 / 5%);
+    --sidebar-accent-foreground: oklch(0.96 0 0);
+    --sidebar-border: oklch(1 0 0 / 6%);
+    --sidebar-ring: oklch(0.55 0.16 260 / 50%);
 
     /* Cinematic Background System (Linear specific) */
     background-color: #020203; /* Absolute darkest base */

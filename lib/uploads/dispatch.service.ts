@@ -14,6 +14,7 @@ import {
 } from "@/lib/contracts";
 import { ApiError } from "@/lib/api/errors";
 
+/** Legacy schema may lack is_default_write and overflow_priority (migrations not applied). */
 type LinkedAccountRow = {
   id: string;
   provider: AccountProvider;
@@ -23,6 +24,8 @@ type LinkedAccountRow = {
   is_active: boolean;
   health_status: "healthy" | "degraded" | "error";
   expires_at: string | null;
+  is_default_write?: boolean;
+  overflow_priority?: number;
 };
 
 type EvaluatedAccount = {
@@ -109,6 +112,24 @@ function compareQuotaFirst(left: EvaluatedAccount, right: EvaluatedAccount): num
   return left.account.id.localeCompare(right.account.id);
 }
 
+/** When no preferred account: default-write first, then overflow_priority ascending, then quota. Safe when columns missing (legacy schema). */
+function compareDefaultThenOverflowThenQuota(
+  left: EvaluatedAccount,
+  right: EvaluatedAccount,
+): number {
+  const leftDefault = left.account.is_default_write === true;
+  const rightDefault = right.account.is_default_write === true;
+  if (leftDefault !== rightDefault) {
+    return leftDefault ? -1 : 1;
+  }
+  const leftPri = left.account.overflow_priority ?? 0;
+  const rightPri = right.account.overflow_priority ?? 0;
+  if (leftPri !== rightPri) {
+    return leftPri - rightPri;
+  }
+  return compareQuotaFirst(left, right);
+}
+
 function mapRoutingReason(
   request: UploadDispatchRequest,
   selected: EvaluatedAccount,
@@ -167,6 +188,11 @@ async function writeDispatchLog(
   }
 }
 
+const LINKED_ACCOUNTS_SELECT_FULL =
+  "id, provider, account_email, quota_total_bytes, quota_used_bytes, is_active, health_status, expires_at, is_default_write, overflow_priority";
+const LINKED_ACCOUNTS_SELECT_LEGACY =
+  "id, provider, account_email, quota_total_bytes, quota_used_bytes, is_active, health_status, expires_at";
+
 export async function dispatchUploadTarget(
   supabase: SupabaseClient,
   userId: string,
@@ -174,19 +200,42 @@ export async function dispatchUploadTarget(
 ): Promise<UploadDispatchResponse> {
   const parsedInput = parseInput(uploadDispatchRequestSchema, input);
 
-  const { data, error } = await supabase
+  let data: unknown[] | null = null;
+  let error: { message: string } | null = null;
+
+  const resultFull = await supabase
     .from("linked_accounts")
-    .select(
-      "id, provider, account_email, quota_total_bytes, quota_used_bytes, is_active, health_status, expires_at",
-    )
+    .select(LINKED_ACCOUNTS_SELECT_FULL)
     .eq("user_id", userId);
 
+  if (resultFull.error && /column.*does not exist|does not exist/i.test(resultFull.error.message ?? "")) {
+    const resultLegacy = await supabase
+      .from("linked_accounts")
+      .select(LINKED_ACCOUNTS_SELECT_LEGACY)
+      .eq("user_id", userId);
+    if (resultLegacy.error) {
+      error = resultLegacy.error;
+    } else {
+      data = resultLegacy.data;
+    }
+  } else if (resultFull.error) {
+    error = resultFull.error;
+  } else {
+    data = resultFull.data;
+  }
+
   if (error) {
+    const msg = error.message ?? "";
+    const schemaHint =
+      /column.*does not exist|does not exist/i.test(msg) ||
+      /is_default_write|overflow_priority/.test(msg)
+        ? " Database schema may be outdated — run migrations: npx supabase db push (or supabase migration up)."
+        : "";
     throw new ApiError(
       500,
       "UPLOAD_DISPATCH_LOOKUP_FAILED",
-      "Failed to load linked accounts for dispatch.",
-      error.message,
+      `Failed to load linked accounts for dispatch.${schemaHint}`,
+      { original: msg },
     );
   }
 
@@ -202,9 +251,11 @@ export async function dispatchUploadTarget(
   const evaluatedAccounts = linkedAccounts.map((account) =>
     evaluateAccount(account, parsedInput.sizeBytes),
   );
-  const rankedEligible = evaluatedAccounts
-    .filter((account) => account.eligible)
-    .sort(compareQuotaFirst);
+  const eligible = evaluatedAccounts.filter((account) => account.eligible);
+  const rankedEligible =
+    parsedInput.preferredAccountId ?? parsedInput.preferredProvider
+      ? eligible.sort(compareQuotaFirst)
+      : eligible.sort(compareDefaultThenOverflowThenQuota);
 
   let fallbackFromAccountId: string | undefined;
   let selected: EvaluatedAccount | undefined;

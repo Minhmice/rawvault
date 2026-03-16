@@ -159,11 +159,34 @@ export async function listExplorerFolders(
   });
 }
 
+/** Return linked account ids for the user. Used to hide files from unlinked accounts. */
+async function getLinkedAccountIds(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("linked_accounts")
+    .select("id")
+    .eq("user_id", userId);
+  if (error) return [];
+  return (data ?? []).map((r: { id: string }) => r.id);
+}
+
 export async function listExplorerFiles(
   supabase: SupabaseClient,
   userId: string,
   query: ListFilesQuery,
 ): Promise<ListFilesResponse> {
+  const linkedAccountIds = await getLinkedAccountIds(supabase, userId);
+  // Only show files that belong to a currently linked account; after unlink, storage_account_id is set null
+  if (linkedAccountIds.length === 0) {
+    return listFilesResponseSchema.parse({
+      success: true,
+      files: [],
+      total: 0,
+    });
+  }
+
   let request = supabase
     .from("files")
     .select(
@@ -185,7 +208,8 @@ export async function listExplorerFiles(
       { count: "exact" },
     )
     .eq("user_id", userId)
-    .is("deleted_at", null);
+    .is("deleted_at", null)
+    .in("storage_account_id", linkedAccountIds);
 
   if (query.folderId) {
     request = request.eq("folder_id", query.folderId);

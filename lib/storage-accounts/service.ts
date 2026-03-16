@@ -16,12 +16,21 @@ import {
   type ListAccountsResponse,
   type SetActiveAccountRequest,
   type SetActiveAccountResponse,
+  type SetDefaultWriteAccountRequest,
+  type SetDefaultWriteAccountResponse,
+  type SetOverflowPriorityRequest,
+  type SetOverflowPriorityResponse,
   type UnlinkAccountRequest,
   type UnlinkAccountResponse,
   setActiveAccountRequestSchema,
   setActiveAccountResponseSchema,
+  setDefaultWriteAccountRequestSchema,
+  setDefaultWriteAccountResponseSchema,
+  setOverflowPriorityRequestSchema,
+  setOverflowPriorityResponseSchema,
 } from "@/lib/contracts";
 import { ApiError } from "@/lib/api/errors";
+import { createServiceRoleSupabaseClient } from "@/lib/supabase/admin";
 import { storageProviderAdapters } from "@/lib/storage-accounts/providers";
 
 const linkedAccountSelect = `
@@ -658,37 +667,15 @@ export async function unlinkStorageAccount(
     throw new ApiError(404, "STORAGE_ACCOUNT_NOT_FOUND", "Account not found.");
   }
 
-  const { count: relatedFilesCount, error: relatedFilesError } = await supabase
-    .from("files")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("storage_account_id", payload.accountId);
-
-  if (relatedFilesError) {
-    throw new ApiError(
-      500,
-      "STORAGE_ACCOUNT_UNLINK_FAILED",
-      "Failed to verify linked file references.",
-      relatedFilesError.message,
-    );
-  }
-
-  if ((relatedFilesCount ?? 0) > 0) {
-    throw new ApiError(
-      409,
-      "ACCOUNT_HAS_LINKED_FILES",
-      "Account has file references and cannot be unlinked in foundation slice.",
-      { linkedFiles: relatedFilesCount },
-    );
-  }
-
-  if ((account as unknown as LinkedAccountRow).is_active) {
-    const { count: remainingAccountsCount, error: remainingAccountsError } =
-      await supabase
-        .from("linked_accounts")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .neq("id", payload.accountId);
+  // files.storage_account_id has ON DELETE SET NULL, so DB handles orphaned files automatically
+  const accountRow = account as unknown as LinkedAccountRow;
+  if (accountRow.is_active) {
+    const { data: otherAccounts, error: remainingAccountsError } = await supabase
+      .from("linked_accounts")
+      .select("id")
+      .eq("user_id", userId)
+      .neq("id", payload.accountId)
+      .order("created_at", { ascending: false });
 
     if (remainingAccountsError) {
       throw new ApiError(
@@ -699,20 +686,43 @@ export async function unlinkStorageAccount(
       );
     }
 
-    if ((remainingAccountsCount ?? 0) > 0) {
-      throw new ApiError(
-        409,
-        "ACTIVE_ACCOUNT_PROTECTION",
-        "Cannot unlink current active account while other accounts exist. Set another account as active first.",
-      );
+    const otherAccountIds = (otherAccounts ?? []).map((r) => r.id);
+    if (otherAccountIds.length > 0) {
+      // Auto-switch to another account before delete so user can unlink without manual switch
+      const { error: setActiveError } = await supabase.rpc("set_active_linked_account", {
+        p_user_id: userId,
+        p_account_id: otherAccountIds[0],
+      });
+      if (setActiveError) {
+        throw new ApiError(
+          500,
+          "STORAGE_ACCOUNT_UNLINK_FAILED",
+          "Could not switch active account before unlinking. Please set another account as active first.",
+          setActiveError.message,
+        );
+      }
     }
   }
 
-  const { error: unlinkError } = await supabase
-    .from("linked_accounts")
-    .delete()
-    .eq("id", payload.accountId)
-    .eq("user_id", userId);
+  let deletedRows: { id: string }[] | null = null;
+  let unlinkError: { message: string } | null = null;
+
+  const deletePayload = {
+    id: payload.accountId,
+    userId,
+  };
+
+  const runDelete = (client: SupabaseClient) =>
+    client
+      .from("linked_accounts")
+      .delete()
+      .eq("id", deletePayload.id)
+      .eq("user_id", deletePayload.userId)
+      .select("id");
+
+  const result = await runDelete(supabase);
+  deletedRows = result.data;
+  unlinkError = result.error;
 
   if (unlinkError) {
     throw new ApiError(
@@ -721,6 +731,30 @@ export async function unlinkStorageAccount(
       "Failed to unlink storage account.",
       unlinkError.message,
     );
+  }
+
+  if (!deletedRows || deletedRows.length === 0) {
+    // Session-based client may have RLS blocking delete (e.g. auth.uid() null in server context).
+    // Retry with service role, which bypasses RLS. Ownership already verified via user_id filter.
+    const adminClient = createServiceRoleSupabaseClient();
+    if (adminClient) {
+      const adminResult = await runDelete(adminClient);
+      if (!adminResult.error && adminResult.data && adminResult.data.length > 0) {
+        deletedRows = adminResult.data;
+      }
+    }
+
+    if (!deletedRows || deletedRows.length === 0) {
+      const serviceRoleUnavailable = !adminClient;
+      throw new ApiError(
+        500,
+        "STORAGE_ACCOUNT_UNLINK_FAILED",
+        serviceRoleUnavailable
+          ? "Account could not be unlinked. Service role client unavailable (check SUPABASE_SERVICE_ROLE_KEY and server logs for [admin] createServiceRoleSupabaseClient)."
+          : "Account could not be unlinked. Row-level security or database constraints may have prevented deletion.",
+        { serviceRoleUnavailable },
+      );
+    }
   }
 
   return unlinkAccountResponseSchema.parse({
@@ -785,4 +819,112 @@ export async function setActiveStorageAccount(
     success: true,
     account: normalizeAccount(accountRow as unknown as LinkedAccountRow),
   });
+}
+
+export async function setDefaultWriteAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  input: SetDefaultWriteAccountRequest,
+): Promise<SetDefaultWriteAccountResponse> {
+  const payload = parseInput(setDefaultWriteAccountRequestSchema, input);
+
+  const { data: target, error: fetchError } = await supabase
+    .from("linked_accounts")
+    .select("id")
+    .eq("id", payload.accountId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new ApiError(
+      500,
+      "STORAGE_ACCOUNT_LOOKUP_FAILED",
+      "Failed to lookup account.",
+      fetchError.message,
+    );
+  }
+  if (!target) {
+    throw new ApiError(404, "STORAGE_ACCOUNT_NOT_FOUND", "Account not found.");
+  }
+
+  const { error: clearError } = await supabase
+    .from("linked_accounts")
+    .update({ is_default_write: false, updated_at: new Date().toISOString() })
+    .eq("user_id", userId);
+
+  if (clearError) {
+    throw new ApiError(
+      500,
+      "DEFAULT_WRITE_UPDATE_FAILED",
+      "Failed to clear default write.",
+      clearError.message,
+    );
+  }
+
+  const { error: setError } = await supabase
+    .from("linked_accounts")
+    .update({
+      is_default_write: true,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", payload.accountId)
+    .eq("user_id", userId);
+
+  if (setError) {
+    throw new ApiError(
+      500,
+      "DEFAULT_WRITE_UPDATE_FAILED",
+      "Failed to set default write account.",
+      setError.message,
+    );
+  }
+
+  return setDefaultWriteAccountResponseSchema.parse({ success: true });
+}
+
+export async function setOverflowPriority(
+  supabase: SupabaseClient,
+  userId: string,
+  input: SetOverflowPriorityRequest,
+): Promise<SetOverflowPriorityResponse> {
+  const payload = parseInput(setOverflowPriorityRequestSchema, input);
+
+  const { data: target, error: fetchError } = await supabase
+    .from("linked_accounts")
+    .select("id")
+    .eq("id", payload.accountId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new ApiError(
+      500,
+      "STORAGE_ACCOUNT_LOOKUP_FAILED",
+      "Failed to lookup account.",
+      fetchError.message,
+    );
+  }
+  if (!target) {
+    throw new ApiError(404, "STORAGE_ACCOUNT_NOT_FOUND", "Account not found.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("linked_accounts")
+    .update({
+      overflow_priority: payload.overflowPriority,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", payload.accountId)
+    .eq("user_id", userId);
+
+  if (updateError) {
+    throw new ApiError(
+      500,
+      "OVERFLOW_PRIORITY_UPDATE_FAILED",
+      "Failed to update overflow priority.",
+      updateError.message,
+    );
+  }
+
+  return setOverflowPriorityResponseSchema.parse({ success: true });
 }

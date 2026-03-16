@@ -30,7 +30,22 @@ export function createServiceRoleSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !serviceRoleKey || !isServiceRoleKey(serviceRoleKey)) {
+  if (!supabaseUrl) {
+    console.error("[admin] createServiceRoleSupabaseClient: NEXT_PUBLIC_SUPABASE_URL is missing");
+    return null;
+  }
+  if (!serviceRoleKey) {
+    console.error("[admin] createServiceRoleSupabaseClient: SUPABASE_SERVICE_ROLE_KEY is missing or empty");
+    return null;
+  }
+  if (!isServiceRoleKey(serviceRoleKey)) {
+    const payload = decodeJwtPayload(serviceRoleKey);
+    const role = payload?.role;
+    console.error(
+      "[admin] createServiceRoleSupabaseClient: SUPABASE_SERVICE_ROLE_KEY invalid format. " +
+        "Expected JWT with payload.role === 'service_role' or key starting with 'sb_secret_'. " +
+        `Got role=${role ?? "undefined"} (key length=${serviceRoleKey.length})`,
+    );
     return null;
   }
 

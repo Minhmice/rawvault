@@ -7,12 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "agents:validate": "python3 .cursor/agents/scripts/validate_agent_system.py && python3 .cursor/agents/scripts/validate_csv_schema.py",
+    "agents:test-search": "python3 .cursor/agents/scripts/test_search_smoke.py",
     "seed:slice2:dev": "node --env-file=.env.local scripts/seed-slice2-dev.mjs seed",
     "seed:slice2:reset": "node --env-file=.env.local scripts/seed-slice2-dev.mjs reset",
     "seed:slice2:reseed": "npm run seed:slice2:reset && npm run seed:slice2:dev",
     "qa:verify-auth-slice2": "node scripts/verify-authenticated-slice2.mjs",
     "qa:verify-phase8-explorer": "node --env-file=.env.local scripts/verify-phase8-explorer.mjs",
-    "qa:verify-phase9-download": "node --env-file=.env.local scripts/verify-phase9-download.mjs"
+    "qa:verify-phase9-download": "node --env-file=.env.local scripts/verify-phase9-download.mjs",
+    "qa:verify-upload-download-txt": "node --env-file=.env.local scripts/verify-upload-download-txt.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

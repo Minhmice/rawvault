@@ -1,17 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, UploadCloud } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { AlertCircle, CheckCircle2, X } from "lucide-react";
 
-import { DashboardLayout } from "@/components/workspace/DashboardLayout";
-import { FileGrid } from "@/components/workspace/FileGrid";
+import { providerConnectCallbackQueryParamKeys } from "@/lib/contracts/storage-account.contracts";
+
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useThemeComponents } from "@/components/themes";
+import { DashboardLayout } from "@/components/workspace/DashboardLayout";
+import { VaultHeader } from "@/components/workspace/VaultHeader";
+import { VaultFilterBar, type ProviderFilter } from "@/components/workspace/VaultFilterBar";
+import { FileGrid } from "@/components/workspace/FileGrid";
+import { ShareDialog } from "@/components/workspace/ShareDialog";
+import { RenameDialog } from "@/components/workspace/RenameDialog";
+import { DeleteConfirmDialog } from "@/components/workspace/DeleteConfirmDialog";
+import type { UnlinkAccountResult } from "@/components/workspace/DashboardLayout";
 import type {
-  AccountProvider,
-  AuthSignInRequest,
   AuthUser,
   BreadcrumbItem,
-  CreateFolderRequest,
   CurrentSessionResponse,
   ExplorerFile,
   ExplorerFolder,
@@ -21,6 +28,7 @@ import type {
   ListAccountsResponse,
   ListFilesResponse,
   ListFoldersResponse,
+  UnifiedExplorerListResponse,
 } from "@/lib/contracts";
 
 type ApiErrorEnvelope = {
@@ -31,23 +39,17 @@ type ApiErrorEnvelope = {
   };
 };
 
-type ProviderFilter = AccountProvider | "all";
 type PreviewFilter = FilePreviewStatus | "all";
 
-const DEFAULT_SIGN_IN: AuthSignInRequest = {
-  email: "qa+slice2@rawvault.local",
-  password: "RawVault123!",
-};
-
-function formatErrorMessage(error: unknown): string {
+function formatErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error) {
     return error.message;
   }
-  return "Unexpected request failure.";
+  return fallback;
 }
 
 async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init);
+  const response = await fetch(input, { ...init, credentials: "include" });
   const payload = (await response.json().catch(() => null)) as T | ApiErrorEnvelope | null;
 
   if (!response.ok) {
@@ -64,6 +66,40 @@ async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Pro
   }
 
   return payload as T;
+}
+
+async function unlinkAccountRequest(accountId: string): Promise<UnlinkAccountResult> {
+  const response = await fetch("/api/storage/accounts/unlink", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accountId, confirm: true }),
+    credentials: "include",
+  });
+  const payload = (await response.json().catch(() => null)) as ApiErrorEnvelope | { success?: boolean } | null;
+
+  if (!response.ok) {
+    const message =
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      payload.error &&
+      typeof payload.error === "object" &&
+      typeof payload.error.message === "string"
+        ? payload.error.message
+        : `Request failed with status ${response.status}.`;
+    const code =
+      payload &&
+      typeof payload === "object" &&
+      "error" in payload &&
+      payload.error &&
+      typeof payload.error === "object" &&
+      typeof payload.error.code === "string"
+        ? payload.error.code
+        : undefined;
+    return { ok: false, error: message, code };
+  }
+
+  return { ok: true };
 }
 
 function buildFilesQuery(params: {
@@ -93,8 +129,14 @@ function buildFilesQuery(params: {
   return query.toString();
 }
 
+type ConnectBanner = { type: "success"; providerLabel: string } | { type: "error"; message: string };
+
 export function VaultClient() {
-  const { ThemeButton: Button } = useThemeComponents();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { t } = useLocale();
+  const { ThemeCard, ThemeButton: Button } = useThemeComponents();
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
@@ -102,171 +144,195 @@ export function VaultClient() {
   const [files, setFiles] = useState<ExplorerFile[]>([]);
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  /** Unified explorer: provider-native list. When set, main view uses unified list API. */
+  const [explorerContext, setExplorerContext] = useState<{
+    accountId: string | null;
+    providerFolderId: string | null;
+    currentFolderName?: string;
+  }>({ accountId: null, providerFolderId: null });
+  const [unifiedFolders, setUnifiedFolders] = useState<UnifiedExplorerListResponse["folders"]>([]);
+  const [unifiedFiles, setUnifiedFiles] = useState<UnifiedExplorerListResponse["files"]>([]);
   const [search, setSearch] = useState("");
   const [providerFilter, setProviderFilter] = useState<ProviderFilter>("all");
-  const [previewFilter, setPreviewFilter] = useState<PreviewFilter>("all");
   const [authLoading, setAuthLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [signOutLoading, setSignOutLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [signingIn, setSigningIn] = useState(false);
-  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
   const [accountActionId, setAccountActionId] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareTarget, setShareTarget] = useState<{
+    type: "file" | "folder";
+    id: string;
+    name: string;
+  } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<{
+    type: "file" | "folder";
+    id: string;
+    name: string;
+  } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: "file" | "folder";
+    id: string;
+    name: string;
+  } | null>(null);
+  const [connectBanner, setConnectBanner] = useState<ConnectBanner | null>(null);
 
-  const refreshAllData = useCallback(async (nextFolderId: string | null = selectedFolderId) => {
-    if (!user) {
-      return;
-    }
+  const refreshAllData = useCallback(
+    async (
+      nextContext?: {
+        accountId: string | null;
+        providerFolderId: string | null;
+        currentFolderName?: string;
+      },
+    ) => {
+      if (!user) return;
 
-    setDataLoading(true);
-    setDataError(null);
+      setDataLoading(true);
+      setDataError(null);
 
-    try {
-      const foldersQuery = new URLSearchParams();
-      if (nextFolderId) {
-        foldersQuery.set("parentId", nextFolderId);
-      }
-
-      const filesQuery = buildFilesQuery({
-        folderId: nextFolderId,
-        search,
-        provider: providerFilter,
-        previewStatus: previewFilter,
-      });
-
-      const [accountsResponse, foldersResponse, filesResponse, breadcrumbResponse] =
-        await Promise.all([
-          requestJson<ListAccountsResponse>("/api/storage/accounts"),
-          requestJson<ListFoldersResponse>(
-            `/api/folders${foldersQuery.toString() ? `?${foldersQuery.toString()}` : ""}`,
-          ),
-          requestJson<ListFilesResponse>(`/api/files?${filesQuery}`),
-          nextFolderId
-            ? requestJson<GetBreadcrumbResponse>(`/api/folders/${nextFolderId}/breadcrumb`)
-            : Promise.resolve<GetBreadcrumbResponse>({ success: true, items: [] }),
-        ]);
-
-      setAccounts(accountsResponse.accounts);
-      setFolders(foldersResponse.folders);
-      setFiles(filesResponse.files);
-      setBreadcrumb(breadcrumbResponse.items);
-      setSelectedFolderId(nextFolderId);
-    } catch (error) {
-      setDataError(formatErrorMessage(error));
-    } finally {
-      setDataLoading(false);
-    }
-  }, [previewFilter, providerFilter, search, selectedFolderId, user]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadSession = async () => {
-      setAuthLoading(true);
-      setAuthError(null);
+      const context = nextContext ?? explorerContext;
 
       try {
-        const response = await requestJson<CurrentSessionResponse>("/api/auth/session");
-        if (cancelled) {
-          return;
+        const accountsResponse = await requestJson<ListAccountsResponse>("/api/storage/accounts");
+        setAccounts(accountsResponse.accounts);
+
+        if (accountsResponse.accounts.length > 0) {
+          const listParams = new URLSearchParams();
+          if (context.accountId) listParams.set("accountId", context.accountId);
+          if (context.providerFolderId) listParams.set("providerFolderId", context.providerFolderId);
+          const listResponse = await requestJson<UnifiedExplorerListResponse>(
+            `/api/explorer/list${listParams.toString() ? `?${listParams.toString()}` : ""}`,
+          );
+          setUnifiedFolders(listResponse.folders);
+          setUnifiedFiles(listResponse.files);
+          setFolders([]);
+          setFiles([]);
+          const breadcrumbItems: BreadcrumbItem[] = [
+            { name: "My Drive", accountId: null, providerFolderId: null },
+          ];
+          if (context.providerFolderId && context.accountId) {
+            breadcrumbItems.push({
+              name: context.currentFolderName ?? "Folder",
+              accountId: context.accountId,
+              providerFolderId: context.providerFolderId,
+            });
+          }
+          setBreadcrumb(breadcrumbItems);
+          setExplorerContext(context);
+        } else {
+          setUnifiedFolders([]);
+          setUnifiedFiles([]);
+          setFolders([]);
+          setFiles([]);
+          setBreadcrumb([{ name: "My Drive" }]);
         }
-        setUser(response.user);
       } catch (error) {
-        if (cancelled) {
-          return;
-        }
-        setAuthError(formatErrorMessage(error));
+        setDataError(formatErrorMessage(error, t("common.unexpectedRequestFailure")));
       } finally {
-        if (!cancelled) {
-          setAuthLoading(false);
-        }
+        setDataLoading(false);
       }
-    };
+    },
+    [explorerContext, providerFilter, search, selectedFolderId, user, t],
+  );
 
+  const loadSession = useCallback(async () => {
+    setAuthLoading(true);
+    setAuthError(null);
+    try {
+      const response = await requestJson<CurrentSessionResponse>("/api/auth/session");
+      setUser(response.user);
+    } catch (error) {
+      setAuthError(formatErrorMessage(error, t("common.unexpectedRequestFailure")));
+    } finally {
+      setAuthLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
     void loadSession();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [loadSession]);
 
   useEffect(() => {
     if (!user) {
       setAccounts([]);
       setFolders([]);
       setFiles([]);
+      setUnifiedFolders([]);
+      setUnifiedFiles([]);
       setBreadcrumb([]);
       setDataLoading(false);
       return;
     }
 
-    void refreshAllData(selectedFolderId);
-  }, [refreshAllData, selectedFolderId, user]);
+    void refreshAllData();
+  }, [refreshAllData, user]);
 
-  const handleSignIn = async () => {
-    setSigningIn(true);
-    setAuthError(null);
+  // OAuth connect callback: read URL params, show banner, clear URL, refresh on success
+  useEffect(() => {
+    const provider = searchParams.get(providerConnectCallbackQueryParamKeys.provider);
+    const status = searchParams.get(providerConnectCallbackQueryParamKeys.status);
+    const message = searchParams.get(providerConnectCallbackQueryParamKeys.message);
 
-    try {
-      await requestJson("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(DEFAULT_SIGN_IN),
+    if (!provider || !status || !pathname) return;
+
+    const providerLabel =
+      provider === "gdrive" ? t("vault.googleDrive") : provider === "onedrive" ? t("vault.oneDrive") : provider;
+
+    if (status === "success") {
+      setConnectBanner({ type: "success", providerLabel });
+      router.replace(pathname);
+      if (user) void refreshAllData();
+    } else if (status === "error" || status === "cancelled") {
+      setConnectBanner({
+        type: "error",
+        message: message?.trim() || t("workspace.storageConnectError"),
       });
-
-      const session = await requestJson<CurrentSessionResponse>("/api/auth/session");
-      setUser(session.user);
-    } catch (error) {
-      setAuthError(formatErrorMessage(error));
-    } finally {
-      setSigningIn(false);
+      router.replace(pathname);
     }
-  };
+  }, [pathname, searchParams, router, t, user, selectedFolderId, refreshAllData]);
 
   const handleSignOut = async () => {
+    setSignOutLoading(true);
+    setAuthError(null);
     try {
       await requestJson("/api/auth/signout", { method: "POST" });
       setUser(null);
       setSelectedFolderId(null);
     } catch (error) {
-      setAuthError(formatErrorMessage(error));
-    }
-  };
-
-  const handleOpenFolder = async (folderId: string) => {
-    await refreshAllData(folderId);
-  };
-
-  const handleOpenRoot = async () => {
-    await refreshAllData(null);
-  };
-
-  const handleCreateFolder = async () => {
-    const name = window.prompt("Folder name");
-    if (!name?.trim()) {
-      return;
-    }
-
-    setCreatingFolder(true);
-    setDataError(null);
-
-    const payload: CreateFolderRequest = {
-      name: name.trim(),
-      parentId: selectedFolderId ?? undefined,
-    };
-
-    try {
-      await requestJson("/api/folders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      await refreshAllData(selectedFolderId);
-    } catch (error) {
-      setDataError(formatErrorMessage(error));
+      setAuthError(formatErrorMessage(error, t("common.unexpectedRequestFailure")));
     } finally {
-      setCreatingFolder(false);
+      setSignOutLoading(false);
     }
+  };
+
+  const handleOpenFolder = (folderId: string) => {
+    void refreshAllData();
+    setSelectedFolderId(folderId);
+  };
+
+  const handleOpenRoot = () => {
+    void refreshAllData({ accountId: null, providerFolderId: null });
+  };
+
+  const handleOpenFolderUnified = (accountId: string, providerId: string, folderName: string) => {
+    void refreshAllData({
+      accountId,
+      providerFolderId: providerId,
+      currentFolderName: folderName,
+    });
+  };
+
+  const handleBreadcrumbSegment = (accountId: string, providerFolderId: string) => {
+    const segment = breadcrumb.find(
+      (b) => b.accountId === accountId && b.providerFolderId === providerFolderId,
+    );
+    void refreshAllData({
+      accountId,
+      providerFolderId,
+      currentFolderName: segment?.name ?? "Folder",
+    });
   };
 
   const handleSetActiveAccount = async (accountId: string) => {
@@ -279,35 +345,54 @@ export function VaultClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accountId }),
       });
-      await refreshAllData(selectedFolderId);
+      await refreshAllData();
     } catch (error) {
-      setDataError(formatErrorMessage(error));
+      setDataError(formatErrorMessage(error, t("common.unexpectedRequestFailure")));
     } finally {
       setAccountActionId(null);
     }
   };
 
-  const handleUnlinkAccount = async (accountId: string) => {
-    const confirmed = window.confirm("Unlink this storage account?");
-    if (!confirmed) {
-      return;
-    }
+  const handleShare = (target: { type: "file" | "folder"; id: string; name: string }) => {
+    setShareTarget(target);
+    setShareDialogOpen(true);
+  };
 
+  const handleRenameFile = (id: string, name: string) => {
+    setRenameTarget({ type: "file", id, name });
+  };
+
+  const handleRenameFolder = (id: string, name: string) => {
+    setRenameTarget({ type: "folder", id, name });
+  };
+
+  const handleDeleteFile = (id: string, name: string) => {
+    setDeleteTarget({ type: "file", id, name });
+  };
+
+  const handleDeleteFolder = (id: string, name: string) => {
+    setDeleteTarget({ type: "folder", id, name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const url = deleteTarget.type === "file" ? `/api/files/${deleteTarget.id}` : `/api/folders/${deleteTarget.id}`;
+    await requestJson(url, { method: "DELETE" });
+    await refreshAllData();
+    setDeleteTarget(null);
+  };
+
+  const handleUnlinkAccount = async (accountId: string): Promise<UnlinkAccountResult> => {
     setAccountActionId(accountId);
-    setDataError(null);
 
-    try {
-      await requestJson("/api/storage/accounts/unlink", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountId, confirm: true }),
-      });
-      await refreshAllData(selectedFolderId);
-    } catch (error) {
-      setDataError(formatErrorMessage(error));
-    } finally {
-      setAccountActionId(null);
+    const result = await unlinkAccountRequest(accountId);
+
+    if (result.ok) {
+      await refreshAllData();
     }
+
+    setAccountActionId(null);
+    return result;
   };
 
   if (authLoading) {
@@ -319,57 +404,58 @@ export function VaultClient() {
         search={search}
         onSearchChange={setSearch}
         onOpenRoot={handleOpenRoot}
+        onBreadcrumbSegment={handleBreadcrumbSegment}
         onSignOut={handleSignOut}
         onSetActiveAccount={handleSetActiveAccount}
         onUnlinkAccount={handleUnlinkAccount}
         accountActionId={accountActionId}
+        signOutLoading={signOutLoading}
       >
         <div className="rounded-[var(--radius)] border border-border bg-card p-6">
-          Checking session...
+          {t("vault.checkingSession")}
         </div>
       </DashboardLayout>
     );
   }
 
   if (!user) {
-    return (
-      <DashboardLayout
-        user={null}
-        accounts={[]}
-        breadcrumb={[]}
-        search={search}
-        onSearchChange={setSearch}
-        onOpenRoot={handleOpenRoot}
-        onSignOut={handleSignOut}
-        onSetActiveAccount={handleSetActiveAccount}
-        onUnlinkAccount={handleUnlinkAccount}
-        accountActionId={accountActionId}
-      >
-        <div className="mx-auto flex h-full max-w-xl items-center">
-          <div className="w-full rounded-[var(--radius)] border border-border bg-card p-6">
-            <h1 className="text-2xl font-heading font-bold uppercase tracking-widest">
-              Connect Frontend To Live API
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Dashboard hien tai da dung session that. Bam vao de dang nhap bang seeded QA user.
-            </p>
-            {authError ? (
-              <p className="mt-4 rounded-[var(--radius-sm)] border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-700">
-                {authError}
-              </p>
-            ) : null}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <Button onClick={handleSignIn} disabled={signingIn}>
-                {signingIn ? "Signing In..." : "Sign In Seeded QA"}
-              </Button>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                qa+slice2@rawvault.local
-              </p>
+    if (authError) {
+      return (
+        <DashboardLayout
+          user={null}
+          accounts={[]}
+          breadcrumb={[]}
+          search={search}
+          onSearchChange={setSearch}
+          onOpenRoot={handleOpenRoot}
+          onBreadcrumbSegment={handleBreadcrumbSegment}
+          onSignOut={handleSignOut}
+          onSetActiveAccount={handleSetActiveAccount}
+          onUnlinkAccount={handleUnlinkAccount}
+          accountActionId={accountActionId}
+          signOutLoading={signOutLoading}
+        >
+          <ThemeCard className="border border-destructive/40 bg-destructive/10 p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3 text-destructive">
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                <p className="text-sm">{authError}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => { setAuthError(null); void loadSession(); }}>
+                  {t("workspace.retry")}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => { setAuthError(null); router.replace("/login"); }}>
+                  {t("common.cancel")}
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
+          </ThemeCard>
+        </DashboardLayout>
+      );
+    }
+    router.replace("/login");
+    return null;
   }
 
   return (
@@ -380,108 +466,145 @@ export function VaultClient() {
       search={search}
       onSearchChange={setSearch}
       onOpenRoot={handleOpenRoot}
+      onBreadcrumbSegment={handleBreadcrumbSegment}
       onSignOut={handleSignOut}
       onSetActiveAccount={handleSetActiveAccount}
       onUnlinkAccount={handleUnlinkAccount}
       accountActionId={accountActionId}
+      signOutLoading={signOutLoading}
     >
-      <div className="flex h-full flex-col space-y-6">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="animate-enter text-3xl font-heading font-bold uppercase tracking-widest text-foreground">
-              My Vault
-            </h1>
-            <p className="mt-1 text-xs font-mono uppercase tracking-widest text-muted-foreground">
-              Frontend dang doc du lieu that tu auth, storage accounts, folders va files.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="gap-2 font-mono uppercase tracking-wider shadow-none"
-              onClick={handleCreateFolder}
-              disabled={creatingFolder}
-            >
-              <Plus className="h-4 w-4 stroke-[1.5px]" />
-              {creatingFolder ? "Creating..." : "New Folder"}
-            </Button>
-            <a
-              href="/api/storage/accounts/connect?provider=gdrive"
-              className="inline-flex items-center gap-2 rounded-[var(--radius)] bg-primary px-4 py-2 text-sm font-medium uppercase tracking-wider text-primary-foreground"
-            >
-              <UploadCloud className="h-4 w-4 stroke-[1.5px]" />
-              Connect GDrive
-            </a>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 border-b border-border pb-4">
-          {(["all", "gdrive", "onedrive"] as const).map((provider) => {
-            const active = providerFilter === provider;
-            const label =
-              provider === "all"
-                ? "All Files"
-                : provider === "gdrive"
-                  ? "Google Drive"
-                  : "OneDrive";
-            return (
-              <button
-                key={provider}
-                type="button"
-                className={`border-b-2 px-1 py-2 text-xs font-mono uppercase tracking-widest transition-colors duration-100 ${
-                  active
-                    ? "border-foreground font-bold text-foreground"
-                    : "border-transparent text-muted-foreground hover:border-foreground hover:text-foreground"
-                }`}
-                onClick={() => setProviderFilter(provider)}
+      <div className="flex h-full min-h-0 flex-col space-y-6">
+        {authError ? (
+          <ThemeCard className="border border-destructive/40 bg-destructive/10 p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3 text-destructive">
+                <AlertCircle className="h-5 w-5 shrink-0" />
+                <p className="text-sm">{authError}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => { setAuthError(null); void handleSignOut(); }}>
+                  {t("workspace.retry")}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setAuthError(null)}>
+                  {t("common.cancel")}
+                </Button>
+              </div>
+            </div>
+          </ThemeCard>
+        ) : null}
+        {connectBanner ? (
+          <ThemeCard
+            className={
+              connectBanner.type === "success"
+                ? "border border-emerald-500/40 bg-emerald-500/10 p-4"
+                : "border border-destructive/40 bg-destructive/10 p-4"
+            }
+          >
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                {connectBanner.type === "success" ? (
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
+                )}
+                <p className="text-sm">
+                  {connectBanner.type === "success"
+                    ? t("workspace.storageConnectSuccess").replace(/\{provider\}/g, connectBanner.providerLabel)
+                    : connectBanner.message}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => setConnectBanner(null)}
+                aria-label={t("common.cancel")}
               >
-                {label}
-              </button>
-            );
-          })}
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </ThemeCard>
+        ) : null}
+        <VaultHeader
+          createFolderOpen={createFolderOpen}
+          onOpenChangeCreateFolder={setCreateFolderOpen}
+          onRefresh={() => refreshAllData()}
+          accounts={accounts}
+          selectedFolderId={selectedFolderId}
+          explorerContext={
+            explorerContext.accountId != null
+              ? {
+                  accountId: explorerContext.accountId,
+                  providerFolderId: explorerContext.providerFolderId,
+                }
+              : undefined
+          }
+        />
 
-          {(["all", "ready", "pending", "failed"] as const).map((status) => {
-            const active = previewFilter === status;
-            const label =
-              status === "all"
-                ? "All Previews"
-                : status === "ready"
-                  ? "Ready Previews"
-                  : status === "pending"
-                    ? "Pending"
-                    : "Failed";
-            return (
-              <button
-                key={status}
-                type="button"
-                className={`border-b-2 px-1 py-2 text-xs font-mono uppercase tracking-widest transition-colors duration-100 ${
-                  active
-                    ? "border-foreground font-bold text-foreground"
-                    : "border-transparent text-muted-foreground hover:border-foreground hover:text-foreground"
-                }`}
-                onClick={() => setPreviewFilter(status)}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
+        <VaultFilterBar value={providerFilter} onChange={setProviderFilter} />
 
-        <div className="flex-1">
+        <div className="flex-1 min-h-0">
           <FileGrid
             folders={folders}
             files={files}
+            unifiedFolders={accounts.length > 0 ? unifiedFolders : undefined}
+            unifiedFiles={accounts.length > 0 ? unifiedFiles : undefined}
             accounts={accounts}
             breadcrumb={breadcrumb}
             loading={dataLoading}
             error={dataError}
             selectedFolderId={selectedFolderId}
-            onRetry={() => refreshAllData(selectedFolderId)}
+            onRetry={() => void refreshAllData()}
             onOpenFolder={handleOpenFolder}
             onOpenRoot={handleOpenRoot}
+            onOpenFolderUnified={handleOpenFolderUnified}
+            onOpenFileUnified={undefined}
+            onShare={handleShare}
+            onRenameFile={handleRenameFile}
+            onRenameFolder={handleRenameFolder}
+            onDeleteFile={handleDeleteFile}
+            onDeleteFolder={handleDeleteFolder}
           />
         </div>
+
+        {/* Dialogs portal to document.body; keep state and handlers in VaultClient. */}
+        {shareTarget ? (
+          <ShareDialog
+            open={shareDialogOpen}
+            onOpenChange={(open) => {
+              setShareDialogOpen(open);
+              if (!open) setShareTarget(null);
+            }}
+            resourceType={shareTarget.type}
+            resourceId={shareTarget.id}
+            resourceName={shareTarget.name}
+          />
+        ) : null}
+
+        {renameTarget ? (
+          <RenameDialog
+            open={!!renameTarget}
+            onOpenChange={(open) => {
+              if (!open) setRenameTarget(null);
+            }}
+            type={renameTarget.type}
+            id={renameTarget.id}
+            currentName={renameTarget.name}
+            onSuccess={() => refreshAllData()}
+          />
+        ) : null}
+
+        {deleteTarget ? (
+          <DeleteConfirmDialog
+            open={!!deleteTarget}
+            onOpenChange={(open) => {
+              if (!open) setDeleteTarget(null);
+            }}
+            type={deleteTarget.type}
+            name={deleteTarget.name}
+            onConfirm={handleDeleteConfirm}
+          />
+        ) : null}
       </div>
     </DashboardLayout>
   );

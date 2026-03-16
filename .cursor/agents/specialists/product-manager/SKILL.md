@@ -29,6 +29,11 @@ Define clear product intent so implementation teams can execute without ambiguit
 - Prioritized acceptance criteria.
 - Non-goals and open questions.
 
+## Tools
+
+- Scope and docs inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/product-manager/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - Does not own implementation details.

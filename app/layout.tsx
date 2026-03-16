@@ -9,9 +9,14 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider/ThemeProvider";
+import { LocaleProvider } from "@/components/i18n/LocaleProvider";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { TooltipProvider } from "@/components/theme/shadcn/tooltip";
+import { ThemePanel } from "@/components/theme-editor/ThemePanel";
 import type { ReactNode } from "react";
+
+// Layout hierarchy: RootLayout → (providers) → LoadingScreen + children → overlays (ThemePanel).
+// Dialogs (Share, Rename, Delete) portal to document.body from within page content.
 
 // ── Vivid fonts ──────────────────────────────────
 const inter = Inter({
@@ -71,10 +76,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontVars} antialiased`}>
         <ThemeProvider>
-          <TooltipProvider>
-            <LoadingScreen />
-            {children}
-          </TooltipProvider>
+          <LocaleProvider>
+            <TooltipProvider>
+              <LoadingScreen />
+              {children}
+              <ThemePanel />
+            </TooltipProvider>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

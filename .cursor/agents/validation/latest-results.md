@@ -29,3 +29,4 @@ Method: dry-run contract and routing simulation using `.cursor/agents/routing/ru
 
 - Routing, handoff template, and quality checklists are internally consistent.
 - Next validation cycle should include real task transcripts once active usage begins.
+- **2026-03-16**: Next-steps plan (`.cursor/PLAN-cursor-next-steps.md`) implemented: Phase 1 (gitignore, README MCP), Phase 3 (handoffs README, docs/execution-plans, docs/scope). Re-run this benchmark suite per runbook when ready (Phase 2).

@@ -45,11 +45,19 @@ export function handleRouteError(error: unknown): NextResponse {
     );
   }
 
+  const message =
+    error instanceof Error ? error.message : "An unexpected server error occurred.";
+  const details =
+    process.env.NODE_ENV === "development" && error != null
+      ? { raw: String(error), message: error instanceof Error ? message : undefined }
+      : undefined;
+
   return NextResponse.json(
     {
       error: {
         code: "INTERNAL_SERVER_ERROR",
-        message: "An unexpected server error occurred.",
+        message: process.env.NODE_ENV === "development" ? message : "An unexpected server error occurred.",
+        ...(details ? { details } : {}),
       },
     },
     { status: 500 },

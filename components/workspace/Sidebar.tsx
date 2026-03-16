@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Cloud, HardDrive, Users, Settings, Trash2, Clock, Star, MoreVertical, Plus } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Cloud, HardDrive, Users, Settings, Trash2, Clock, Star, MoreVertical, Plus, Unlink, LogOut, Loader2, Link2 } from "lucide-react";
 
+import { LinkAccountDialog } from "@/components/auth/LinkAccountDialog";
 import { useTheme } from "@/components/theme-provider/ThemeProvider";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { AuthUser, LinkedAccount } from "@/lib/contracts";
 import { useThemeComponents } from "../themes";
 
@@ -14,17 +17,31 @@ import { Separator } from "@/components/theme/shadcn/separator";
 import { ScrollArea } from "@/components/theme/shadcn/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/theme/shadcn/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/theme/shadcn/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/theme/shadcn/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/theme/shadcn/dropdown-menu";
 
-const navItems = [
-  { icon: HardDrive, label: "My Vault", href: "/" },
-  { icon: Users, label: "Shared with me", href: "/shared" },
-  { icon: Clock, label: "Recent", href: "/recent" },
-  { icon: Star, label: "Starred", href: "/starred" },
+const navItemKeys = [
+  { icon: HardDrive, labelKey: "sidebar.myVault" as const, href: "/" },
+  { icon: Users, labelKey: "sidebar.sharedByMe" as const, href: "/shared" },
+  { icon: Clock, labelKey: "sidebar.recent" as const, href: "/recent" },
+  { icon: Star, labelKey: "sidebar.starred" as const, href: "/starred" },
 ];
 
-const secondaryItems = [
-  { icon: Trash2, label: "Trash", href: "/trash" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+const secondaryItemKeys = [
+  { icon: Trash2, labelKey: "sidebar.trash" as const, href: "/trash" },
+  { icon: Settings, labelKey: "sidebar.settings" as const, href: "/settings" },
 ];
 
 const NAV_THEME = {
@@ -73,12 +90,33 @@ const LOGO_THEME = {
   }
 };
 
+const ACCOUNT_CARD_THEME = {
+  vivid: {
+    card: "group relative rounded-xl border border-rv-border bg-rv-surface p-4 transition-all duration-300 ease-out hover:border-rv-primary/30 hover:shadow-md",
+    badge: "rounded-full bg-rv-primary/10 px-2.5 py-1 text-[10px] font-bold text-rv-primary uppercase tracking-wider",
+  },
+  monochrome: {
+    card: "group relative rounded-none border-l-4 border-rv-text bg-rv-surface p-4 transition-colors duration-100 hover:bg-rv-surface-muted",
+    badge: "rounded-none border border-rv-text px-2 py-0.5 text-[10px] font-mono font-bold text-rv-text uppercase",
+  },
+  bauhaus: {
+    card: "group relative rounded-none border-2 border-[#121212] bg-white p-4 transition-all duration-150 hover:shadow-[3px_3px_0px_0px_#121212]",
+    badge: "rounded-none border-2 border-[#121212] bg-[#F0C020] px-2 py-0.5 text-[10px] font-black text-[#121212] uppercase",
+  },
+  linear: {
+    card: "group relative rounded-lg border border-rv-border bg-rv-surface p-4 transition-all duration-300 ease-in-out hover:border-rv-border hover:bg-rv-surface-hover",
+    badge: "rounded-md border border-rv-border bg-rv-surface-muted px-2 py-0.5 text-[10px] font-medium text-rv-text uppercase",
+  },
+};
+
 type SidebarProps = {
   user: AuthUser | null;
   accounts: LinkedAccount[];
   onSetActiveAccount: (accountId: string) => void;
-  onUnlinkAccount: (accountId: string) => void;
+  onUnlinkAccount: (accountId: string) => Promise<{ ok: boolean; error?: string; code?: string }>;
   accountActionId: string | null;
+  onSignOut: () => void;
+  signOutLoading?: boolean;
 };
 
 function formatStorage(bytes: number) {
@@ -99,20 +137,28 @@ export function Sidebar({
   onSetActiveAccount,
   onUnlinkAccount,
   accountActionId,
+  onSignOut,
+  signOutLoading = false,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useLocale();
   const { ThemeButton: Button } = useThemeComponents();
   const name = (theme.name ?? "vivid") as keyof typeof NAV_THEME;
   const nav = NAV_THEME[name] ?? NAV_THEME.vivid;
   const logo = LOGO_THEME[name] ?? LOGO_THEME.vivid;
+  const cardTheme = (ACCOUNT_CARD_THEME[name] ?? ACCOUNT_CARD_THEME.vivid) as (typeof ACCOUNT_CARD_THEME)["vivid"];
+  const [unlinkAccountId, setUnlinkAccountId] = useState<string | null>(null);
+  const [unlinkLoading, setUnlinkLoading] = useState(false);
+  const [unlinkError, setUnlinkError] = useState<string | null>(null);
   
   const totalQuota = accounts.reduce((sum, account) => sum + account.quotaTotalBytes, 0);
   const totalUsed = accounts.reduce((sum, account) => sum + account.quotaUsedBytes, 0);
   const usage = totalQuota > 0 ? Math.min(100, Math.round((totalUsed / totalQuota) * 100)) : 0;
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-rv-border bg-rv-bg max-md:hidden">
+    <aside className="flex h-full min-h-0 w-64 flex-col border-r border-rv-border bg-rv-bg max-md:hidden">
       {/* --- LOGO SECTION --- */}
       <div className={logo.wrapper}>
         <div className={logo.inner}>
@@ -132,13 +178,13 @@ export function Sidebar({
         </div>
       </div>
 
-      <ScrollArea className="flex-1 w-full flex flex-col">
+      <ScrollArea className="flex-1 min-h-0 w-full">
         {/* --- MAIN NAVIGATION --- */}
         <nav className="flex-1 space-y-1.5 px-3 py-6">
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-rv-text-muted">
-            Menu
+            {t("sidebar.menu")}
           </p>
-          {navItems.map((item) => {
+          {navItemKeys.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -147,7 +193,7 @@ export function Sidebar({
                 className={`${nav.base} ${isActive ? nav.active : nav.inactive}`}
               >
                 <item.icon className={`h-[18px] w-[18px] shrink-0 stroke-[2px] transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -157,9 +203,9 @@ export function Sidebar({
           </div>
 
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-rv-text-muted">
-            Other
+            {t("sidebar.other")}
           </p>
-          {secondaryItems.map((item) => {
+          {secondaryItemKeys.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -168,7 +214,7 @@ export function Sidebar({
                 className={`${nav.base} ${isActive ? nav.active : nav.inactive}`}
               >
                 <item.icon className="h-[18px] w-[18px] shrink-0 stroke-[2px]" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -178,97 +224,200 @@ export function Sidebar({
         <div className="px-4 pb-6 mt-2 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-rv-text-muted">
-              Linked Accounts
+              {t("sidebar.linkedAccounts")}
             </p>
-            <Tooltip>
-              <TooltipTrigger render={
-                <Link
-                  href="/api/storage/accounts/connect?provider=onedrive"
+            <LinkAccountDialog
+              trigger={
+                <button
+                  type="button"
+                  title={t("sidebar.linkStorageAccountAria")}
+                  aria-label={t("sidebar.linkStorageAccountAria")}
                   className="rounded-full p-1 transition-colors hover:bg-rv-surface-muted text-rv-text-muted hover:text-rv-text"
-                />
-              }>
+                >
                   <Plus className="h-3.5 w-3.5" />
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>Connect new OneDrive account</p>
-              </TooltipContent>
-            </Tooltip>
+                </button>
+              }
+            />
           </div>
           
           <div className="space-y-3">
             {accounts.length === 0 ? (
               <div className="rounded-xl border border-dashed border-rv-border p-4 text-center">
-                <p className="text-sm text-rv-text-muted">No linked provider accounts yet.</p>
+                <p className="text-sm text-rv-text-muted">{t("sidebar.noLinkedAccounts")}</p>
               </div>
             ) : (
               accounts.map((account) => (
-                <div key={account.id} className="group relative rounded-xl border border-rv-border bg-rv-surface p-3 shadow-sm transition-all hover:shadow-md hover:border-rv-primary/30">
+                <div key={account.id} className={cardTheme.card}>
                   <div className="flex items-start justify-between gap-2">
-                    <div className="truncate">
-                      <p className="text-xs font-bold text-rv-text truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-rv-text truncate">
                         {account.providerMetadata.providerLabel}
                       </p>
                       <Tooltip>
-                        <TooltipTrigger render={
-                          <p className="mt-0.5 text-xs text-rv-text-muted truncate cursor-default" />
-                        }>
-                            {account.accountEmail ?? account.providerMetadata.accountIdHint}
-                        </TooltipTrigger>
+                        <TooltipTrigger
+                          render={
+                            <p className="mt-0.5 text-xs text-rv-text-muted truncate cursor-default">
+                              {account.accountEmail ?? account.providerMetadata.accountIdHint}
+                            </p>
+                          }
+                        />
                         <TooltipContent side="right" className="max-w-[200px] break-all">
                           {account.accountEmail ?? account.providerMetadata.accountIdHint}
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    {account.isActive && (
-                      <span className="shrink-0 rounded-full bg-rv-primary/10 px-2 py-0.5 text-[10px] font-bold text-rv-primary uppercase tracking-wider">
-                        Active
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1 shrink-0">
+                      {account.isActive && (
+                        <span className={cardTheme.badge}>{t("sidebar.active")}</span>
+                      )}
+                      {(account.status === "reauth_required" || account.status === "error") && (
+                        <span className={cardTheme.badge}>
+                          {account.status === "reauth_required" ? t("sidebar.reauthRequired") : t("sidebar.accountError")}
+                        </span>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-md text-rv-text-muted hover:text-rv-text hover:bg-rv-surface-muted"
+                              disabled={accountActionId === account.id}
+                              aria-label={t("sidebar.accountMenu")}
+                            />
+                          }
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="right" align="center" sideOffset={8} className="min-w-[160px]">
+                          {(account.status === "reauth_required" || account.status === "error") && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const returnTo = pathname ? `&returnTo=${encodeURIComponent(pathname)}` : "";
+                                router.push(`/api/storage/accounts/connect?provider=${encodeURIComponent(account.provider)}${returnTo}`);
+                              }}
+                              className="flex items-center gap-2 cursor-pointer"
+                            >
+                              <Link2 className="h-4 w-4" />
+                              {t("sidebar.reconnect")}
+                            </DropdownMenuItem>
+                          )}
+                          {!account.isActive && (
+                            <DropdownMenuItem
+                              onClick={() => onSetActiveAccount(account.id)}
+                              disabled={accountActionId === account.id}
+                              className="cursor-pointer"
+                            >
+                              {accountActionId === account.id ? t("sidebar.saving") : t("sidebar.setActive")}
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => {
+                              setUnlinkError(null);
+                              const id = account.id;
+                              setTimeout(() => setUnlinkAccountId(id), 0);
+                            }}
+                            disabled={accountActionId === account.id}
+                          >
+                            <Unlink className="h-4 w-4" />
+                            {t("sidebar.unlink")}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
-                  
+
                   <div className="mt-3">
                     <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-[10px] font-medium text-rv-text-muted">
-                        Usage
-                      </span>
+                      <span className="text-[10px] font-medium text-rv-text-muted">{t("sidebar.usage")}</span>
                       <span className="text-[10px] font-medium text-rv-text">
                         {formatStorage(account.quotaUsedBytes)} / {formatStorage(account.quotaTotalBytes)}
                       </span>
                     </div>
-                    <Progress 
-                      value={account.quotaTotalBytes > 0 ? (account.quotaUsedBytes / account.quotaTotalBytes) * 100 : 0} 
+                    <Progress
+                      value={account.quotaTotalBytes > 0 ? (account.quotaUsedBytes / account.quotaTotalBytes) * 100 : 0}
                       className="h-1.5 bg-rv-surface-muted"
-                      // Pass color via CSS variables for themes if Progress doesn't adapt out of the box
-                      style={{ 
-                        "--primary": name === "monochrome" || name === "bauhaus" ? "var(--rv-text)" : "var(--rv-primary)"
+                      style={{
+                        "--primary": name === "monochrome" || name === "bauhaus" ? "var(--rv-text)" : "var(--rv-primary)",
                       } as React.CSSProperties}
                     />
-                  </div>
-
-                  <div className="mt-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    {!account.isActive && (
-                      <Button
-                        variant="outline"
-                        className="h-7 px-2 text-[10px] font-medium w-full"
-                        onClick={() => onSetActiveAccount(account.id)}
-                        disabled={accountActionId === account.id}
-                      >
-                        {accountActionId === account.id ? "Saving..." : "Set Active"}
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      className="h-7 px-2 text-[10px] font-medium w-full hover:bg-rv-danger/10 hover:text-rv-danger"
-                      onClick={() => onUnlinkAccount(account.id)}
-                      disabled={accountActionId === account.id}
-                    >
-                      Unlink
-                    </Button>
                   </div>
                 </div>
               ))
             )}
           </div>
+
+          <Dialog
+            open={!!unlinkAccountId}
+            onOpenChange={(open) => {
+              if (!open) {
+                setUnlinkAccountId(null);
+                setUnlinkError(null);
+              }
+            }}
+          >
+            <DialogContent showCloseButton>
+              <DialogHeader>
+                <DialogTitle>{t("sidebar.unlinkAccountTitle")}</DialogTitle>
+                <DialogDescription>
+                  {unlinkAccountId ? (() => {
+                    const acc = accounts.find((a) => a.id === unlinkAccountId);
+                    return acc
+                      ? t("sidebar.unlinkAccountDescription")
+                          .replace(/\{provider\}/g, acc.providerMetadata.providerLabel)
+                          .replace(/\{email\}/g, acc.accountEmail ?? acc.providerMetadata.accountIdHint ?? "")
+                      : t("sidebar.unlinkAccountDescriptionFallback");
+                  })() : ""}
+                </DialogDescription>
+              </DialogHeader>
+              {unlinkError && (
+                <div
+                  className="rounded-lg border border-rv-danger/50 bg-rv-danger/10 px-3 py-2 text-sm text-rv-danger"
+                  role="alert"
+                >
+                  {unlinkError}
+                </div>
+              )}
+              <DialogFooter showCloseButton={false}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setUnlinkAccountId(null);
+                    setUnlinkError(null);
+                  }}
+                  disabled={unlinkLoading}
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  variant="default"
+                  className="bg-rv-danger hover:bg-rv-danger/90"
+                  disabled={unlinkLoading}
+                  onClick={async () => {
+                    if (!unlinkAccountId) return;
+                    setUnlinkLoading(true);
+                    setUnlinkError(null);
+                    try {
+                      const result = await onUnlinkAccount(unlinkAccountId);
+                      if (result.ok) {
+                        setUnlinkAccountId(null);
+                        setUnlinkError(null);
+                      } else {
+                        setUnlinkError(result.error ?? t("common.failedToUnlink"));
+                      }
+                    } catch {
+                      setUnlinkError(t("common.unexpectedError"));
+                    } finally {
+                      setUnlinkLoading(false);
+                    }
+                  }}
+                >
+                  {unlinkLoading ? t("common.unlinking") : t("common.unlink")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </ScrollArea>
 
@@ -276,34 +425,60 @@ export function Sidebar({
       <div className="mt-auto shrink-0 border-t border-rv-border bg-rv-surface p-4">
         <div className="flex items-center gap-3 mb-4">
           <Avatar className="h-9 w-9 border border-rv-border/50">
-            <AvatarImage src={`https://avatar.vercel.sh/${user?.email ?? 'anon'}.png`} />
+            <AvatarImage src={`https://avatar.vercel.sh/${user?.email ?? "anon"}.png`} />
             <AvatarFallback className="bg-rv-primary/10 text-rv-primary font-bold">
               {user?.email?.[0]?.toUpperCase() ?? "U"}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-rv-text truncate">
-              {user?.email ?? "Signed out"}
+              {user?.email ?? t("sidebar.signedOut")}
             </p>
             <p className="text-[10px] text-rv-text-muted uppercase tracking-wider">
-              {name === "bauhaus" ? "USER_SESSION" : "Personal"}
+              {name === "bauhaus" ? t("sidebar.userSession") : t("sidebar.personal")}
             </p>
           </div>
-          <Tooltip>
-            <TooltipTrigger render={
-              <button className="h-8 w-8 flex justify-center items-center rounded-md hover:bg-rv-surface-muted text-rv-text-muted transition-colors" />
-            }>
-                <MoreVertical className="h-4 w-4" />
-            </TooltipTrigger>
-            <TooltipContent align="end">
-              <p>Account Settings</p>
-            </TooltipContent>
-          </Tooltip>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-md text-rv-text-muted hover:text-rv-text hover:bg-rv-surface-muted"
+                  aria-label={t("sidebar.accountMenu")}
+                />
+              }
+            >
+              <MoreVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="end" sideOffset={8} className="min-w-[160px]">
+              <DropdownMenuItem
+                onClick={() => router.push("/settings")}
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                {t("common.settings")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={onSignOut}
+                disabled={signOutLoading}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                {signOutLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
+                {t("sidebar.logout")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-rv-text-muted">Total Quota</span>
+            <span className="font-medium text-rv-text-muted">{t("sidebar.totalQuota")}</span>
             <span className="font-semibold text-rv-text">{usage}%</span>
           </div>
           <Progress 

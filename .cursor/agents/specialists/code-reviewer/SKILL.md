@@ -34,6 +34,7 @@ Act as an independent quality gate and report findings by severity.
 
 - Diff and file inspection tools.
 - Lint/test result inspection.
+- Local curated search: `python3 .cursor/agents/specialists/code-reviewer/scripts/search.py "<query>" [--fallback-raw]`
 
 ## Boundaries
 

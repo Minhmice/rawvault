@@ -1,107 +1,104 @@
-# Hướng dẫn sử dụng Multi-Agent + Cursor Rules (Reusable)
+# Multi-Agent System + Cursor Rules — Usage Guide (Reusable)
 
-Tài liệu này hướng dẫn cách dùng hệ thống multi-agent và Cursor rules theo hướng tái sử dụng cho nhiều project.
-
----
-
-## 1. Tổng quan
-
-Hệ thống có hai lớp hỗ trợ AI:
-
-| Lớp | Vị trí | Mục đích |
-|-----|--------|----------|
-| **Multi-Agent System** | `.cursor/agents/` | Điều phối và chuyên gia (orchestrator, planner, frontend, backend, …) |
-| **Cursor Rules** | `.cursor/rules/` | Quy tắc bền vững theo ngữ cảnh file / chủ đề |
-
-Cursor rules tự áp dụng khi mở file khớp `globs`; multi-agent được gọi qua prompt hoặc orchestrator.
+This guide explains how to use the multi-agent system and Cursor rules. The system has two layers: **Cursor rules** apply automatically when you open files matching their globs; **agents** are invoked by your prompt or by the orchestrator.
 
 ---
 
-## 2. Cursor Rules – Frontend & Backend
+## 1. Overview
+
+| Layer | Location | Purpose |
+|-------|----------|--------|
+| **Multi-Agent System** | `.cursor/agents/` | Orchestrator and specialists (frontend, backend, planner, code-reviewer, qa-tester, etc.) |
+| **Cursor Rules** | `.cursor/rules/` | Persistent rules that apply by file context or always |
+
+Rules auto-apply when you open a file that matches their `globs`. Agents are invoked when you ask for work (or when the orchestrator delegates to them).
+
+---
+
+## 2. Cursor Rules — Frontend & Backend
 
 ### 2.1 Frontend Developer (`frontend-developer.mdc`)
 
-**Kích hoạt khi**: Mở file `**/*.tsx`, `**/app/**/*.ts`, `**/components/**/*`
+**Activates when**: Opening `**/*.tsx`, `**/app/**/*.ts`, `**/components/**/*`
 
-**Project stack (tùy biến)**:
-- Framework UI (Next.js/React/Vue/Svelte)
-- Styling system (Tailwind/CSS Modules/Design System)
-- Auth/client SDK nếu có
+**Project stack (customize per project)**:
+- UI framework (Next.js / React / Vue / Svelte)
+- Styling (Tailwind / CSS Modules / design system)
+- Component library and auth/client SDK if any
 
-**Dùng cho**:
-- Trang, layout, component, routing
-- Danh sách/chi tiết, loading/error/empty state
-- Form, accessibility (a11y)
+**Use for**:
+- Pages, layout, components, routing
+- Lists/detail views, loading/error/empty states
+- Forms, accessibility (a11y)
 
-**Không dùng cho**:
+**Do not use for**:
 - API routes, server logic, schema, migration
 
-**Quy tắc chính**:
-1. Ưu tiên Server Component; `"use client"` chỉ khi cần hooks/sự kiện
-2. Dùng `components/ui/` có sẵn; thêm mới: `npx shadcn@latest add [tên]`
-3. Tailwind utility classes; tránh inline style
-4. Semantic HTML, `aria-*`, keyboard nav
-5. Luôn xử lý loading, error, empty; kiểm tra contract API
+**Critical rules**:
+1. Prefer Server Components; use `"use client"` only when you need hooks or events.
+2. Use existing `components/ui/` first; add new ones via `npx shadcn@latest add [name]`.
+3. Use Tailwind utility classes; avoid inline styles.
+4. Semantic HTML, `aria-*`, keyboard navigation.
+5. Always handle loading, error, and empty states; validate API contract.
 
 ---
 
 ### 2.2 Backend Developer (`backend-developer.mdc`)
 
-**Kích hoạt khi**: Mở file `**/api/**/*.ts`, `**/app/api/**/*`
+**Activates when**: Opening `**/api/**/*.ts`, `**/app/api/**/*`
 
-**Project stack (tùy biến)**:
-- Runtime API (Next.js Route Handlers / Express / Fastify)
+**Project stack (customize per project)**:
+- API runtime (Next.js Route Handlers / Express / Fastify)
 - Database and policy model
-- Auth provider
-- Validation library
+- Auth provider and validation library
 
-**Dùng cho**:
+**Use for**:
 - API routes (`app/api/`)
-- Server actions với DB logic
-- Kiểm tra auth, ownership, permission
-- Điều phối integration/service calls
+- Server actions with DB logic
+- Auth, ownership, and permission checks
+- Integration and service calls
 
-**Không dùng cho**:
-- UI thuần
+**Do not use for**:
+- Pure UI or styling
 - Schema, migration, RLS (→ `database-specialist`)
-- Infra/CI (→ `devops-engineer`)
+- Infra/CI only (→ `devops-engineer`)
 
-**Quy tắc chính**:
-1. Mọi route protected: verify `supabase.auth.getUser()`; trả 401 nếu chưa đăng nhập
-2. Kiểm tra `user_id` / `owner_id` trước thao tác file/folder/share
-3. Validate input bằng Zod; 400 + message rõ ràng khi lỗi
-4. Không expose `access_token`, `refresh_token` ra client
+**Critical rules**:
+1. Every protected route must verify identity and return 401 when unauthenticated.
+2. Enforce `user_id` / `owner_id` checks before file/folder/share operations.
+3. Validate input (e.g. Zod); return 400 with a clear message on invalid payloads.
+4. Never expose `access_token`, `refresh_token`, or secrets to the client.
 
 ---
 
 ### 2.3 Backend Architect (`backend-architect.mdc`)
 
-**Mục đích**: Thiết kế kiến trúc, schema, API contract, không implement chi tiết.
+**Purpose**: Design architecture, schema, and API contracts; do not implement details.
 
-**Dùng khi**: thiết kế kiến trúc hệ thống, schema, API contract, phân rã service, reliability/security strategy.
+**Use when**: Designing system architecture, schema, API contract, service decomposition, or reliability/security strategy.
 
 ---
 
 ## 3. Multi-Agent System
 
-### 3.1 Khi nào dùng Orchestrator
+### 3.1 When to use the Orchestrator
 
-- Yêu cầu nhiều bước, đụng nhiều domain (FE + BE + DB)
-- Phạm vi không rõ, cần phân rã
-- Muốn luồng chuẩn: plan → implement → review → QA → docs
+- The request is multi-step and touches several domains (FE + BE + DB).
+- Scope is unclear and needs to be broken down.
+- You want the standard flow: plan → implement → review → QA → docs.
 
-Gợi ý prompt: *"Phân tích và lên kế hoạch triển khai feature X"* hoặc *"Triển khai tính năng Y từ đầu đến cuối"*.
+**Example prompts**: *"Analyze and plan implementation for feature X"* or *"Implement feature Y end-to-end"*.
 
-### 3.2 Khi nào dùng specialist trực tiếp
+### 3.2 When to use a specialist directly
 
-- Đã rõ phạm vi: *"Implement UI cho explorer"* → frontend-developer
-- Đã rõ API: *"Thêm route upload dispatch"* → backend-developer
-- Chỉ cần review: *"Review đoạn code này"* → code-reviewer
+- Scope is clear: *"Implement UI for explorer"* → frontend-developer.
+- *"Add upload dispatch route"* → backend-developer.
+- *"Review this code"* → code-reviewer.
 
-### 3.3 Mapping nhanh (Prompt → Agent)
+### 3.3 Prompt → Agent (quick mapping)
 
-| Prompt chứa | Agent gợi ý |
-|-------------|-------------|
+| Prompt contains | Suggested agent |
+|-----------------|-----------------|
 | `plan`, `decompose`, `roadmap` | planner |
 | `UI`, `component`, `page`, `a11y` | frontend-developer |
 | `API`, `route`, `auth`, `server` | backend-developer |
@@ -110,63 +107,79 @@ Gợi ý prompt: *"Phân tích và lên kế hoạch triển khai feature X"* ho
 | `test`, `verify`, `edge case` | qa-tester |
 | `deploy`, `pipeline`, `rollback` | devops-engineer |
 | `docs`, `README`, `runbook` | documentation-writer |
+| `gws`, `google workspace`, `cli` | google-cli-specialist |
 
-Chi tiết: xem [`.cursor/agents/routing/rules.yaml`](routing/rules.yaml) và [delegation-matrix.md](routing/delegation-matrix.md).
+Details: [`.cursor/agents/routing/rules.yaml`](routing/rules.yaml) and [delegation-matrix.md](routing/delegation-matrix.md).
+
+Search helpers:
+
+- `python3 .cursor/agents/scripts/find_skill.py "<task description>"` suggests the best field and specialist.
+- `python3 .cursor/agents/specialists/<specialist-id>/scripts/search.py "<query>"` looks up specialist-local curated guidance.
+- `python3 .cursor/agents/scripts/search_curated.py "<query>" --field <field-id>` is only a dispatcher to the local specialist search script.
+
+### 3.4 Chat behavior: the system finds the right agent/skill
+
+**When you start a chat, describe your problem.** The system will classify it and either route you to the right agent/skill or run the orchestrator (plan → implement → review → QA). You do not need to @ the orchestrator; it is always on.
 
 ---
 
-## 4. Workflow đề xuất
+## 4. Suggested Workflow
 
-### Feature mới (ví dụ: module quản lý tài nguyên)
+### New feature (e.g. a resource module)
 
-1. **Product / Scope** (nếu chưa rõ): *"Xác định acceptance criteria cho module X"* → product-manager
-2. **Plan**: *"Lên plan triển khai module X"* → planner
-3. **Implement**:
-   - FE: *"Implement UI cho luồng người dùng chính"* (mở file `.tsx` → rule frontend)
-   - BE: *"Implement API cho luồng dữ liệu chính"* (mở file API → rule backend)
-4. **Review**: *"Review thay đổi auth và permission"* → code-reviewer
-5. **QA**: *"Test edge cases và regression"* → qa-tester
-6. **Docs** (nếu cần): *"Cập nhật README/API docs"* → documentation-writer
+1. **Product / scope** (if unclear): *"Define acceptance criteria for module X"* → product-manager.
+2. **Plan**: *"Create implementation plan for module X"* → planner.
+3. **Implement**: FE (*"Implement UI for main user flow"* — open `.tsx` so frontend rule applies); BE (*"Implement API for main data flow"* — open API files so backend rule applies).
+4. **Review**: *"Review auth and permission changes"* → code-reviewer.
+5. **QA**: *"Test edge cases and regression"* → qa-tester.
+6. **Docs** (if needed): *"Update README/API docs"* → documentation-writer.
 
 ### Bug fix
 
-1. *"Debug trạng thái bị kẹt/không đồng bộ"* → debugger
-2. *"Review fix trước khi merge"* → code-reviewer
-3. *"Verify không tái phát"* → qa-tester
+1. *"Debug stuck or out-of-sync state"* → debugger.
+2. *"Review the fix before merge"* → code-reviewer.
+3. *"Verify it does not regress"* → qa-tester.
 
 ---
 
-## 5. Kết hợp Rules với Agents
+## 5. Combining Rules and Agents
 
-- **Rule tự động**: Mở file `.tsx` → frontend-developer rule được load; prompt sẽ có ngữ cảnh phù hợp.
-- **Agent thủ công**: Gọi trực tiếp, ví dụ *"Làm vai trò frontend developer, implement FileItem component"*.
-- **Orchestrator**: Prompt như *"Triển khai feature X end-to-end"* → orchestrator sẽ route sang planner, rồi specialist phù hợp.
+- **Rules (automatic)**: Opening a `.tsx` file loads the frontend-developer rule so your prompt has the right context.
+- **Agents (by prompt)**: Invoke directly, e.g. *"Act as frontend developer and implement the FileItem component"*.
+- **Orchestrator**: A prompt like *"Implement feature X end-to-end"* triggers the orchestrator, which then routes to the right specialists.
 
 ---
 
-## 6. Thư mục quan trọng
+## 6. Important Folders
 
 ```
 .cursor/
-├── agents/                    # Multi-agent system
-│   ├── registry.yaml         # Danh sách agent
-│   ├── orchestrator/         # Skill orchestrator
-│   ├── specialists/          # Các specialist (planner, frontend, backend, …)
-│   ├── routing/              # Routing rules, delegation matrix
-│   ├── shared/               # Contract, templates, checklists
-│   └── compat/               # External skill compatibility
-└── rules/                    # Cursor rules
-    ├── frontend-developer.mdc # Rule frontend
-    ├── backend-developer.mdc  # Rule backend (implementation)
-    └── backend-architect.mdc # Rule backend (architecture)
+├── agents/                     # Multi-agent system
+│   ├── mappings/               # Canonical rule ownership and skill-finder CSVs
+│   ├── registry.yaml           # Agent list
+│   ├── orchestrator/           # Orchestrator SKILL and handoff template
+│   ├── scripts/                # Shared routing dispatch and validation scripts
+│   ├── specialists/            # Specialist SKILLs plus specialist-local data/ and scripts/
+│   ├── skills/                 # Job specs by field: one SKILL.md per field (frontend, backend, …); each describes the job and what to use (rule + specialist)
+│   ├── routing/                # Routing rules, delegation matrix
+│   ├── shared/                 # Contract, templates, checklists
+│   └── compat/                 # External skill compatibility
+└── rules/                      # Cursor rules
+    ├── always-orchestrator-skill.mdc  # Orchestrator always on
+    ├── agents-orchestrator.mdc
+    ├── frontend-developer.mdc
+    ├── backend-developer.mdc
+    └── backend-architect.mdc
 ```
+
+Frontend keeps its existing specialist-local UI search system. Other specialists use one `data/catalog.csv` and one local `scripts/search.py`.
 
 ---
 
-## 7. Lưu ý khi tái sử dụng cho project khác
+## 7. Reusing in Another Project
 
-- Đổi `description` + `globs` trong từng rule theo cấu trúc codebase mới.
-- Cập nhật mục `Project Stack Context` trong rule frontend/backend cho đúng stack.
-- Giữ nguyên boundaries để tránh chồng vai trò giữa FE/BE/DB/DevOps.
-- Import skill ngoài: xem [`.cursor/agents/compat/external-skill-map.yaml`](compat/external-skill-map.yaml) và [conflict-resolution.md](compat/conflict-resolution.md).
-- Dùng template rút gọn: [`.cursor/agents/RULES-TEMPLATE.md`](RULES-TEMPLATE.md).
+- Update `description` and `globs` in each rule to match the new codebase.
+- Update the **Project Stack Context** in frontend/backend rules.
+- Keep the same boundaries (FE / BE / DB / DevOps) to avoid overlapping roles.
+- External skills: see [`.cursor/agents/compat/external-skill-map.yaml`](compat/external-skill-map.yaml) and [conflict-resolution.md](compat/conflict-resolution.md).
+- Use the short template: [`.cursor/agents/RULES-TEMPLATE.md`](RULES-TEMPLATE.md).

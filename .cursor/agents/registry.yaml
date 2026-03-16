@@ -8,79 +8,99 @@ system:
 agents:
   - id: orchestrator
     type: orchestrator
+    field_id: orchestrator
     skill: .cursor/agents/orchestrator/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: high
   - id: planner
     type: specialist
+    field_id: planner
     skill: .cursor/agents/specialists/planner/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: product-manager
     type: specialist
+    field_id: product-manager
     skill: .cursor/agents/specialists/product-manager/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: research-analyst
     type: specialist
+    field_id: research
     skill: .cursor/agents/specialists/research-analyst/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: frontend-developer
     type: specialist
+    field_id: frontend
     skill: .cursor/agents/specialists/frontend-developer/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: backend-developer
     type: specialist
+    field_id: backend
     skill: .cursor/agents/specialists/backend-developer/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: typescript-specialist
     type: specialist
+    field_id: typescript
     skill: .cursor/agents/specialists/typescript-specialist/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: database-specialist
     type: specialist
+    field_id: database
     skill: .cursor/agents/specialists/database-specialist/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: debugger
     type: specialist
+    field_id: debugger
     skill: .cursor/agents/specialists/debugger/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: high
   - id: code-reviewer
     type: specialist
+    field_id: code-review
     skill: .cursor/agents/specialists/code-reviewer/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: qa-tester
     type: specialist
+    field_id: qa
     skill: .cursor/agents/specialists/qa-tester/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced
   - id: documentation-writer
     type: specialist
+    field_id: documentation
     skill: .cursor/agents/specialists/documentation-writer/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: fast
   - id: devops-engineer
     type: specialist
+    field_id: devops
     skill: .cursor/agents/specialists/devops-engineer/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: high
+  - id: google-cli-specialist
+    type: specialist
+    field_id: google-cli
+    skill: .cursor/agents/specialists/google-cli-specialist/SKILL.md
+    enabled: true
+    auto_routable: true
+    model_tier: balanced

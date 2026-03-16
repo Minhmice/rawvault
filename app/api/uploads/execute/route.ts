@@ -32,6 +32,17 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get(UPLOAD_EXECUTE_FORM_KEYS.file);
+    const folderIdRaw = parseFormValue(formData, UPLOAD_EXECUTE_FORM_KEYS.folderId);
+    const preferredAccountId = parseFormValue(
+      formData,
+      UPLOAD_EXECUTE_FORM_KEYS.preferredAccountId,
+    );
+    const accountIdRaw = parseFormValue(formData, UPLOAD_EXECUTE_FORM_KEYS.accountId);
+    const providerFolderIdRaw = parseFormValue(
+      formData,
+      UPLOAD_EXECUTE_FORM_KEYS.providerFolderId,
+    );
+
     if (!file || !(file instanceof File)) {
       throw new ApiError(400, "VALIDATION_ERROR", "Missing or invalid file part.");
     }
@@ -44,14 +55,9 @@ export async function POST(request: Request) {
         ? Number.parseInt(sizeBytesRaw, 10)
         : file.size;
     const mime = parseFormValue(formData, UPLOAD_EXECUTE_FORM_KEYS.mime);
-    const folderIdRaw = parseFormValue(formData, UPLOAD_EXECUTE_FORM_KEYS.folderId);
     const preferredProvider = parseFormValue(
       formData,
       UPLOAD_EXECUTE_FORM_KEYS.preferredProvider,
-    );
-    const preferredAccountId = parseFormValue(
-      formData,
-      UPLOAD_EXECUTE_FORM_KEYS.preferredAccountId,
     );
 
     const parsedProvider = accountProviderSchema.safeParse(preferredProvider);
@@ -62,6 +68,11 @@ export async function POST(request: Request) {
       folderId: folderIdRaw?.trim() || undefined,
       preferredProvider: parsedProvider.success ? parsedProvider.data : undefined,
       preferredAccountId: preferredAccountId?.trim() || undefined,
+      accountId: accountIdRaw?.trim() || undefined,
+      providerFolderId:
+        providerFolderIdRaw === "" || providerFolderIdRaw == null
+          ? undefined
+          : providerFolderIdRaw.trim(),
     });
 
     const body = await file.arrayBuffer();

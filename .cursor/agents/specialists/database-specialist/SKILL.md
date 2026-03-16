@@ -29,6 +29,11 @@ Own data-layer correctness, integrity, and migration safety.
 - Policy/query updates and rollback notes.
 - Data risk and compatibility notes.
 
+## Tools
+
+- SQL and migration inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/database-specialist/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - No frontend ownership.

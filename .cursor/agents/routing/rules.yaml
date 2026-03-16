@@ -43,6 +43,8 @@ signals:
     keywords: ["readme", "docs", "runbook", "how-to", "changelog"]
   devops-engineer:
     keywords: ["deploy", "pipeline", "rollback", "slo", "monitoring", "ci/cd"]
+  google-cli-specialist:
+    keywords: ["gws", "google workspace", "google-cli", "cli", "discovery", "auth", "commands", "validate"]
 quality_gates:
   mandatory_before_done:
     - code-reviewer

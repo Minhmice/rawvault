@@ -35,6 +35,7 @@ Turn goals into actionable execution plans with clear phases and decision points
 
 - Repository read/search tools.
 - Planning templates and checklists.
+- Local curated search: `python3 .cursor/agents/specialists/planner/scripts/search.py "<query>" [--fallback-raw]`
 
 ## Boundaries
 

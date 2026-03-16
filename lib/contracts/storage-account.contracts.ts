@@ -217,6 +217,23 @@ export const setActiveAccountResponseSchema = z.object({
   account: linkedAccountSchema,
 });
 
+export const setDefaultWriteAccountRequestSchema = z.object({
+  accountId: z.string().uuid(),
+});
+
+export const setDefaultWriteAccountResponseSchema = z.object({
+  success: z.literal(true),
+});
+
+export const setOverflowPriorityRequestSchema = z.object({
+  accountId: z.string().uuid(),
+  overflowPriority: z.number().int().min(0),
+});
+
+export const setOverflowPriorityResponseSchema = z.object({
+  success: z.literal(true),
+});
+
 export const apiErrorSchema = z.object({
   error: z.object({
     code: z.string().min(1),
@@ -259,6 +276,10 @@ export type UnlinkAccountRequest = z.infer<typeof unlinkAccountRequestSchema>;
 export type UnlinkAccountResponse = z.infer<typeof unlinkAccountResponseSchema>;
 export type SetActiveAccountRequest = z.infer<typeof setActiveAccountRequestSchema>;
 export type SetActiveAccountResponse = z.infer<typeof setActiveAccountResponseSchema>;
+export type SetDefaultWriteAccountRequest = z.infer<typeof setDefaultWriteAccountRequestSchema>;
+export type SetDefaultWriteAccountResponse = z.infer<typeof setDefaultWriteAccountResponseSchema>;
+export type SetOverflowPriorityRequest = z.infer<typeof setOverflowPriorityRequestSchema>;
+export type SetOverflowPriorityResponse = z.infer<typeof setOverflowPriorityResponseSchema>;
 export type ApiError = z.infer<typeof apiErrorSchema>;
 export type StorageAccountsErrorResponse = z.infer<
   typeof storageAccountsErrorResponseSchema

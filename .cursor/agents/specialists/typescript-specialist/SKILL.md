@@ -29,6 +29,11 @@ Strengthen correctness through strict, maintainable type contracts.
 - Error resolution summary.
 - Notes on residual type risk.
 
+## Tools
+
+- Type-checking and contract inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/typescript-specialist/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - No ownership of product behavior decisions.

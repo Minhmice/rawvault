@@ -29,6 +29,11 @@ Ensure safe, observable, and reversible delivery to runtime environments.
 - Monitoring/alert checks.
 - Release go/no-go recommendation.
 
+## Tools
+
+- CI/CD and environment inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/devops-engineer/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - No ownership of feature behavior implementation.

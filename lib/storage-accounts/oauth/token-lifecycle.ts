@@ -39,6 +39,7 @@ type LinkedAccountTokenRow = {
 export type UsableTokenResult = {
   accessToken: string;
   accountId: string;
+  provider: AccountProvider;
 };
 
 export async function getUsableProviderToken(
@@ -82,7 +83,7 @@ export async function getUsableProviderToken(
       500,
       "TOKEN_LOAD_FAILED",
       `Failed to load linked account for token access. ${loadError}`,
-      loadError,
+      { originalError: loadError },
     );
   }
 
@@ -131,7 +132,7 @@ export async function getUsableProviderToken(
 
   if (needsRefresh && account.refresh_token_encrypted) {
     const refreshed = await refreshAndPersistToken(supabase, userId, account);
-    return { accessToken: refreshed.accessToken, accountId: account.id };
+    return { accessToken: refreshed.accessToken, accountId: account.id, provider: account.provider };
   }
 
   if (needsRefresh && !account.refresh_token_encrypted) {
@@ -143,7 +144,7 @@ export async function getUsableProviderToken(
     );
   }
 
-  return { accessToken, accountId: account.id };
+  return { accessToken, accountId: account.id, provider: account.provider };
 }
 
 async function refreshAndPersistToken(

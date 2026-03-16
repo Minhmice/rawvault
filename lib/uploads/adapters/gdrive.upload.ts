@@ -27,24 +27,28 @@ function extractDriveError(payload: unknown): string | null {
   return null;
 }
 
-const BOUNDARY = "rv_upload_boundary_" + Math.random().toString(36).slice(2);
-
 function buildMultipartBody(
+  boundary: string,
   fileName: string,
   mime: string,
   body: Buffer,
+  parentFolderId?: string | null,
 ): Buffer {
+  const metadata: Record<string, unknown> = { name: fileName };
+  if (parentFolderId && parentFolderId.trim().length > 0) {
+    metadata.parents = [parentFolderId.trim()];
+  }
   const metaPart = Buffer.from(
-    `--${BOUNDARY}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
-      JSON.stringify({ name: fileName }) +
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
+      JSON.stringify(metadata) +
       "\r\n",
     "utf-8",
   );
   const filePart = Buffer.from(
-    `--${BOUNDARY}\r\nContent-Type: ${mime}\r\n\r\n`,
+    `--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`,
     "utf-8",
   );
-  const endPart = Buffer.from(`\r\n--${BOUNDARY}--\r\n`, "utf-8");
+  const endPart = Buffer.from(`\r\n--${boundary}--\r\n`, "utf-8");
   return Buffer.concat([metaPart, filePart, body, endPart]);
 }
 
@@ -57,13 +61,20 @@ export async function uploadToGoogleDrive(
   const body =
     input.body instanceof ArrayBuffer ? Buffer.from(input.body) : input.body;
   const mime = input.mime ?? "application/octet-stream";
-  const multipart = buildMultipartBody(input.fileName, mime, body);
+  const boundary = "rv_upload_" + Math.random().toString(36).slice(2) + "_" + Date.now().toString(36);
+  const multipart = buildMultipartBody(
+    boundary,
+    input.fileName,
+    mime,
+    body,
+    input.parentFolderId,
+  );
 
   const response = await fetch(url.toString(), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${input.accessToken}`,
-      "Content-Type": `multipart/related; boundary=${BOUNDARY}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
       "Content-Length": String(multipart.length),
     },
     body: new Uint8Array(multipart),

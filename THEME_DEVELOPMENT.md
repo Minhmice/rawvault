@@ -47,7 +47,9 @@ Key UI Elements & Components to check and update:
 - **Interactive Core (`ThemeButton`, `ThemeCard`, `ThemeInput`)**: Ensure these core wrappers correctly implement the new theme's animation personality (e.g., easing curves, transition durations, multi-layer shadows, transforms).
 - **Popovers & Overlays (`Tooltip`, `DropdownMenu`, `Dialog`, `ContextMenu`)**: Verify that the floating elements' background colors, border radius, border thickness, and drop shadows align with the new theme's aesthetic. Add theme-specific modifiers if they don't inherit correctly from global CSS.
 - **Data Display (`Progress`, `Avatar`, `Badge`, `Separator`)**: Ensure indicators and structural elements reflect the theme. For instance, `Progress` bars might need explicit CSS variables passed via inline styles (e.g., `style={{ "--primary": ... }}`) or conditional rounded corners, while `Avatar` borders might need thickness adjustments.
-- **`ThemePanel.tsx`**: Add the new theme's accent color palette to `ACCENT_PALETTES` and build a dedicated visual preset selection card so the user can activate the new theme.
+- **`ThemePanel.tsx`**: Add the new theme's accent color palette to `ACCENT_PALETTES` and build a dedicated visual preset selection card in `THEME_CARDS` so the user can activate the new theme.
+- **shadcn Sidebar Tokens**: Each `.theme-[name]` block should define `--sidebar`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-accent`, `--sidebar-border`, `--sidebar-ring` for consistent popover/sidebar styling.
+- **UX Research**: See [docs/theme-ux-research.md](docs/theme-ux-research.md) for shadcn theming best practices and design token architecture.
 
 ---
 

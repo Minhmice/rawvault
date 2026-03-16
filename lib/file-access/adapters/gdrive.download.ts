@@ -1,6 +1,8 @@
 /**
  * Phase 9: Google Drive download adapter.
- * Fetches file content via Drive API v3 alt=media.
+ * Fetches file content via Drive API v3:
+ * - files.get with alt=media for binary files
+ * - files.export for Google Docs/Sheets/Slides (application/vnd.google-apps.*)
  */
 
 import { ApiError } from "@/lib/api/errors";
@@ -8,12 +10,37 @@ import { ApiError } from "@/lib/api/errors";
 export type GDriveDownloadInput = {
   accessToken: string;
   providerFileId: string;
+  /** If set and is a Google Workspace mime, uses files.export instead of files.get */
+  mimeType?: string | null;
 };
 
 export type GDriveDownloadResult = {
   body: ReadableStream<Uint8Array>;
   contentType: string;
   contentLength: number | null;
+};
+
+const GOOGLE_APPS_DOCUMENT = "application/vnd.google-apps.document";
+const GOOGLE_APPS_SPREADSHEET = "application/vnd.google-apps.spreadsheet";
+const GOOGLE_APPS_PRESENTATION = "application/vnd.google-apps.presentation";
+const GOOGLE_APPS_DRAWING = "application/vnd.google-apps.drawing";
+const GOOGLE_APPS_FORM = "application/vnd.google-apps.form";
+
+const GOOGLE_APPS_MIMES = new Set([
+  GOOGLE_APPS_DOCUMENT,
+  GOOGLE_APPS_SPREADSHEET,
+  GOOGLE_APPS_PRESENTATION,
+  GOOGLE_APPS_DRAWING,
+  GOOGLE_APPS_FORM,
+]);
+
+/** Export MIME types for Google Workspace files (drive.readonly allows files.export) */
+const EXPORT_MIME_MAP: Record<string, string> = {
+  [GOOGLE_APPS_DOCUMENT]: "application/pdf",
+  [GOOGLE_APPS_SPREADSHEET]: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  [GOOGLE_APPS_PRESENTATION]: "application/pdf",
+  [GOOGLE_APPS_DRAWING]: "image/png",
+  [GOOGLE_APPS_FORM]: "application/pdf",
 };
 
 function extractDriveError(payload: unknown): string | null {
@@ -31,13 +58,27 @@ function extractDriveError(payload: unknown): string | null {
   return null;
 }
 
+function isGoogleWorkspaceFile(mimeType: string | null | undefined): boolean {
+  return !!mimeType && GOOGLE_APPS_MIMES.has(mimeType);
+}
+
 export async function downloadFromGoogleDrive(
   input: GDriveDownloadInput,
 ): Promise<GDriveDownloadResult> {
-  const url = new URL(
-    `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(input.providerFileId)}`,
-  );
-  url.searchParams.set("alt", "media");
+  const useExport =
+    isGoogleWorkspaceFile(input.mimeType) &&
+    EXPORT_MIME_MAP[input.mimeType!];
+
+  const baseUrl = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(input.providerFileId)}`;
+  const url = useExport
+    ? new URL(`${baseUrl}/export`)
+    : new URL(baseUrl);
+
+  if (useExport) {
+    url.searchParams.set("mimeType", EXPORT_MIME_MAP[input.mimeType!]);
+  } else {
+    url.searchParams.set("alt", "media");
+  }
 
   const response = await fetch(url.toString(), {
     method: "GET",

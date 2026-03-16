@@ -35,6 +35,7 @@ Provide objective pass/fail validation with reproducible evidence.
 - Test command execution.
 - Manual scenario validation.
 - Log or error output capture.
+- Local curated search: `python3 .cursor/agents/specialists/qa-tester/scripts/search.py "<query>" [--fallback-raw]`
 
 ## Boundaries
 

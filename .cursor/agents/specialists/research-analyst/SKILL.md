@@ -28,6 +28,11 @@ Reduce decision risk with focused, cited evidence.
 - Confidence level and uncertainty points.
 - Recommendation options with tradeoffs.
 
+## Tools
+
+- Repo, docs, and source inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/research-analyst/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - No direct code modification ownership.

@@ -417,8 +417,15 @@ export async function restoreFolder(
   if (!folder) {
     throw new ApiError(404, "FOLDER_NOT_FOUND", "Folder not found.");
   }
-  if (!folder.parent_id) {
-    // Already had no parent; just clear deleted_at
+  if (folder.parent_id) {
+    const parent = await getFolderOwned(supabase, userId, folder.parent_id);
+    if (!parent) {
+      throw new ApiError(
+        404,
+        "PARENT_NOT_FOUND",
+        "Parent folder not found or is deleted. Restore the parent first.",
+      );
+    }
   }
 
   const { data, error } = await supabase
@@ -573,6 +580,16 @@ export async function restoreFile(
   const file = await getFileOwned(supabase, userId, fileId, true);
   if (!file) {
     throw new ApiError(404, "FILE_NOT_FOUND", "File not found.");
+  }
+  if (file.folder_id) {
+    const folder = await getFolderOwned(supabase, userId, file.folder_id);
+    if (!folder) {
+      throw new ApiError(
+        404,
+        "PARENT_NOT_FOUND",
+        "Folder not found or is deleted. Restore the folder first.",
+      );
+    }
   }
 
   const { data, error } = await supabase

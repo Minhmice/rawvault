@@ -1,5 +1,6 @@
 ---
 name: backend-developer
+model: gpt-5.3-codex-xhigh
 description: Implement APIs, server-side business logic, auth checks, and service integrations. Use for routes, handlers, and backend workflows.
 ---
 # Backend Developer
@@ -35,6 +36,7 @@ Build reliable backend behavior with clear contracts, safety checks, and maintai
 - Code editing tools.
 - Lint/build/test commands.
 - Integration checks and log inspection.
+- Local curated search: `python3 .cursor/agents/specialists/backend-developer/scripts/search.py "<query>" [--fallback-raw]`
 
 ## Boundaries
 

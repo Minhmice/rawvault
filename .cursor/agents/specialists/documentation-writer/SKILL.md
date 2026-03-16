@@ -28,6 +28,11 @@ Keep documentation aligned with real system behavior and operational needs.
 - Changelog or release notes when relevant.
 - Known limitations and next actions.
 
+## Tools
+
+- Doc inspection and diff tools.
+- Local curated search: `python3 .cursor/agents/specialists/documentation-writer/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - Do not invent behavior not supported by implementation.

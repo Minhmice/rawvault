@@ -116,6 +116,7 @@ const googleDriveOAuthAdapter: OAuthProviderAdapter = {
         "email",
         "profile",
         "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive.readonly", // Required for browse/list; existing users must re-connect
       ].join(" "),
       access_type: "offline",
       prompt: "consent",

@@ -2,66 +2,55 @@
 
 import { useState, useEffect } from "react";
 import { X, Palette, LayoutTemplate, Sparkles, Monitor, Moon } from "lucide-react";
+import type { MessageKey } from "@/lib/i18n/messages";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useTheme, type ThemeName } from "../theme-provider/ThemeProvider";
 
 // ─── Per-theme accent color palettes ─────────────────────────────────────────
-const ACCENT_PALETTES: Record<ThemeName, { name: string; value: string }[]> = {
+const ACCENT_PALETTES: Record<ThemeName, { name: string; value: string; key: MessageKey }[]> = {
   vivid: [
-    { name: "Blue",    value: "#3b82f6" },
-    { name: "Violet",  value: "#8b5cf6" },
-    { name: "Rose",    value: "#f43f5e" },
-    { name: "Emerald", value: "#10b981" },
-    { name: "Amber",   value: "#f59e0b" },
-    { name: "Slate",   value: "#64748b" },
+    { name: "Blue",    value: "#3b82f6", key: "theme.accBlue" },
+    { name: "Violet",  value: "#8b5cf6", key: "theme.accViolet" },
+    { name: "Rose",    value: "#f43f5e", key: "theme.accRose" },
+    { name: "Emerald", value: "#10b981", key: "theme.accEmerald" },
+    { name: "Amber",   value: "#f59e0b", key: "theme.accAmber" },
+    { name: "Slate",   value: "#64748b", key: "theme.accSlate" },
   ],
   monochrome: [
-    { name: "Black",    value: "#000000" },
-    { name: "Charcoal", value: "#333333" },
-    { name: "Graphite", value: "#555555" },
+    { name: "Black",    value: "#000000", key: "theme.accBlack" },
+    { name: "Charcoal", value: "#333333", key: "theme.accCharcoal" },
+    { name: "Graphite", value: "#555555", key: "theme.accGraphite" },
   ],
   bauhaus: [
-    { name: "Red",    value: "#D02020" },
-    { name: "Blue",   value: "#1040C0" },
-    { name: "Yellow", value: "#F0C020" },
-    { name: "Black",  value: "#121212" },
+    { name: "Red",    value: "#D02020", key: "theme.accRed" },
+    { name: "Blue",   value: "#1040C0", key: "theme.accBlue" },
+    { name: "Yellow", value: "#F0C020", key: "theme.accYellow" },
+    { name: "Black",  value: "#121212", key: "theme.accBlack" },
   ],
   linear: [
-    { name: "Indigo",  value: "#5E6AD2" },
-    { name: "Cyan",    value: "#22D3EE" },
-    { name: "Magenta", value: "#D946EF" },
-    { name: "Violet",  value: "#8B5CF6" },
+    { name: "Indigo",  value: "#5E6AD2", key: "theme.accIndigo" },
+    { name: "Cyan",    value: "#22D3EE", key: "theme.accCyan" },
+    { name: "Magenta", value: "#D946EF", key: "theme.accMagenta" },
+    { name: "Violet",  value: "#8B5CF6", key: "theme.accViolet" },
   ],
 };
 
 // ─── Preset card definitions ─────────────────────────────────────────────────
 const THEME_CARDS: {
   name: ThemeName;
-  label: string;
-  subtitle: string;
+  labelKey: MessageKey;
+  subtitleKey: MessageKey;
   swatches: string[];
 }[] = [
-  {
-    name: "vivid",
-    label: "Vivid",
-    subtitle: "Dynamic Colorful",
-    swatches: ["#3b82f6", "#8b5cf6", "#f43f5e"],
-  },
-  {
-    name: "monochrome",
-    label: "Minimalist Monochrome",
-    subtitle: "Editorial High-Contrast",
-    swatches: ["#000000", "#555555", "#ffffff"],
-  },
-  {
-    name: "bauhaus",
-    label: "Bauhaus",
-    subtitle: "Geometric Constructivist",
-    swatches: ["#D02020", "#1040C0", "#F0C020"],
-  },
+  { name: "vivid",     labelKey: "theme.vivid",     subtitleKey: "theme.vividSubtitle",     swatches: ["#3b82f6", "#8b5cf6", "#f43f5e"] },
+  { name: "monochrome", labelKey: "theme.monochrome", subtitleKey: "theme.monochromeSubtitle", swatches: ["#000000", "#555555", "#ffffff"] },
+  { name: "bauhaus",   labelKey: "theme.bauhaus",   subtitleKey: "theme.bauhausSubtitle",   swatches: ["#D02020", "#1040C0", "#F0C020"] },
+  { name: "linear",    labelKey: "theme.linear",    subtitleKey: "theme.linearSubtitle",    swatches: ["#5E6AD2", "#22D3EE", "#8B5CF6"] },
 ];
 
 export function ThemePanel() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLocale();
   const { theme, setTheme, applyPreset } = useTheme();
 
   const palette = ACCENT_PALETTES[theme.name] ?? ACCENT_PALETTES.vivid;
@@ -84,30 +73,31 @@ export function ThemePanel() {
       />
 
       {/* Panel */}
-      <aside className="fixed right-0 top-0 h-full w-80 bg-background border-l border-border shadow-2xl z-50 flex flex-col">
+      <aside className="fixed right-0 top-0 h-full w-80 bg-card border-l border-border shadow-2xl z-50 flex flex-col overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
           <div className="flex items-center gap-2 font-semibold text-foreground">
-            <Palette className="h-5 w-5" />
-            Workspace Theme
+            <Palette className="h-5 w-5 text-primary" />
+            {t("theme.workspaceTheme")}
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1 rounded-full text-muted-foreground hover:bg-muted transition-colors"
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t("theme.closePanel")}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-7">
+        <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-7">
 
           {/* ── Appearance ── */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <LayoutTemplate className="h-3.5 w-3.5" />
-              Appearance
+              {t("theme.appearance")}
             </h3>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -118,7 +108,7 @@ export function ThemePanel() {
                     : "bg-background text-foreground border-border hover:border-foreground/40"}`}
               >
                 <Monitor className="h-4 w-4" />
-                Light
+                {t("theme.light")}
               </button>
               <button
                 onClick={() => setTheme({ mode: "dark" })}
@@ -128,7 +118,7 @@ export function ThemePanel() {
                     : "bg-background text-foreground border-border hover:border-foreground/40"}`}
               >
                 <Moon className="h-4 w-4" />
-                Dark
+                {t("theme.dark")}
               </button>
             </div>
           </div>
@@ -137,7 +127,7 @@ export function ThemePanel() {
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Palette className="h-3.5 w-3.5" />
-              Accent Color
+              {t("theme.accentColor")}
             </h3>
             <div className="grid grid-cols-3 gap-2">
               {palette.map((c) => (
@@ -153,7 +143,7 @@ export function ThemePanel() {
                     className="w-6 h-6 rounded-full border border-black/10"
                     style={{ backgroundColor: c.value }}
                   />
-                  <span className="text-muted-foreground">{c.name}</span>
+                  <span className="text-muted-foreground">{t(c.key)}</span>
                 </button>
               ))}
             </div>
@@ -162,18 +152,18 @@ export function ThemePanel() {
           {/* ── Border Radius — SLIDER ── */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-              Border Radius
+              {t("theme.borderRadius")}
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Sharp</span>
+                <span>{t("theme.sharp")}</span>
                 <span
                   className="rounded px-1.5 py-0.5 border border-border text-foreground font-mono"
                   style={{ borderRadius: `${borderRadius}px` }}
                 >
                   {borderRadius}px
                 </span>
-                <span>Rounded</span>
+                <span>{t("theme.rounded")}</span>
               </div>
               <input
                 type="range"
@@ -191,7 +181,7 @@ export function ThemePanel() {
           <div className="space-y-3 pt-2 border-t border-border">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5" />
-              Design Systems
+              {t("theme.designSystems")}
             </h3>
             <div className="space-y-2">
               {THEME_CARDS.map((tc) => {
@@ -207,8 +197,8 @@ export function ThemePanel() {
                     style={{ borderRadius: `${borderRadius}px` }}
                   >
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-sm font-semibold text-foreground">{tc.label}</span>
-                      <span className="text-xs text-muted-foreground">{tc.subtitle}</span>
+                      <span className="text-sm font-semibold text-foreground">{t(tc.labelKey)}</span>
+                      <span className="text-xs text-muted-foreground">{t(tc.subtitleKey)}</span>
                     </div>
                     <div className="flex gap-1">
                       {tc.swatches.map((color) => (
@@ -227,13 +217,13 @@ export function ThemePanel() {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border">
+        <div className="shrink-0 border-t border-border p-4">
           <button
             onClick={() => applyPreset("vivid")}
-            className="w-full h-9 text-sm font-medium border border-border rounded hover:border-foreground/40 text-muted-foreground transition-all"
+            className="w-full h-9 text-sm font-medium border border-border bg-muted/30 text-muted-foreground transition-all hover:bg-muted hover:text-foreground hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             style={{ borderRadius: `${borderRadius}px` }}
           >
-            Reset to Default
+            {t("theme.resetToDefault")}
           </button>
         </div>
       </aside>

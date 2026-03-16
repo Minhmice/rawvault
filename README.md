@@ -48,6 +48,12 @@ RawVault proves that:
 
 ---
 
+## Cursor / MCP
+
+For Cursor MCP (e.g. Stitch), see [.cursor/README.md](.cursor/README.md). Copy `.cursor/mcp.json.example` to `.cursor/mcp.json` and set your API key; do not commit `mcp.json`.
+
+---
+
 ## Project Structure
 
 ```
@@ -80,7 +86,8 @@ rawvault/
 │   ├── seed-slice2-dev.mjs     # QA seed + linked accounts + folders + files
 │   ├── verify-authenticated-slice2.mjs
 │   ├── verify-phase8-explorer.mjs
-│   └── verify-phase9-download.mjs
+│   ├── verify-phase9-download.mjs
+│   └── verify-upload-download-txt.mjs
 ├── supabase/
 │   └── migrations/             # Schema, RLS, indexes, Phase 4 token lifecycle
 ├── ENV_VALIDATION_REQUIREMENTS.md
@@ -301,8 +308,9 @@ The main page (`/`) includes:
 | Auth + Explorer + Dispatch | `npm run qa:verify-auth-slice2` | Sign-in, folders, files, file detail, dispatch |
 | Phase 8 Explorer | `npm run qa:verify-phase8-explorer` | Folders, files, detail, provider badge, preview status |
 | Phase 9 Download | `npm run qa:verify-phase9-download` | Download, stream, 401, 404 |
+| Upload + Download txt | `npm run qa:verify-upload-download-txt` | Upload .txt to Drive via app, then download and verify body |
 
-**Prerequisites:** Dev server running, seed data. `.env.local` for `qa:verify-phase8-explorer` and `qa:verify-phase9-download` (they use `--env-file=.env.local`).
+**Prerequisites:** Dev server running, `.env.local` for scripts that use `--env-file=.env.local`. For Phase 8/9 and upload-download: an account with linked Google Drive gives full pass (set `RAWVAULT_QA_EMAIL`, `RAWVAULT_QA_PASSWORD`). Node 20+ for `qa:verify-upload-download-txt` (File API).
 
 **Run order:** Seed → Dev server → Scripts
 
@@ -352,8 +360,9 @@ For live Google Drive and OneDrive flows:
 
 ### OAuth connect fails
 
+- **Error 400: redirect_uri_mismatch** — URL trong `.env.local` phải **trùng chính xác** với **Authorized redirect URI** trong Google Cloud Console. Port phải đúng với port app đang chạy (mặc định 3000). Chi tiết: [docs/GOOGLE_DRIVE_SETUP.md](docs/GOOGLE_DRIVE_SETUP.md#8-xử-lý-lỗi-thường-gặp).
 - Ensure `RAWVAULT_GDRIVE_OAUTH_CALLBACK_URL` (or OneDrive) matches exactly: `https://your-domain/api/storage/accounts/connect/callback`
-- For localhost: `http://localhost:3000/api/storage/accounts/connect/callback`
+- For localhost: `http://localhost:3000/api/storage/accounts/connect/callback` (đổi port nếu chạy khác, ví dụ 3002)
 - Env vars for client ID, secret, and state secret must be set
 
 ---

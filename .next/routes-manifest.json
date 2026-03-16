@@ -76,6 +76,46 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/folders/(?<nxtPid>[^/]+?)/restore(?:/)?$"
+    },
+    {
+      "page": "/api/share/resolve/[token]",
+      "regex": "^/api/share/resolve/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/api/share/resolve/(?<nxtPtoken>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/share/v/[token]/folder",
+      "regex": "^/api/share/v/([^/]+?)/folder(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/api/share/v/(?<nxtPtoken>[^/]+?)/folder(?:/)?$"
+    },
+    {
+      "page": "/api/share/v/[token]/stream",
+      "regex": "^/api/share/v/([^/]+?)/stream(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/api/share/v/(?<nxtPtoken>[^/]+?)/stream(?:/)?$"
+    },
+    {
+      "page": "/api/share/[id]",
+      "regex": "^/api/share/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/share/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/s/[token]",
+      "regex": "^/s/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtoken": "nxtPtoken"
+      },
+      "namedRegex": "^/s/(?<nxtPtoken>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -140,6 +180,24 @@
       "namedRegex": "^/api/auth/user(?:/)?$"
     },
     {
+      "page": "/api/explorer/folder",
+      "regex": "^/api/explorer/folder(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/explorer/folder(?:/)?$"
+    },
+    {
+      "page": "/api/explorer/list",
+      "regex": "^/api/explorer/list(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/explorer/list(?:/)?$"
+    },
+    {
+      "page": "/api/explorer/stream",
+      "regex": "^/api/explorer/stream(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/explorer/stream(?:/)?$"
+    },
+    {
       "page": "/api/files",
       "regex": "^/api/files(?:/)?$",
       "routeKeys": {},
@@ -150,6 +208,12 @@
       "regex": "^/api/folders(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/folders(?:/)?$"
+    },
+    {
+      "page": "/api/share",
+      "regex": "^/api/share(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/share(?:/)?$"
     },
     {
       "page": "/api/storage/accounts",
@@ -170,10 +234,22 @@
       "namedRegex": "^/api/storage/accounts/connect/callback(?:/)?$"
     },
     {
+      "page": "/api/storage/accounts/default-write",
+      "regex": "^/api/storage/accounts/default\\-write(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/storage/accounts/default\\-write(?:/)?$"
+    },
+    {
       "page": "/api/storage/accounts/link",
       "regex": "^/api/storage/accounts/link(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/storage/accounts/link(?:/)?$"
+    },
+    {
+      "page": "/api/storage/accounts/overflow-priority",
+      "regex": "^/api/storage/accounts/overflow\\-priority(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/storage/accounts/overflow\\-priority(?:/)?$"
     },
     {
       "page": "/api/storage/accounts/set-active",
@@ -188,6 +264,18 @@
       "namedRegex": "^/api/storage/accounts/unlink(?:/)?$"
     },
     {
+      "page": "/api/storage/drive/browse",
+      "regex": "^/api/storage/drive/browse(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/storage/drive/browse(?:/)?$"
+    },
+    {
+      "page": "/api/storage/drive/import",
+      "regex": "^/api/storage/drive/import(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/storage/drive/import(?:/)?$"
+    },
+    {
       "page": "/api/uploads/dispatch",
       "regex": "^/api/uploads/dispatch(?:/)?$",
       "routeKeys": {},
@@ -198,6 +286,30 @@
       "regex": "^/api/uploads/execute(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/uploads/execute(?:/)?$"
+    },
+    {
+      "page": "/api/workspace/preferences",
+      "regex": "^/api/workspace/preferences(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/workspace/preferences(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/shared",
+      "regex": "^/shared(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/shared(?:/)?$"
+    },
+    {
+      "page": "/signup",
+      "regex": "^/signup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/signup(?:/)?$"
     }
   ],
   "dataRoutes": [],

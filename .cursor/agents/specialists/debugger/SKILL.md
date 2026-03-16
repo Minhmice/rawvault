@@ -29,6 +29,11 @@ Find root cause quickly and produce reliable fixes with verification.
 - Minimal fix strategy.
 - Regression test recommendation.
 
+## Tools
+
+- Log, diff, and repro inspection tools.
+- Local curated search: `python3 .cursor/agents/specialists/debugger/scripts/search.py "<query>" [--fallback-raw]`
+
 ## Boundaries
 
 - Do not expand into broad refactors unless required for fix.
