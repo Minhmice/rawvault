@@ -15,6 +15,8 @@ import { FileGrid } from "@/components/workspace/FileGrid";
 import { ShareDialog } from "@/components/workspace/ShareDialog";
 import { RenameDialog } from "@/components/workspace/RenameDialog";
 import { DeleteConfirmDialog } from "@/components/workspace/DeleteConfirmDialog";
+import { PreviewOverlay } from "@/components/preview/PreviewOverlay";
+import { PreviewRouter } from "@/components/preview/PreviewRouter";
 import type { UnlinkAccountResult } from "@/components/workspace/DashboardLayout";
 import type {
   AuthUser,
@@ -30,6 +32,8 @@ import type {
   ListFoldersResponse,
   UnifiedExplorerListResponse,
 } from "@/lib/contracts";
+import type { PreviewModel } from "@/lib/contracts/preview.contracts";
+import { buildPreviewModel } from "@/lib/preview/build-preview-model";
 
 type ApiErrorEnvelope = {
   error?: {
@@ -177,6 +181,7 @@ export function VaultClient() {
     id: string;
     name: string;
   } | null>(null);
+  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
   const [connectBanner, setConnectBanner] = useState<ConnectBanner | null>(null);
 
   const refreshAllData = useCallback(
@@ -374,6 +379,12 @@ export function VaultClient() {
     setDeleteTarget({ type: "folder", id, name });
   };
 
+  const handlePreview = useCallback((file: ExplorerFile) => {
+    setPreviewModel(buildPreviewModel(file));
+  }, []);
+
+  const previewDownload = previewModel?.source.downloadUrl;
+
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
     const url = deleteTarget.type === "file" ? `/api/files/${deleteTarget.id}` : `/api/folders/${deleteTarget.id}`;
@@ -559,6 +570,7 @@ export function VaultClient() {
             onOpenRoot={handleOpenRoot}
             onOpenFolderUnified={handleOpenFolderUnified}
             onOpenFileUnified={undefined}
+            onPreview={handlePreview}
             onShare={handleShare}
             onRenameFile={handleRenameFile}
             onRenameFolder={handleRenameFolder}
@@ -605,6 +617,32 @@ export function VaultClient() {
             onConfirm={handleDeleteConfirm}
           />
         ) : null}
+
+        <PreviewOverlay
+          open={previewModel !== null}
+          onClose={() => setPreviewModel(null)}
+          model={previewModel}
+          onDownload={
+            previewDownload
+              ? () => {
+                  window.location.href = previewDownload;
+                }
+              : undefined
+          }
+        >
+          {previewModel && (
+            <PreviewRouter
+              model={previewModel}
+              onDownload={
+                previewDownload
+                  ? () => {
+                      window.location.href = previewDownload;
+                    }
+                  : undefined
+              }
+            />
+          )}
+        </PreviewOverlay>
       </div>
     </DashboardLayout>
   );

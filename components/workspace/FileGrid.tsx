@@ -73,6 +73,7 @@ type FileGridProps = {
   onRenameFolder?: (id: string, name: string) => void;
   onDeleteFile?: (id: string, name: string) => void;
   onDeleteFolder?: (id: string, name: string) => void;
+  onPreview?: (file: ExplorerFile) => void;
 };
 
 function formatBytes(bytes: number) {
@@ -148,6 +149,7 @@ export function FileGrid({
   onRenameFolder,
   onDeleteFile,
   onDeleteFolder,
+  onPreview,
 }: FileGridProps) {
   const { t } = useLocale();
   const { ThemeCard, ThemeButton: Button } = useThemeComponents();
@@ -446,15 +448,17 @@ export function FileGrid({
               key={file.id}
               glass
               className={`group flex cursor-pointer flex-col overflow-hidden ${folderHoverClass}`}
-              onClick={() => {
-                if (downloadOnlyClick) {
-                  const a = document.createElement("a");
-                  a.href = `/api/files/${file.id}/download`;
-                  a.download = file.name;
-                  a.click();
-                }
-              }}
-            >
+               onClick={() => {
+                 if (downloadOnlyClick) {
+                   const a = document.createElement("a");
+                   a.href = `/api/files/${file.id}/download`;
+                   a.download = file.name;
+                   a.click();
+                 } else {
+                   onPreview?.(file);
+                 }
+               }}
+             >
               {/* Header: type badge + filename + optional split/download-only badge + three-dots */}
               <div className="flex items-center gap-2 border-b border-border bg-card p-2">
                 <span
