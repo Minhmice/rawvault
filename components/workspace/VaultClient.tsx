@@ -380,7 +380,11 @@ export function VaultClient() {
   };
 
   const handlePreview = useCallback((file: ExplorerFile) => {
-    setPreviewModel(buildPreviewModel(file));
+    // null first → renderer unmounts → useEffect cleanup aborts fetch + revokes blob URL
+    setPreviewModel(null);
+    requestAnimationFrame(() => {
+      setPreviewModel(buildPreviewModel(file));
+    });
   }, []);
 
   const previewDownload = previewModel?.source.downloadUrl;
