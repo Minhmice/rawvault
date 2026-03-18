@@ -15,6 +15,7 @@ export function buildPreviewModel(file: ExplorerFile): PreviewModel {
     sizeBytes: file.sizeBytes,
     source: {
       fileId: file.id,
+      providerFileId: file.providerFileId ?? undefined,
       streamUrl: buildStreamUrl(file.id),
       downloadUrl: buildDownloadUrl(file.id),
       provider: file.provider === "gdrive" ? "gdrive" : file.provider === "onedrive" ? "onedrive" : undefined,
