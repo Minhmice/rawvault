@@ -28,7 +28,7 @@ function extractDriveError(payload: unknown): string | null {
 }
 
 function toBrowseItem(
-  f: { id?: string; name?: string; mimeType?: string; size?: string },
+  f: { id?: string; name?: string; mimeType?: string; size?: string; webViewLink?: string; thumbnailLink?: string },
 ): DriveBrowseItem {
   const isFolder = f.mimeType === DRIVE_FOLDER_MIME;
   const sizeBytes = f.size ? parseInt(f.size, 10) : null;
@@ -38,11 +38,13 @@ function toBrowseItem(
     isFolder,
     mimeType: f.mimeType ?? null,
     sizeBytes: Number.isNaN(sizeBytes ?? NaN) ? null : sizeBytes,
+    webViewLink: f.webViewLink,
+    thumbnailLink: f.thumbnailLink,
   };
 }
 
 const PAGE_SIZE = 200;
-type DriveFileRow = { id?: string; name?: string; mimeType?: string; size?: string };
+type DriveFileRow = { id?: string; name?: string; mimeType?: string; size?: string; webViewLink?: string; thumbnailLink?: string };
 
 /** Drive file/folder IDs are alphanumeric with - and _; reject anything else to avoid query injection. */
 const DRIVE_ID_REGEX = /^[\w-]+$/;
@@ -74,7 +76,7 @@ export async function listGoogleDrive(
     const url = new URL("https://www.googleapis.com/drive/v3/files");
     url.searchParams.set("q", q);
     url.searchParams.set("pageSize", String(PAGE_SIZE));
-    url.searchParams.set("fields", "nextPageToken,files(id,name,mimeType,size)");
+    url.searchParams.set("fields", "nextPageToken,files(id,name,mimeType,size,webViewLink,thumbnailLink)");
     url.searchParams.set("orderBy", "folder,name");
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
