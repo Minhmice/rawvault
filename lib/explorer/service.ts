@@ -43,6 +43,7 @@ type FileRow = {
   preview_status: FilePreviewStatus;
   sync_status: FileSyncStatus;
   error_code: string | null;
+  provider_file_id_original: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -97,6 +98,7 @@ function normalizeFile(row: FileRow) {
     previewStatus: row.preview_status,
     syncStatus: row.sync_status,
     errorCode: row.error_code?.trim() || null,
+    providerFileId: row.provider_file_id_original ?? undefined,
     createdAt: normalizeTimestamp(row.created_at),
     updatedAt: normalizeTimestamp(row.updated_at),
   };
@@ -202,6 +204,7 @@ export async function listExplorerFiles(
       preview_status,
       sync_status,
       error_code,
+      provider_file_id_original,
       created_at,
       updated_at
     `,
@@ -269,6 +272,7 @@ export async function getExplorerFile(
       preview_status,
       sync_status,
       error_code,
+      provider_file_id_original,
       created_at,
       updated_at
     `,

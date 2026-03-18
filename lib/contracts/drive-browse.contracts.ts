@@ -6,6 +6,8 @@ export const driveBrowseItemSchema = z.object({
   isFolder: z.boolean(),
   mimeType: z.string().nullable(),
   sizeBytes: z.number().int().nonnegative().nullable(),
+  webViewLink: z.string().url().optional(),
+  thumbnailLink: z.string().url().optional(),
 });
 
 export const driveBrowseQuerySchema = z.object({

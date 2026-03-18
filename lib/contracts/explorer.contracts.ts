@@ -68,6 +68,7 @@ export const explorerFileSchema = z.object({
   previewStatus: filePreviewStatusSchema,
   syncStatus: fileSyncStatusSchema,
   errorCode: z.string().min(1).nullable(),
+  providerFileId: z.string().min(1).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -147,6 +148,7 @@ export const explorerFileItemSchema = explorerItemBaseSchema.extend({
   previewStatus: filePreviewStatusSchema,
   syncStatus: fileSyncStatusSchema,
   errorCode: z.string().min(1).nullable(),
+  providerFileId: z.string().min(1).optional(),
 });
 
 export const explorerItemSchema = z.discriminatedUnion("kind", [
