@@ -99,7 +99,7 @@ export function PdfPreview({ model }: PdfPreviewProps) {
       <object
         data={state.objectUrl}
         type="application/pdf"
-        className="w-full flex-1 min-h-0 rounded-lg"
+        className="w-full h-full flex-1 min-h-0 rounded-lg"
         aria-label="PDF document"
       >
         <PreviewError

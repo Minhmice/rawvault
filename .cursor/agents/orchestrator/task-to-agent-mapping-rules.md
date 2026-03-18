@@ -4,7 +4,7 @@
 
 **Core rule**: When the orchestrator is called, **agents run in parallel within a phase**. If the work is split into **multiple sub-phases**, those sub-phases run **sequentially**, and each sub-phase may run multiple agents in parallel. This preserves speed while avoiding dependency deadlocks.
 
-**Post-implementation gate (mandatory)**: After implementation agents finish and their output is merged, the orchestrator **must** run **code-reviewer** and **qa-tester** in parallel before declaring the task complete. Do not skip this step unless the user explicitly asks to skip review/QA or the task is non-code. For **low-risk** (single-file, docs-only, or user said "quick fix"/"skip review"), Phase 2 may be reduced or skipped if the user agreed (see `PERFORMANCE.md`).
+**Post-implementation gate (mandatory)**: After implementation agents finish and their output is merged, the orchestrator **must** run **code-reviewer** and **qa-tester** in parallel before declaring the task complete. Do not skip this step unless the user explicitly asks to skip review/QA or the task is non-code.
 
 **Registry agents**: orchestrator, planner, product-manager, research-analyst, frontend-developer, backend-developer, typescript-specialist, database-specialist, google-cli-specialist, debugger, code-reviewer, qa-tester, documentation-writer, devops-engineer, rule-skill-ingestor
 

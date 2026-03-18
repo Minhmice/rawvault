@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useCallback } from "react";
-import { X, Download } from "lucide-react";
+import { X, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PreviewModel } from "@/lib/contracts/preview.contracts";
 
@@ -11,27 +11,30 @@ export type PreviewOverlayProps = {
   model: PreviewModel | null;
   children?: React.ReactNode;
   onDownload?: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 };
 
-/**
- * Full-screen preview overlay shell.
- * - Escape key closes
- * - Body scroll locked while open
- * - Theme-compatible via CSS variables
- * - Mobile-friendly: full viewport, safe-area padding
- */
 export function PreviewOverlay({
   open,
   onClose,
   model,
   children,
   onDownload,
+  onPrev,
+  onNext,
+  hasPrev = false,
+  hasNext = false,
 }: PreviewOverlayProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && hasPrev) onPrev?.();
+      if (e.key === "ArrowRight" && hasNext) onNext?.();
     },
-    [onClose],
+    [onClose, onPrev, onNext, hasPrev, hasNext],
   );
 
   useEffect(() => {
@@ -48,62 +51,86 @@ export function PreviewOverlay({
   if (!open || !model) return null;
 
   return (
-    <div
-      data-testid="preview-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Preview: ${model.title}`}
-      className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-sm"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      {/* Header bar */}
-      <div className="flex items-center justify-between gap-2 border-b border-border/50 px-4 py-3 shrink-0">
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-medium truncate text-foreground">
-            {model.title}
-          </span>
-          {model.mimeType && (
-            <span className="text-xs text-muted-foreground truncate">
-              {model.mimeType}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {onDownload && (
-            <button
-              data-testid="preview-download-button"
-              onClick={onDownload}
-              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground transition-colors"
-              aria-label="Download file"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Download
-            </button>
-          )}
-          <button
-            data-testid="preview-close-button"
-            onClick={onClose}
-            className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="Close preview"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Content area */}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
       <div
-        data-testid="preview-content"
-        className="flex-1 overflow-auto flex items-center justify-center min-h-0 p-4"
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden
+      />
+
+      {hasPrev && onPrev && (
+        <button
+          onClick={onPrev}
+          className="absolute left-2 sm:left-6 z-20 rounded-full bg-background/80 hover:bg-background p-2 text-foreground transition-colors shadow-lg"
+          aria-label="Previous file"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+      )}
+
+      {hasNext && onNext && (
+        <button
+          onClick={onNext}
+          className="absolute right-2 sm:right-6 z-20 rounded-full bg-background/80 hover:bg-background p-2 text-foreground transition-colors shadow-lg"
+          aria-label="Next file"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      )}
+
+      <div
+        data-testid="preview-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Preview: ${model.title}`}
+        className="relative z-10 flex flex-col bg-background rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-border/50"
       >
-        {children}
+        <div className="flex items-center justify-between gap-2 border-b border-border/50 px-4 py-3 shrink-0">
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-medium truncate text-foreground">
+              {model.title}
+            </span>
+            {model.mimeType && (
+              <span className="text-xs text-muted-foreground truncate">
+                {model.mimeType}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {onDownload && (
+              <button
+                data-testid="preview-download-button"
+                onClick={onDownload}
+                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium bg-muted hover:bg-muted/80 text-foreground transition-colors"
+                aria-label="Download file"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download
+              </button>
+            )}
+            <button
+              data-testid="preview-close-button"
+              onClick={onClose}
+              className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Close preview"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div
+          data-testid="preview-content"
+          className="flex-1 overflow-auto flex items-center justify-center min-h-0 p-0"
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
 }
 
-/** Loading state shown inside the overlay content area */
-export function PreviewLoading({ label = "Loading preview…" }: { label?: string }) {
+export function PreviewLoading({ label }: { label?: string }) {
   return (
     <div
       data-testid="preview-loading"
@@ -112,12 +139,11 @@ export function PreviewLoading({ label = "Loading preview…" }: { label?: strin
       aria-live="polite"
     >
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
-      <span className="text-sm">{label}</span>
+      {label ? <span className="text-sm">{label}</span> : null}
     </div>
   );
 }
 
-/** Error/fallback state shown inside the overlay content area */
 export function PreviewError({
   title = "Preview unavailable",
   description,
@@ -143,7 +169,6 @@ export function PreviewError({
   );
 }
 
-/** Progress bar shown during download */
 export function PreviewProgress({
   fraction,
   label,

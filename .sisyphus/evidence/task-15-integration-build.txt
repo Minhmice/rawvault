@@ -1,0 +1,75 @@
+
+> rawvault@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/minhmice/Documents/Projects/rawvault/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/minhmice/Documents/Projects/rawvault/.claude/worktrees/drive-file-preview/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.0s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/32) ...
+  Generating static pages using 7 workers (8/32) 
+  Generating static pages using 7 workers (16/32) 
+  Generating static pages using 7 workers (24/32) 
+✓ Generating static pages using 7 workers (32/32) in 117.6ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/auth/dev/seeded-signin
+├ ƒ /api/auth/session
+├ ƒ /api/auth/session/persist
+├ ƒ /api/auth/signin
+├ ƒ /api/auth/signout
+├ ƒ /api/auth/signup
+├ ƒ /api/auth/user
+├ ƒ /api/explorer/folder
+├ ƒ /api/explorer/list
+├ ƒ /api/explorer/stream
+├ ƒ /api/files
+├ ƒ /api/files/[id]
+├ ƒ /api/files/[id]/download
+├ ƒ /api/files/[id]/restore
+├ ƒ /api/files/[id]/stream
+├ ƒ /api/folders
+├ ƒ /api/folders/[id]
+├ ƒ /api/folders/[id]/breadcrumb
+├ ƒ /api/folders/[id]/restore
+├ ƒ /api/share
+├ ƒ /api/share/[id]
+├ ƒ /api/share/resolve/[token]
+├ ƒ /api/share/v/[token]/folder
+├ ƒ /api/share/v/[token]/stream
+├ ƒ /api/storage/accounts
+├ ƒ /api/storage/accounts/connect
+├ ƒ /api/storage/accounts/connect/callback
+├ ƒ /api/storage/accounts/default-write
+├ ƒ /api/storage/accounts/link
+├ ƒ /api/storage/accounts/overflow-priority
+├ ƒ /api/storage/accounts/set-active
+├ ƒ /api/storage/accounts/unlink
+├ ƒ /api/storage/drive/browse
+├ ƒ /api/storage/drive/import
+├ ƒ /api/uploads/dispatch
+├ ƒ /api/uploads/execute
+├ ƒ /api/workspace/preferences
+├ ○ /login
+├ ƒ /s/[token]
+├ ○ /shared
+└ ○ /signup
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+exit:0

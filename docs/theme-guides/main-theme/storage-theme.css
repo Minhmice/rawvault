@@ -1,0 +1,200 @@
+/* ============================================================
+   STORAGE UI THEME — shadcn/ui Custom Theme
+   Inspired by: Clean mobile storage manager UI
+   
+   Design Language:
+   - Soft neumorphic cards on a cool-gray background
+   - Vibrant category accent colors (cyan, violet, orange, red...)
+   - Rounded, airy layout with generous spacing
+   - Multicolor horizontal progress bar as signature motif
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* ── Background & Surface ── */
+    --background:        220 20% 96%;   /* #F2F4F8 — cool off-white */
+    --foreground:        220 25% 14%;   /* #1B2130 — near-black */
+
+    --card:              0 0% 100%;     /* pure white cards */
+    --card-foreground:   220 25% 14%;
+
+    --popover:           0 0% 100%;
+    --popover-foreground: 220 25% 14%;
+
+    /* ── Brand / Primary — Electric Indigo ── */
+    --primary:           238 82% 62%;   /* #4F46E5 */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary — Soft Gray-Blue ── */
+    --secondary:         220 18% 90%;   /* #DDE1EB */
+    --secondary-foreground: 220 25% 35%;
+
+    /* ── Muted / Subtle ── */
+    --muted:             220 14% 93%;
+    --muted-foreground:  220 12% 55%;
+
+    /* ── Accent — Cyan (Images category) ── */
+    --accent:            191 96% 52%;   /* #06D6F0 */
+    --accent-foreground: 220 25% 10%;
+
+    /* ── Destructive — Coral Red ── */
+    --destructive:       3 89% 60%;     /* #F44336 */
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Borders & Inputs ── */
+    --border:            220 16% 88%;
+    --input:             220 16% 88%;
+    --ring:              238 82% 62%;
+
+    /* ── Chart / Category Colors (storage segments) ── */
+    --chart-1:           191 96% 52%;   /* Cyan   — Images  */
+    --chart-2:           238 82% 62%;   /* Indigo — Apps    */
+    --chart-3:           262 71% 60%;   /* Violet — Videos  */
+    --chart-4:           27  96% 60%;   /* Orange — Mail    */
+    --chart-5:           3   89% 60%;   /* Red    — Files   */
+
+    /* ── Radius ── */
+    --radius:            1rem;          /* 16px — generous rounding */
+  }
+
+  /* ── Dark Mode ── */
+  .dark {
+    --background:        222 28% 11%;   /* #141924 */
+    --foreground:        220 20% 92%;
+
+    --card:              222 24% 16%;   /* #1E2535 */
+    --card-foreground:   220 20% 92%;
+
+    --popover:           222 24% 16%;
+    --popover-foreground: 220 20% 92%;
+
+    --primary:           238 82% 68%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary:         222 20% 22%;
+    --secondary-foreground: 220 18% 72%;
+
+    --muted:             222 20% 20%;
+    --muted-foreground:  220 14% 52%;
+
+    --accent:            191 90% 48%;
+    --accent-foreground: 222 28% 11%;
+
+    --destructive:       3 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border:            222 20% 22%;
+    --input:             222 20% 22%;
+    --ring:              238 82% 68%;
+
+    --chart-1:           191 90% 52%;
+    --chart-2:           238 82% 68%;
+    --chart-3:           262 71% 65%;
+    --chart-4:           27  95% 62%;
+    --chart-5:           3   80% 60%;
+  }
+}
+
+/* ============================================================
+   COMPONENT OVERRIDES
+   ============================================================ */
+
+@layer components {
+
+  /* ── Card ── */
+  .card {
+    border-radius: calc(var(--radius) * 1.25);
+    box-shadow:
+      0 2px 8px hsl(220 25% 14% / .05),
+      0 0 0 1px hsl(var(--border) / .6);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  .card:hover {
+    box-shadow:
+      0 8px 24px hsl(220 25% 14% / .10),
+      0 0 0 1px hsl(var(--border));
+    transform: translateY(-1px);
+  }
+
+  /* ── Button ── */
+  .btn, [data-slot="button"] {
+    border-radius: 999px;           /* pill buttons */
+    font-weight: 600;
+    letter-spacing: .01em;
+    transition: all 150ms ease;
+  }
+
+  /* ── Badge ── */
+  [data-slot="badge"] {
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+
+  /* ── Progress bar — multicolor stripe ── */
+  [data-slot="progress"] > div {
+    background: linear-gradient(
+      to right,
+      hsl(var(--chart-1))  0%   22%,
+      hsl(var(--chart-2))  22%  46%,
+      hsl(var(--chart-3))  46%  66%,
+      hsl(var(--chart-4))  66%  80%,
+      hsl(var(--chart-5))  80%  100%
+    );
+    border-radius: 999px;
+    transition: width 600ms cubic-bezier(.4, 0, .2, 1);
+  }
+
+  /* ── Separator ── */
+  [data-slot="separator"] {
+    background-color: hsl(var(--border));
+    opacity: .6;
+  }
+
+  /* ── Avatar — colored ring ── */
+  [data-slot="avatar"] {
+    ring-color: hsl(var(--primary) / .25);
+    border-radius: 999px;
+  }
+
+  /* ── Dialog / Sheet ── */
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"] {
+    border-radius: calc(var(--radius) * 1.5);
+    box-shadow: 0 24px 64px hsl(220 25% 14% / .18);
+  }
+
+  /* ── Tooltip ── */
+  [data-slot="tooltip-content"] {
+    border-radius: .5rem;
+    font-size: .75rem;
+    font-weight: 500;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+}
+
+/* ============================================================
+   UTILITY TOKENS  (use in className or inline style)
+   ============================================================ */
+
+/*
+  Category icon backgrounds — apply to storage item icon wrappers:
+
+  .icon-images   { background: hsl(191 96% 92%); color: hsl(191 96% 35%); }
+  .icon-videos   { background: hsl(238 82% 94%); color: hsl(238 82% 50%); }
+  .icon-apps     { background: hsl(262 71% 93%); color: hsl(262 71% 50%); }
+  .icon-mail     { background: hsl(27  96% 92%); color: hsl(27  96% 45%); }
+  .icon-files    { background: hsl(3   89% 93%); color: hsl(3   89% 50%); }
+  .icon-others   { background: hsl(220 14% 91%); color: hsl(220 14% 50%); }
+*/
+
+@layer utilities {
+  .icon-images  { background-color: hsl(191 96% 92%); color: hsl(191 96% 35%); }
+  .icon-videos  { background-color: hsl(238 82% 94%); color: hsl(238 82% 50%); }
+  .icon-apps    { background-color: hsl(262 71% 93%); color: hsl(262 71% 50%); }
+  .icon-mail    { background-color: hsl(27  96% 92%); color: hsl(27  96% 45%); }
+  .icon-files   { background-color: hsl(3   89% 93%); color: hsl(3   89% 50%); }
+  .icon-others  { background-color: hsl(220 14% 91%); color: hsl(220 14% 50%); }
+}

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RawVault Cloud Storage Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                        "indigo-950": "#1E1B4B",
+                        "indigo-900": "#312E81",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .aurora-bg {
+            background: radial-gradient(circle at top left, rgba(165, 180, 252, 0.15), transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(103, 232, 249, 0.15), transparent 40%);
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .card-gradient-border {
+            border: 1px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #E8E5FF, #DFF9FF) border-box;
+        }
+        .sidebar-gradient {
+            background: linear-gradient(to bottom, #1E1B4B, #312E81);
+        }
+        .pill-frosted {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark aurora-bg min-h-screen flex overflow-hidden">
+<!-- Sidebar Component (Fixed) -->
+<aside class="w-64 sidebar-gradient h-screen flex flex-col p-6 text-white shrink-0 transition-transform duration-300 ease-out translate-x-0">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center border border-white/30">
+<span class="material-symbols-outlined text-white">cloud_upload</span>
+</div>
+<div>
+<h1 class="text-lg font-bold tracking-tight">RawVault</h1>
+<p class="text-xs text-white/60">Cloud Storage</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg pill-frosted border border-white/10 transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-white/80 hover:text-white" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span>Files</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-white/80 hover:text-white" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Shared</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-white/80 hover:text-white" href="#">
+<span class="material-symbols-outlined">schedule</span>
+<span>Recent</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-white/80 hover:text-white" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span>Trash</span>
+</a>
+</nav>
+<div class="mt-auto">
+<div class="p-4 rounded-xl bg-white/5 border border-white/10 mb-6">
+<p class="text-xs text-white/60 mb-2 uppercase font-bold tracking-wider">Storage Used</p>
+<div class="flex items-end justify-between mb-2">
+<span class="text-sm font-bold">128.4 GB</span>
+<span class="text-xs text-white/60">of 512 GB</span>
+</div>
+<div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-1/4"></div>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary hover:scale-[1.03] transition-transform text-white text-sm font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">upgrade</span>
+                Upgrade Plan
+            </button>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+<!-- Sticky Header Component -->
+<header class="sticky top-0 z-50 glass-header border-b border-slate-200/60 px-8 py-4 flex items-center justify-between">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-slate-100/50 border-none rounded-xl pl-11 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all" placeholder="Search files, folders, members..." type="text"/>
+<kbd class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">⌘K</kbd>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex items-center gap-6 mr-6">
+<a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Plans</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Settings</a>
+</nav>
+<button class="relative p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 mx-1"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-slate-900 leading-none">Alex Rivers</p>
+<p class="text-xs text-slate-500">Pro Account</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="User profile photo of a man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEa4AmPPDD9RRVy4pkptwWgeTuH0czr9galKzYXcbGsCEdb0shaUHxEESJz-BErjPkL-2L6VK9kG9fv_fqr6AvqPl-lrSizpE-uM8wKZ_3kKn7tLvVRtMAKL3UCLgiOXSsT7Kqi7FbpwePHY65gS6S_x96DZTx5sVSdWEMUBum8xpE6egkzGLXDifW97YWw87JL-vg10XfdQjAjld4hjoVkNSyAheWl0YQXjm5K1rKqh7lRFCn9X_b2sDl2lw7uHgLc6p_Q87TB9zZ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="p-8 space-y-10 max-w-7xl mx-auto w-full opacity-0 animate-[fade-in_400ms_ease-out_forwards]">
+<!-- Breadcrumb Component -->
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<a class="hover:text-primary transition-colors" href="#">Storage</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="font-medium text-slate-900">Dashboard Overview</span>
+</div>
+<!-- Header Section -->
+<div class="flex items-end justify-between">
+<div>
+<h2 class="text-3xl font-bold text-slate-900 tracking-tight">Storage Overview</h2>
+<p class="text-slate-500">Manage your connected cloud accounts and file distribution.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:scale-[1.03] transition-all">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filters
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-primary rounded-lg text-sm font-bold text-white hover:scale-[1.03] transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Upload File
+                    </button>
+</div>
+</div>
+<!-- SECTION 1: STORAGE OVERVIEW -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Main Storage Card -->
+<div class="lg:col-span-2 bg-white rounded-xl card-gradient-border p-8 shadow-[0_8px_32px_rgba(79,70,229,0.06)] flex flex-col md:flex-row items-center gap-10">
+<div class="relative w-48 h-48 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-100" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="16"></circle>
+<circle class="transition-all duration-1000 ease-out" cx="96" cy="96" fill="transparent" r="80" stroke="url(#gradientMain)" stroke-dasharray="502.6" stroke-dashoffset="376" stroke-linecap="round" stroke-width="16"></circle>
+<defs>
+<lineargradient id="gradientMain" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#2463eb"></stop>
+<stop offset="100%" stop-color="#06b6d4"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-3xl font-bold text-slate-900">25%</span>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Used Capacity</span>
+</div>
+</div>
+<div class="flex-1 space-y-6">
+<div>
+<h3 class="text-xl font-bold text-slate-900 mb-1">Vault Health: Excellent</h3>
+<p class="text-slate-500 text-sm">You have 384 GB remaining of your total 512 GB pool.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Average Growth</p>
+<p class="text-lg font-bold text-slate-900">+1.2 GB <span class="text-green-500 font-medium text-xs">/week</span></p>
+</div>
+<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Last Sync</p>
+<p class="text-lg font-bold text-slate-900">2 mins <span class="text-slate-500 font-medium text-xs">ago</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2 p-3 rounded-lg bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                            Your most active storage is Dropbox (12% increase this month).
+                        </div>
+</div>
+</div>
+<!-- Provider Mini Cards -->
+<div class="space-y-6">
+<div class="bg-white p-6 rounded-xl card-gradient-border shadow-sm flex items-center justify-between group hover:shadow-md transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+<img class="w-6 h-6" data-alt="Dropbox logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwoFwUfigg8NhBzKSOWucT660H4td3v0gpLDL8v9WZx-i2Uhpd9Rh3NATulVXjm9d2omX-cIWlxmqG9S5MC0EzE1tv9Mi_SwTksMLTcoAnRnK7L3HY15Vpne_sWvfm7ddy2vne2NFRGWHLDab1T6TQJzBYOxMaPA9kETNxMsiBpHvkQlCD3fYmCYPT8RxdLytmHjiu9Gs5e8B55csAMFgGvjbjWriS9kRrN6x9zIa2f_3fcR6tvSxi24p7kUxZpwcep1-GSyf9eBCM"/>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Dropbox</h4>
+<p class="text-xs text-slate-500">45GB / 100GB</p>
+</div>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-100" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="transparent" r="20" stroke="#2463eb" stroke-dasharray="125" stroke-dashoffset="68.75" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl card-gradient-border shadow-sm flex items-center justify-between group hover:shadow-md transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+<img class="w-6 h-6" data-alt="Google Drive logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwoMI0FXaWV85YWyk9rsNoa659DGzQbFX1qof0OHuqJmamqHmAD4GozaPVLX61yJUUVjWMg8fwnRgh4Vu3yNNFlBQb9KFLHZfPVCWloN9YxZR-RiFloV-1diu7mWrw7tfj2XzHqlaiNNtbODE7f4pK11ruwocbe0Bb6rY4WQJLU6GWbqg6Wk8CsxGyU3gvIvCHQcihC1ofvtT0oy7ZvG21nk316WQ2aq5B6pvzrVrc_7wBVD6xSvLKFn1h-SVKTqM7iJqKOEHhCagI"/>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Google Drive</h4>
+<p class="text-xs text-slate-500">82GB / 200GB</p>
+</div>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-100" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="transparent" r="20" stroke="#f59e0b" stroke-dasharray="125" stroke-dashoffset="73.75" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl card-gradient-border shadow-sm flex items-center justify-between group hover:shadow-md transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center">
+<img class="w-6 h-6" data-alt="Box logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpjhjpWy0QgJXA9XbBkpqVrLzlbxE7A4gAUcq6S4levviGHFPHXAzJ52VMFM3gkMqUmV0sfZQ20wRv72wuW3kLaXhApUTb3MHxOxkxb37LFr8SNwGl7SwkWt5Y4d76z-fcvcoebd_xkwwfK60TnJbEh_M3-fT2XBW9i5KoRvAJehiGJVyni-nGyC0Oy-_pT_XE4TzKlqrfpnORdIcEuX5DgYJRT1OuAc1sKp66UkKaMXnDlwrm7NhD86c4uEwQu_SuXDi8lFwsVO-3"/>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Box Cloud</h4>
+<p class="text-xs text-slate-500">1.4GB / 212GB</p>
+</div>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-slate-100" cx="24" cy="24" fill="transparent" r="20" stroke="currentColor" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="transparent" r="20" stroke="#ea580c" stroke-dasharray="125" stroke-dashoffset="124" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 2: CATEGORY GRID -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold text-slate-900">File Categories</h3>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">View All Types</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+<!-- Category Cards -->
+<div class="p-6 rounded-2xl bg-gradient-to-br from-cyan-400 to-primary text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">image</span>
+<h4 class="font-bold">Images</h4>
+<p class="text-xs opacity-80">2,451 files • 12 GB</p>
+</div>
+<div class="p-6 rounded-2xl bg-gradient-to-br from-indigo-400 to-indigo-600 text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-indigo-600/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">description</span>
+<h4 class="font-bold">Documents</h4>
+<p class="text-xs opacity-80">1,240 files • 2 GB</p>
+</div>
+<div class="p-6 rounded-2xl bg-gradient-to-br from-rose-400 to-rose-600 text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-rose-600/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">music_note</span>
+<h4 class="font-bold">Music</h4>
+<p class="text-xs opacity-80">452 files • 3.4 GB</p>
+</div>
+<div class="p-6 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-amber-600/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">movie</span>
+<h4 class="font-bold">Videos</h4>
+<p class="text-xs opacity-80">84 files • 42 GB</p>
+</div>
+<div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-emerald-600/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">code</span>
+<h4 class="font-bold">Code</h4>
+<p class="text-xs opacity-80">5,820 files • 1.2 GB</p>
+</div>
+<div class="p-6 rounded-2xl bg-gradient-to-br from-slate-600 to-slate-800 text-white hover:scale-[1.03] transition-all cursor-pointer shadow-lg shadow-slate-800/10">
+<span class="material-symbols-outlined text-3xl mb-4 block">archive</span>
+<h4 class="font-bold">Archive</h4>
+<p class="text-xs opacity-80">12 files • 5.1 GB</p>
+</div>
+</div>
+</section>
+<!-- SECTION 3: RECENT FILES & SHADCN COMPONENTS SHOWCASE -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+<div class="xl:col-span-2 space-y-8">
+<!-- Recent Files Table -->
+<div class="bg-white rounded-xl card-gradient-border shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+<h3 class="font-bold text-slate-900">Recent Activity</h3>
+<button class="text-xs font-bold text-slate-500 hover:text-slate-900 uppercase tracking-wider">Expand</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-slate-50/50 text-slate-500 font-medium uppercase text-[10px] tracking-widest">
+<tr>
+<th class="px-6 py-3">File Name</th>
+<th class="px-6 py-3">Size</th>
+<th class="px-6 py-3">Date Modified</th>
+<th class="px-6 py-3 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">image</span>
+</div>
+<span class="font-medium text-slate-900">Branding_Guidelines_v2.pdf</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500">12.4 MB</td>
+<td class="px-6 py-4 text-slate-500">Today, 2:40 PM</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900 transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-emerald-100 flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined text-[18px]">table_chart</span>
+</div>
+<span class="font-medium text-slate-900">Q4_Revenue_Projections.xlsx</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500">2.1 MB</td>
+<td class="px-6 py-4 text-slate-500">Yesterday</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900 transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/80 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-rose-100 flex items-center justify-center text-rose-600">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+</div>
+<span class="font-medium text-slate-900">Keynote_Hero_Video.mp4</span>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500">854.0 MB</td>
+<td class="px-6 py-4 text-slate-500">Oct 24, 2023</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-900 transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Component Showcase Part 1 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Card with Tabs -->
+<div class="bg-white rounded-xl border border-slate-200 p-6">
+<div class="flex gap-4 border-b border-slate-100 mb-6">
+<button class="pb-3 text-sm font-bold border-b-2 border-primary text-primary">Notifications</button>
+<button class="pb-3 text-sm font-medium text-slate-400 hover:text-slate-600">Recent Alerts</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+<span class="material-symbols-outlined text-amber-500 mt-0.5">warning</span>
+<div>
+<p class="text-sm font-bold text-slate-900">Storage Limit Approaching</p>
+<p class="text-xs text-slate-500">Your Google Drive is at 82% capacity. Consider upgrading.</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-100">
+<span class="material-symbols-outlined text-green-500">check_circle</span>
+<p class="text-sm font-bold text-green-800">Files Synced Successfully</p>
+</div>
+</div>
+</div>
+<!-- Card with Slider & Switch -->
+<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-8">
+<div>
+<div class="flex justify-between items-center mb-4">
+<label class="text-sm font-bold text-slate-900">Max Upload Size</label>
+<span class="text-xs bg-slate-100 px-2 py-0.5 rounded font-bold">500MB</span>
+</div>
+<div class="relative w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="absolute h-full bg-primary w-1/2"></div>
+<div class="absolute w-4 h-4 bg-white border-2 border-primary rounded-full top-1/2 left-1/2 -translate-y-1/2 shadow-md cursor-pointer"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-sm font-bold text-slate-900">Automatic Backup</p>
+<p class="text-xs text-slate-500">Sync files while computer is idle</p>
+</div>
+<button class="w-10 h-6 bg-primary rounded-full p-1 relative transition-colors">
+<div class="w-4 h-4 bg-white rounded-full absolute right-1"></div>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-sm font-bold text-slate-900">Encryption</p>
+<p class="text-xs text-slate-500">AES-256 end-to-end</p>
+</div>
+<button class="w-10 h-6 bg-slate-200 rounded-full p-1 relative transition-colors">
+<div class="w-4 h-4 bg-white rounded-full absolute left-1"></div>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- SIDEBAR CONTENT / SHADCN SHOWCASE PART 2 -->
+<div class="space-y-6">
+<!-- Calendar Component -->
+<div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h4 class="font-bold text-slate-900">Sync Schedule</h4>
+<div class="flex gap-1">
+<button class="p-1 hover:bg-slate-100 rounded"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="p-1 hover:bg-slate-100 rounded"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-2 text-center mb-2">
+<span class="text-[10px] font-bold text-slate-400">S</span>
+<span class="text-[10px] font-bold text-slate-400">M</span>
+<span class="text-[10px] font-bold text-slate-400">T</span>
+<span class="text-[10px] font-bold text-slate-400">W</span>
+<span class="text-[10px] font-bold text-slate-400">T</span>
+<span class="text-[10px] font-bold text-slate-400">F</span>
+<span class="text-[10px] font-bold text-slate-400">S</span>
+</div>
+<div class="grid grid-cols-7 gap-2 text-center text-xs">
+<span class="p-2 rounded text-slate-300">29</span>
+<span class="p-2 rounded text-slate-300">30</span>
+<span class="p-2 rounded text-slate-300">31</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">1</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">2</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">3</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">4</span>
+<span class="p-2 rounded bg-primary text-white font-bold cursor-pointer">5</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">6</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">7</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">8</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">9</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">10</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer">11</span>
+<span class="p-2 rounded hover:bg-slate-50 cursor-pointer font-bold text-slate-900">12</span>
+</div>
+</div>
+<!-- Profile & Context Menu -->
+<div class="bg-indigo-950 text-white rounded-xl p-6 shadow-xl relative overflow-hidden group">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+<h4 class="font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">workspace_premium</span>
+                            Premium Features
+                        </h4>
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-sm text-white/80">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+                                Unlimited sharing
+                            </div>
+<div class="flex items-center gap-2 text-sm text-white/80">
+<span class="material-symbols-outlined text-[18px]">cloud_sync</span>
+                                Advanced sync rules
+                            </div>
+</div>
+<button class="w-full mt-6 py-2 bg-white/20 hover:bg-white/30 border border-white/20 rounded-lg text-xs font-bold transition-all backdrop-blur-sm">
+                            Learn More
+                        </button>
+</div>
+<!-- Progress & Badges Showcase -->
+<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
+<h4 class="font-bold text-slate-900 text-sm">System Status</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase mb-2">
+<span>Syncing Progress</span>
+<span>65%</span>
+</div>
+<div class="w-full bg-slate-100 h-2 rounded-full">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 65%"></div>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-blue-100 text-primary text-[10px] font-bold rounded uppercase tracking-wider">Connected</span>
+<span class="px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider">Standby</span>
+<span class="px-2 py-1 bg-green-100 text-green-600 text-[10px] font-bold rounded uppercase tracking-wider">Secure</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 4: EXHAUSTIVE UI COMPONENTS LISTING -->
+<section class="py-10 border-t border-slate-200">
+<div class="bg-slate-50/50 p-8 rounded-2xl border border-dashed border-slate-300 text-center">
+<h3 class="font-bold text-slate-400 mb-8 uppercase tracking-[0.2em] text-sm">Component Integration Reference</h3>
+<div class="flex flex-wrap justify-center gap-3">
+<!-- Mapping all 47+ components requested into a visual "wall" -->
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Accordion</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Alert</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">AlertDialog</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">AspectRatio</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Avatar</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Badge</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Breadcrumb</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Button</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Calendar</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Card</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Carousel</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Chart</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Checkbox</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Collapsible</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Command</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">ContextMenu</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Dialog</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Drawer</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">DropdownMenu</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Form</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">HoverCard</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Input</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">InputOTP</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Label</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Menubar</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">NavigationMenu</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Pagination</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Popover</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Progress</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">RadioGroup</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Resizable</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">ScrollArea</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Select</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Separator</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Sheet</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Sidebar</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Skeleton</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Slider</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Sonner</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Switch</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Table</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Tabs</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Textarea</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Toast</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Toggle</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">ToggleGroup</span>
+<span class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-medium shadow-sm">Tooltip</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Pagination Component (Footer) -->
+<footer class="p-8 border-t border-slate-200 bg-white/50">
+<div class="flex items-center justify-between">
+<p class="text-xs text-slate-500 font-medium">© 2024 RawVault Cloud Storage Inc. Built with Linear-style UI.</p>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<span class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white text-xs font-bold">1</span>
+<span class="w-8 h-8 flex items-center justify-center rounded text-xs font-medium text-slate-500 hover:bg-slate-100 cursor-pointer">2</span>
+<span class="w-8 h-8 flex items-center justify-center rounded text-xs font-medium text-slate-500 hover:bg-slate-100 cursor-pointer">3</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<!-- Alert Dialog Simulation (Hidden by default but markup exists) -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+<div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+<div class="relative bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border border-slate-200">
+<h3 class="text-lg font-bold text-slate-900 mb-2">Delete branding_asset.zip?</h3>
+<p class="text-sm text-slate-500 mb-6">This action cannot be undone. This will permanently delete your file from our servers.</p>
+<div class="flex justify-end gap-3">
+<button class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+<button class="px-4 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-lg shadow-red-500/20">Delete Forever</button>
+</div>
+</div>
+</div>
+</body></html>

@@ -36,7 +36,7 @@ Implement and fix UI: pages, layouts, components, routing, client state, and acc
 - **Path**: Primitives live under `@/components/theme/shadcn`. `components.json` → `ui`: `@/components/theme/shadcn`. Style `base-nova`, RSC, Tailwind in `app/globals.css`.
 - **Theming**: Use theme wrappers and `useThemeComponents()` from `@/components/themes`. New UI uses theme-aware components; add new primitives under `components/theme/shadcn` and wire via themes if needed.
 - **Add component**: `npx shadcn@latest add <name>`; then fix imports to `@/components/theme/shadcn/<name>` if needed. Use `cn()` for class merging; extend via wrappers in `components/theme/` or `components/workspace/`, not by editing `theme/shadcn/` directly when avoidable.
-- **More detail**: `.cursor/agents/skills/shadcn.md`; optional project reference `skills/shadcn-ui/SKILL.md` if present.
+- **More detail**: `.cursor/agents/skills/shadcn.md`; optional project reference `.cursor/agents/compat/skills/shadcn-ui/SKILL.md` if present.
 
 ## Responsive design (merged from responsive-design skill)
 

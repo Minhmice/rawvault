@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CloudBox - Storage Dashboard &amp; UI Showcase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5048e5",
+                        "surface": "#FFFFFF",
+                        "background": "#F9FAFB",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "neumorphic": "8px 8px 16px #e0e0e0, -8px -8px 16px #ffffff",
+                        "soft": "0 2px 12px rgba(0,0,0,0.03)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; }
+        .donut-chart {
+            background: conic-gradient(#5048e5 0% 70%, #E5E7EB 70% 100%);
+            border-radius: 50%;
+        }
+        .inner-donut {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%;
+            height: 75%;
+            background: white;
+            border-radius: 50%;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #5048e5; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-slate-900 font-sans antialiased">
+<div class="flex min-h-screen">
+<!-- Sidebar Component -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-200/60 p-6 flex flex-col z-50">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">cloud_done</span>
+</div>
+<div>
+<h1 class="text-xl font-black tracking-tight text-slate-900 leading-none">CloudBox</h1>
+<p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">v2.4 Premium</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 ml-4">Main Menu</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-primary/10 text-primary font-bold transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-500 hover:bg-slate-50 transition-all font-medium" href="#showcase">
+<span class="material-symbols-outlined text-[20px]">extension</span>
+<span>UI Components</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-500 hover:bg-slate-50 transition-all font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">folder</span>
+<span>All Files</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-500 hover:bg-slate-50 transition-all font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span>Recent</span>
+</a>
+</nav>
+<div class="mt-auto space-y-4">
+<!-- DropdownMenu & Sidebar Component Labels -->
+<div class="bg-slate-50 p-4 rounded-2xl">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-slate-600">Storage Used</span>
+<span class="text-xs font-bold text-primary">70%</span>
+</div>
+<div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 70%"></div>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-4 rounded-full font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">cloud_upload</span>
+                    Upload New
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-72 flex-1 p-8 lg:p-12 max-w-7xl mx-auto">
+<!-- Header (Breadcrumb, Avatar, NavigationMenu) -->
+<header class="flex items-center justify-between mb-12">
+<div>
+<div class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">
+<span>Workspace</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary font-black">Dashboard</span>
+</div>
+<h2 class="text-4xl font-black text-slate-900 tracking-tight">Cloud Storage</h2>
+</div>
+<div class="flex items-center gap-6">
+<!-- NavigationMenu Desktop -->
+<nav class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-500">
+<a class="hover:text-primary transition-colors" href="#">Overview</a>
+<a class="hover:text-primary transition-colors" href="#">Shared</a>
+<a class="hover:text-primary transition-colors" href="#">Requests</a>
+</nav>
+<div class="flex items-center gap-3 bg-white p-1.5 pl-4 pr-1.5 border border-slate-200 rounded-full shadow-sm">
+<span class="text-xs font-bold text-slate-600">Alex Rivera</span>
+<!-- Avatar Component -->
+<div class="w-9 h-9 rounded-full overflow-hidden border-2 border-white ring-1 ring-slate-100">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPrzT4AWdedHKXrz1QuQpmp-Hx2-NqjPyVtZBfOJrBciqE-LBQj4cpllTYYTtV603LuUuR-fSbx5Aq5nYeaIE7OyjOZpptXJiWKGuaGFq6SFbEveJ80qXNMmK4-gwm4kXYCEHKYRqUKlEYl7QCye6kNrtqm1_g-dhQKWAncnkEPwsSKb9D_Zy4X9qGra9jTF1W2qV_Ru_R2Ah5RCe4MLXezBObI2z3E_-h5iC0Ah8EkSIVA4EFrYymiFRTnAsWYQ_dXe3itI13ezCB"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Overview Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+<!-- Storage Overview (Donut Chart) -->
+<div class="lg:col-span-1 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft flex flex-col items-center">
+<h3 class="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-8 w-full">Storage Capacity</h3>
+<div class="relative w-48 h-48 donut-chart mb-8">
+<div class="inner-donut flex flex-col items-center justify-center">
+<span class="text-4xl font-black text-slate-900 leading-none">70%</span>
+<span class="text-[10px] font-bold text-slate-400 uppercase mt-1">Used</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-8 w-full">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Total Limit</p>
+<p class="text-xl font-black text-slate-900">500 GB</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Free Space</p>
+<p class="text-xl font-black text-primary">150 GB</p>
+</div>
+</div>
+</div>
+<!-- Provider Cards (Dropbox / Google Drive) -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Connected Accounts</h3>
+<button class="text-xs font-bold text-primary hover:underline">Link New +</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Dropbox Card -->
+<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-neumorphic flex items-center gap-5 transition-transform hover:-translate-y-1">
+<div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined text-4xl">folder_shared</span>
+</div>
+<div class="flex-1">
+<h4 class="font-black text-slate-900">Dropbox</h4>
+<p class="text-xs text-slate-400 font-medium mb-3">alex-box-2024</p>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500" style="width: 45%"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-500">45%</span>
+</div>
+</div>
+</div>
+<!-- Google Drive Card -->
+<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-neumorphic flex items-center gap-5 transition-transform hover:-translate-y-1">
+<div class="w-16 h-16 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-600">
+<span class="material-symbols-outlined text-4xl">add_to_drive</span>
+</div>
+<div class="flex-1">
+<h4 class="font-black text-slate-900">G-Drive</h4>
+<p class="text-xs text-slate-400 font-medium mb-3">Work Shared</p>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-500" style="width: 82%"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-500">82%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Category Cards (Aspect Ratio Grid) -->
+<div class="grid grid-cols-4 gap-4">
+<div class="aspect-square bg-indigo-500 rounded-3xl p-5 text-white flex flex-col justify-between group cursor-pointer hover:bg-indigo-600 transition-colors">
+<span class="material-symbols-outlined text-3xl">image</span>
+<div>
+<p class="text-[10px] font-bold uppercase opacity-70">Images</p>
+<p class="text-lg font-black">1.2k</p>
+</div>
+</div>
+<div class="aspect-square bg-emerald-500 rounded-3xl p-5 text-white flex flex-col justify-between group cursor-pointer hover:bg-emerald-600 transition-colors">
+<span class="material-symbols-outlined text-3xl">description</span>
+<div>
+<p class="text-[10px] font-bold uppercase opacity-70">Docs</p>
+<p class="text-lg font-black">458</p>
+</div>
+</div>
+<div class="aspect-square bg-rose-500 rounded-3xl p-5 text-white flex flex-col justify-between group cursor-pointer hover:bg-rose-600 transition-colors">
+<span class="material-symbols-outlined text-3xl">music_note</span>
+<div>
+<p class="text-[10px] font-bold uppercase opacity-70">Music</p>
+<p class="text-lg font-black">2.4k</p>
+</div>
+</div>
+<div class="aspect-square bg-amber-500 rounded-3xl p-5 text-white flex flex-col justify-between group cursor-pointer hover:bg-amber-600 transition-colors">
+<span class="material-symbols-outlined text-3xl">movie</span>
+<div>
+<p class="text-[10px] font-bold uppercase opacity-70">Videos</p>
+<p class="text-lg font-black">94</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Folders Section -->
+<section class="mb-16">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-2xl font-black text-slate-900">Recent Folders</h3>
+<!-- Segmented Control / Tabs Component -->
+<div class="flex p-1 bg-slate-100 rounded-full w-fit">
+<button class="px-6 py-2 bg-primary rounded-full text-xs font-bold text-white shadow-sm">All</button>
+<button class="px-6 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-standard">Folders</button>
+<button class="px-6 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-standard">Files</button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+<!-- Pastel Folder Cards -->
+<div class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100 hover:shadow-lg hover:shadow-blue-200/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-10">
+<div class="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">folder</span>
+</div>
+<button class="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">UI Assets</h4>
+<p class="text-xs text-blue-600 font-medium mt-1">18 files</p>
+</div>
+</div>
+<div class="bg-orange-50 p-6 rounded-[2rem] border border-orange-100 hover:shadow-lg hover:shadow-orange-200/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-10">
+<div class="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">folder</span>
+</div>
+<button class="text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Client Projects</h4>
+<p class="text-xs text-orange-600 font-medium mt-1">42 files</p>
+</div>
+</div>
+<div class="bg-pink-50 p-6 rounded-[2rem] border border-pink-100 hover:shadow-lg hover:shadow-pink-200/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-10">
+<div class="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">folder</span>
+</div>
+<button class="text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Branding Materials</h4>
+<p class="text-xs text-pink-600 font-medium mt-1">12 files</p>
+</div>
+</div>
+<div class="bg-teal-50 p-6 rounded-[2rem] border border-teal-100 hover:shadow-lg hover:shadow-teal-200/50 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-10">
+<div class="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">folder</span>
+</div>
+<button class="text-teal-400 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-bold text-slate-900">Source Code</h4>
+<p class="text-xs text-teal-600 font-medium mt-1">8 files</p>
+</div>
+</div>
+</div>
+</section>
+<!-- SHADCN/UI EXPLICIT SHOWCASE -->
+<section class="pt-20 border-t border-slate-200" id="showcase">
+<div class="flex flex-col items-center text-center mb-16">
+<span class="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">shadcn/ui Showcase</span>
+<h2 class="text-5xl font-black text-slate-900 tracking-tighter mb-4">47+ Component Matrix</h2>
+<p class="text-slate-500 max-w-2xl font-medium">Every primitive built for the CloudBox Design System following shadcn standards.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+<!-- Group: Forms & Controls -->
+<div class="space-y-8">
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Forms &amp; Inputs</h4>
+<div class="space-y-6">
+<div>
+<label class="text-xs font-bold text-slate-600 mb-2 block">Input / Label</label>
+<input class="w-full px-5 py-3 rounded-full border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none text-sm transition-all" placeholder="Enter value..." type="text"/>
+</div>
+<div class="flex items-center justify-between">
+<label class="text-xs font-bold text-slate-600">Switch</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-3">
+<label class="text-xs font-bold text-slate-600">Slider</label>
+<input class="w-full accent-primary" type="range"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-1.5 bg-slate-100 text-[10px] font-bold rounded-full border border-slate-200 flex items-center gap-1">Checkbox <input checked="" class="rounded text-primary focus:ring-primary h-3 w-3" type="checkbox"/></span>
+<span class="px-4 py-1.5 bg-slate-100 text-[10px] font-bold rounded-full border border-slate-200 flex items-center gap-1">Radio <input checked="" class="text-primary focus:ring-primary h-3 w-3" type="radio"/></span>
+</div>
+<div>
+<label class="text-xs font-bold text-slate-600 mb-2 block">Select</label>
+<select class="w-full px-5 py-3 rounded-full border border-slate-200 text-sm appearance-none bg-white font-medium">
+<option>Option 1</option>
+<option>Option 2</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-bold text-slate-600 mb-2 block">Textarea</label>
+<textarea class="w-full px-5 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:border-primary" rows="2"></textarea>
+</div>
+<div>
+<label class="text-xs font-bold text-slate-600 mb-2 block">InputOTP</label>
+<div class="flex gap-2">
+<input class="w-10 h-10 border border-slate-200 rounded-lg text-center font-bold" value="1"/>
+<input class="w-10 h-10 border border-slate-200 rounded-lg text-center font-bold" value="2"/>
+<input class="w-10 h-10 border border-slate-200 rounded-lg text-center font-bold" value="3"/>
+<input class="w-10 h-10 border border-slate-200 rounded-lg text-center font-bold" value="4"/>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Buttons &amp; Toggles</h4>
+<div class="flex flex-wrap gap-3">
+<button class="px-6 py-2.5 bg-primary text-white text-xs font-bold rounded-full shadow-lg shadow-primary/20">Button</button>
+<button class="px-6 py-2.5 border-2 border-primary text-primary text-xs font-bold rounded-full">Outline</button>
+<div class="flex bg-slate-100 p-1 rounded-full">
+<button class="px-4 py-1.5 bg-white text-[10px] font-bold rounded-full shadow-sm">ToggleGroup</button>
+<button class="px-4 py-1.5 text-[10px] font-bold text-slate-500">Toggle</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Group: Feedback & Overlays -->
+<div class="space-y-8">
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Alerts &amp; Dialogs</h4>
+<div class="space-y-4">
+<!-- Alert Component -->
+<div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex gap-3 items-start">
+<span class="material-symbols-outlined text-amber-600 text-sm mt-0.5">warning</span>
+<div>
+<p class="text-[10px] font-black text-amber-900 uppercase">Alert Component</p>
+<p class="text-[10px] text-amber-700 font-medium">Storage limit almost reached.</p>
+</div>
+</div>
+<!-- AlertDialog Simulation -->
+<div class="p-6 bg-slate-50 border border-slate-100 rounded-2xl">
+<h5 class="text-xs font-bold text-slate-900 mb-3">AlertDialog / Dialog / Sheet</h5>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-full">Open Dialog</button>
+<button class="px-4 py-2 bg-slate-200 text-slate-900 text-[10px] font-bold rounded-full">Open Sheet</button>
+<button class="px-4 py-2 bg-slate-200 text-slate-900 text-[10px] font-bold rounded-full">Drawer</button>
+</div>
+</div>
+<!-- Toast/Sonner Placeholder -->
+<div class="flex items-center justify-between p-4 bg-primary/5 rounded-2xl">
+<span class="text-[10px] font-bold text-primary">Sonner / Toast / Tooltip</span>
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Status &amp; Loading</h4>
+<div class="space-y-6">
+<!-- Progress Component -->
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase">
+<span>Progress</span>
+<span>65%</span>
+</div>
+<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500" style="width: 65%"></div>
+</div>
+</div>
+<!-- Skeleton Component -->
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-slate-100 rounded-full animate-pulse"></div>
+<div class="flex-1 space-y-2">
+<div class="h-2 bg-slate-100 rounded-full w-3/4 animate-pulse"></div>
+<div class="h-2 bg-slate-100 rounded-full w-1/2 animate-pulse"></div>
+</div>
+</div>
+<!-- Badge / HoverCard -->
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full">Badge</span>
+<span class="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-full">HoverCard Target</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group: Data & Layout -->
+<div class="space-y-8">
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Data &amp; Layout</h4>
+<div class="space-y-4">
+<!-- Table Component -->
+<div class="overflow-hidden rounded-xl border border-slate-100">
+<table class="w-full text-[10px]">
+<thead class="bg-slate-50">
+<tr>
+<th class="px-3 py-2 text-left font-black text-slate-400">TABLE</th>
+<th class="px-3 py-2 text-right font-black text-slate-400">SIZE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50">
+<tr><td class="px-3 py-2 font-bold">report.pdf</td><td class="px-3 py-2 text-right text-slate-500">2.4MB</td></tr>
+<tr><td class="px-3 py-2 font-bold">image.png</td><td class="px-3 py-2 text-right text-slate-500">850KB</td></tr>
+</tbody>
+</table>
+</div>
+<!-- Accordion / Collapsible -->
+<div class="space-y-2">
+<details class="bg-slate-50 rounded-xl overflow-hidden group">
+<summary class="p-3 text-[10px] font-black uppercase cursor-pointer flex justify-between items-center text-slate-600">
+                                            Accordion / Collapsible
+                                            <span class="material-symbols-outlined text-sm group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="p-3 pt-0 text-[10px] text-slate-500">Expanded content with smooth transition properties.</div>
+</details>
+</div>
+<!-- Calendar Simulation -->
+<div class="p-4 bg-slate-50 rounded-2xl flex flex-col items-center">
+<p class="text-[10px] font-black text-slate-400 uppercase mb-3">Calendar</p>
+<div class="grid grid-cols-7 gap-1">
+<div class="w-6 h-6 flex items-center justify-center text-[10px] font-black text-slate-300">S</div>
+<div class="w-6 h-6 flex items-center justify-center text-[10px] font-black text-slate-300">M</div>
+<div class="w-6 h-6 flex items-center justify-center text-[10px] font-bold bg-primary text-white rounded-full">14</div>
+<div class="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-slate-600">15</div>
+<div class="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-slate-600">16</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-soft">
+<h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Navigation &amp; Menus</h4>
+<div class="space-y-4">
+<!-- Command / Popover / Menubar -->
+<div class="bg-slate-900 text-white p-4 rounded-2xl">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-sm text-primary">terminal</span>
+<span class="text-[10px] font-black uppercase tracking-widest">Command Menu</span>
+</div>
+<div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 space-y-1">
+<p class="px-2 py-1 bg-white/5 rounded">Search files...</p>
+<p class="px-2 py-1">New project</p>
+</div>
+</div>
+<!-- Carousel / Pagination / ScrollArea -->
+<div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+<span class="text-[10px] font-bold text-slate-500 uppercase">Pagination / Carousel</span>
+<div class="flex gap-1">
+<button class="w-6 h-6 bg-white border border-slate-200 rounded flex items-center justify-center text-[10px] font-bold shadow-sm">1</button>
+<button class="w-6 h-6 bg-white border border-slate-200 rounded flex items-center justify-center text-[10px] font-bold">2</button>
+</div>
+</div>
+<!-- ContextMenu / Dropdown / Popover -->
+<div class="flex gap-2">
+<div class="flex-1 px-4 py-3 border-2 border-dashed border-slate-200 rounded-2xl text-center">
+<span class="text-[10px] font-bold text-slate-400">ContextMenu Area</span>
+</div>
+<div class="flex-1 px-4 py-3 bg-slate-50 rounded-2xl text-center">
+<span class="text-[10px] font-bold text-slate-600">Menubar</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Missing Extras: Separator, Resizable, AspectRatio, Chart -->
+<div class="mt-12 p-8 bg-slate-900 rounded-[2.5rem] relative overflow-hidden">
+<div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div>
+<h4 class="text-white text-2xl font-black mb-4 tracking-tight">Advanced Layout Primitives</h4>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-black text-primary uppercase">Separator</span>
+<div class="flex-1 h-[1px] bg-slate-800"></div>
+</div>
+<div class="p-4 bg-slate-800 rounded-2xl border border-white/10 flex justify-between items-center">
+<span class="text-[10px] font-bold text-slate-400">Resizable Handle Simulation</span>
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-1 aspect-[16/9] bg-slate-800 rounded-xl flex items-center justify-center">
+<span class="text-[10px] font-black text-slate-500">AspectRatio 16:9</span>
+</div>
+<div class="flex-1 aspect-square bg-slate-800 rounded-xl flex items-center justify-center">
+<span class="text-[10px] font-black text-slate-500">AspectRatio 1:1</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white/5 p-8 rounded-[2rem] border border-white/10 backdrop-blur-sm">
+<p class="text-[10px] font-black text-primary uppercase mb-6 tracking-widest">Analytics Chart (Primitive)</p>
+<div class="flex items-end gap-2 h-40">
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary" style="height: 30%"></div>
+<div class="flex-1 bg-primary/40 rounded-t-lg transition-all hover:bg-primary" style="height: 60%"></div>
+<div class="flex-1 bg-primary/30 rounded-t-lg transition-all hover:bg-primary" style="height: 45%"></div>
+<div class="flex-1 bg-primary/80 rounded-t-lg transition-all hover:bg-primary" style="height: 90%"></div>
+<div class="flex-1 bg-primary/60 rounded-t-lg transition-all hover:bg-primary" style="height: 70%"></div>
+<div class="flex-1 bg-primary/50 rounded-t-lg transition-all hover:bg-primary" style="height: 55%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="mt-32 pt-16 border-t border-slate-200 pb-16 flex flex-col md:flex-row items-center justify-between gap-8">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-white text-[10px] font-black">CB</div>
+<span class="font-black text-slate-900 tracking-tight">CloudBox UI Kit</span>
+</div>
+<p class="text-slate-400 text-xs font-medium">© 2024 Design System Lab. Powered by shadcn/ui.</p>
+</div>
+<div class="flex items-center gap-8">
+<a class="text-xs font-bold text-slate-500 hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-xs font-bold text-slate-500 hover:text-primary transition-colors" href="#">Components</a>
+<a class="text-xs font-bold text-slate-500 hover:text-primary transition-colors" href="#">GitHub</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

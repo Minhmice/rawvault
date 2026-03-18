@@ -38,6 +38,12 @@ export const PREVIEW_SIZE_CAPS: Record<string, number> = {
 const RAW_EXTENSIONS = new Set([
   "arw", "cr2", "cr3", "nef", "nrw", "dng", "raf", "orf", "rw2", "pef",
   "srw", "x3f", "3fr", "mef", "mrw", "rwl", "iiq", "cap", "erf",
+  "kdc", "mos", "braw", "bay", "raw",
+]);
+
+const IMAGE_EXTENSIONS = new Set([
+  "png", "jpg", "jpeg", "webp", "gif", "bmp", "tiff", "tif", "avif", "heic", "heif",
+  "psd", "psb", "ai", "eps", "jfif", "jxl", "jp2", "j2k", "ico", "tga",
 ]);
 
 // Office extensions (lowercase, no dot)
@@ -65,12 +71,12 @@ function classifyKind(mimeType: string | null | undefined, filename: string): Pr
   // Google Workspace
   if (mime.startsWith("application/vnd.google-apps.")) return "google_redirect";
 
+  // RAW — must check BEFORE generic image/ so .arw with mime "image/x-sony-arw" isn't misclassified
+  if (RAW_EXTENSIONS.has(ext)) return "raw_embedded";
+
   // Images
   if (mime.startsWith("image/")) return "image";
-  if (["png", "jpg", "jpeg", "webp", "gif", "bmp", "tiff", "tif", "avif", "heic", "heif"].includes(ext)) return "image";
-
-  // RAW (check before generic image)
-  if (RAW_EXTENSIONS.has(ext)) return "raw_embedded";
+  if (IMAGE_EXTENSIONS.has(ext)) return "image";
 
   // PDF
   if (mime === "application/pdf" || ext === "pdf") return "pdf";

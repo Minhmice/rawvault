@@ -8,6 +8,7 @@ export const unifiedExplorerItemSchema = z.object({
   isFolder: z.boolean(),
   mimeType: z.string().nullable(),
   sizeBytes: z.number().int().nonnegative().nullable(),
+  thumbnailUrl: z.string().optional(),
 });
 
 export const unifiedExplorerListQuerySchema = z.object({

@@ -1,0 +1,43 @@
+@layer base {
+  .rawvault-light,
+  [data-theme="rawvault-light"] {
+    --rv-bg: #f7f9fb;
+    --rv-surface: #ffffff;
+    --rv-surface-muted: #f2f4f6;
+    --rv-border: #c7c4d7;
+    --rv-text: #191c1e;
+    --rv-text-muted: #464554;
+    --rv-primary: #4648d4;
+    --rv-primary-hover: #3323cc;
+    --rv-danger: #ba1a1a;
+
+    --background: #f7f9fb;
+    --foreground: #191c1e;
+    --card: #ffffff;
+    --card-foreground: #191c1e;
+    --popover: #ffffff;
+    --popover-foreground: #191c1e;
+    --primary: #4648d4;
+    --primary-foreground: #ffffff;
+    --secondary: #3fe1fd;
+    --secondary-foreground: #00616f;
+    --muted: #f2f4f6;
+    --muted-foreground: #464554;
+    --accent: #645efb;
+    --accent-foreground: #fffbff;
+    --destructive: #ba1a1a;
+    --destructive-foreground: #ffffff;
+    --border: #c7c4d7;
+    --input: #e0e3e5;
+    --ring: #4648d4;
+
+    --sidebar: #f7f9fb;
+    --sidebar-foreground: #191c1e;
+    --sidebar-primary: #4648d4;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f2f4f6;
+    --sidebar-accent-foreground: #191c1e;
+    --sidebar-border: #c7c4d7;
+    --sidebar-ring: #4648d4;
+  }
+}

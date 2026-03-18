@@ -12,9 +12,10 @@ type OfficeFallbackProps = {
 
 export function OfficeFallback({ model, onDownload }: OfficeFallbackProps) {
   const providerFileId = model.source.providerFileId;
+  const canOpenInGoogle = model.source.provider === "gdrive" && !!providerFileId;
 
   const handleOpenInGoogle = () => {
-    if (!providerFileId) return;
+    if (!canOpenInGoogle || !providerFileId) return;
     window.open(
       `https://drive.google.com/open?id=${encodeURIComponent(providerFileId)}`,
       "_blank",
@@ -55,7 +56,7 @@ export function OfficeFallback({ model, onDownload }: OfficeFallbackProps) {
           <Download className="h-4 w-4" />
           Download
         </button>
-        {providerFileId && (
+        {canOpenInGoogle && (
           <button
             onClick={handleOpenInGoogle}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium bg-muted hover:bg-muted/80 text-foreground transition-colors"

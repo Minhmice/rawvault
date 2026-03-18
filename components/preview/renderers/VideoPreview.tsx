@@ -1,27 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { downloadToBlob, buildStreamUrl, type DownloadProgress } from "@/lib/preview/download-blob";
-import { PreviewLoading, PreviewError, PreviewProgress } from "@/components/preview/PreviewOverlay";
+import { buildStreamUrl } from "@/lib/preview/download-blob";
+import { PreviewLoading, PreviewError } from "@/components/preview/PreviewOverlay";
 import type { PreviewModel } from "@/lib/contracts/preview.contracts";
 import { PREVIEW_SIZE_CAPS } from "@/lib/contracts/preview.contracts";
 
 type VideoPreviewProps = { model: PreviewModel };
 
 type State =
-  | { phase: "loading"; progress: DownloadProgress | null }
-  | { phase: "ready"; objectUrl: string; contentType: string }
+  | { phase: "loading" }
+  | { phase: "ready" }
   | { phase: "error"; message: string }
-  | { phase: "too_large" }
-  | { phase: "aborted" };
+  | { phase: "too_large" };
 
 export function VideoPreview({ model }: VideoPreviewProps) {
-  const [state, setState] = useState<State>({ phase: "loading", progress: null });
-  const abortRef = useRef<AbortController | null>(null);
+  const [state, setState] = useState<State>({ phase: "loading" });
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
 
   const cleanup = useCallback(() => {
-    abortRef.current?.abort();
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
@@ -35,9 +33,6 @@ export function VideoPreview({ model }: VideoPreviewProps) {
       return;
     }
 
-    const controller = new AbortController();
-    abortRef.current = controller;
-
     const streamUrl =
       model.source.streamUrl ??
       (model.source.fileId ? buildStreamUrl(model.source.fileId) : null);
@@ -46,30 +41,12 @@ export function VideoPreview({ model }: VideoPreviewProps) {
       return cleanup;
     }
 
-    downloadToBlob(streamUrl, {
-      signal: controller.signal,
-      onProgress: (p) => setState({ phase: "loading", progress: p }),
-    }).then((result) => {
-      if (result.ok) {
-        const url = URL.createObjectURL(result.blob);
-        objectUrlRef.current = url;
-        setState({ phase: "ready", objectUrl: url, contentType: result.contentType });
-      } else if (result.reason === "aborted") {
-        setState({ phase: "aborted" });
-      } else {
-        setState({ phase: "error", message: result.message ?? "Download failed" });
-      }
-    });
-
+    setState({ phase: "loading" });
     return cleanup;
   }, [model, cleanup]);
 
   if (state.phase === "loading") {
-    return state.progress ? (
-      <PreviewProgress fraction={state.progress.fraction} label="Downloading video…" />
-    ) : (
-      <PreviewLoading label="Downloading video…" />
-    );
+    return <PreviewLoading label="Loading video…" />;
   }
   if (state.phase === "too_large") {
     return (
@@ -79,26 +56,30 @@ export function VideoPreview({ model }: VideoPreviewProps) {
       />
     );
   }
-  if (state.phase === "aborted") return <PreviewError title="Download cancelled" />;
   if (state.phase === "error") {
     return <PreviewError title="Video preview failed" description={state.message} />;
   }
 
+  const streamUrl =
+    model.source.streamUrl ??
+    (model.source.fileId ? buildStreamUrl(model.source.fileId) : null);
+
   return (
-    <div
-      data-testid="preview-video"
-      className="w-full h-full flex items-center justify-center"
-    >
+    <div data-testid="preview-video" className="w-full h-full flex items-center justify-center min-h-0">
       <video
+        key={streamUrl}
+        ref={videoRef}
         controls
         playsInline
-        src={state.objectUrl}
+        autoPlay
+        src={streamUrl ?? undefined}
         className="max-w-full max-h-full rounded-lg"
-        autoPlay={false}
-      >
-        <source src={state.objectUrl} type={state.contentType} />
-        Your browser does not support video playback.
-      </video>
+        onLoadedMetadata={() => setState({ phase: "ready" })}
+        onError={(e) => {
+          const target = e.target as HTMLVideoElement;
+          setState({ phase: "error", message: target.error?.message ?? "Failed to load video" });
+        }}
+      />
     </div>
   );
 }

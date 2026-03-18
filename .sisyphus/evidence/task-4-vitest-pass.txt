@@ -1,0 +1,14 @@
+
+> rawvault@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/Users/minhmice/Documents/Projects/rawvault/.claude/worktrees/drive-file-preview[39m
+
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 12:56:28
+[2m   Duration [22m 725ms[2m (transform 13ms, setup 74ms, import 6ms, tests 2ms, environment 508ms)[22m
+
+exit:0

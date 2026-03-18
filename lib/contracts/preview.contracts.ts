@@ -36,6 +36,7 @@ export const previewSourceSchema = z.object({
   provider: z.enum(["gdrive", "onedrive"]).optional(),
   /** Stream URL — /api/files/{id}/stream or /api/explorer/stream?... */
   streamUrl: z.string().optional(),
+  thumbnailUrl: z.string().optional(),
   /** Download URL — /api/files/{id}/download */
   downloadUrl: z.string().optional(),
 });

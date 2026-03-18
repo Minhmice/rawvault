@@ -1,0 +1,51 @@
+QA Verification Report — drive-file-preview
+Date: Wed Mar 18 2026
+Worktree: /Users/minhmice/Documents/Projects/rawvault/.claude/worktrees/drive-file-preview
+
+=== STEP 1: npm run build ===
+Result: EXIT 0 — PASS
+Details: Next.js 16.1.6 (Turbopack) compiled successfully in 15.6s
+         32 static pages generated, all routes processed without errors.
+
+=== STEP 2: npm run test ===
+Result: ALL PASSING — PASS
+Details: vitest v4.1.0
+         Test Files: 3 passed (3)
+         Tests:      37 passed (37)
+         Duration:   7.91s
+
+=== STEP 3: Key Preview Files Check ===
+Result: ALL FILES PRESENT — PASS
+
+components/preview/PreviewOverlay.tsx          ✓ EXISTS
+components/preview/PreviewRouter.tsx           ✓ EXISTS
+components/preview/renderers/ImagePreview.tsx  ✓ EXISTS
+components/preview/renderers/PdfPreview.tsx    ✓ EXISTS
+components/preview/renderers/RawPreview.tsx    ✓ EXISTS
+components/preview/renderers/AudioPreview.tsx  ✓ EXISTS
+components/preview/renderers/VideoPreview.tsx  ✓ EXISTS
+components/preview/renderers/GoogleRedirect.tsx ✓ EXISTS
+components/preview/renderers/OfficeFallback.tsx ✓ EXISTS
+lib/preview/file-type-resolver.ts              ✓ EXISTS
+lib/preview/download-blob.ts                   ✓ EXISTS
+lib/preview/raw-extractor.ts                   ✓ EXISTS
+lib/preview/build-preview-model.ts             ✓ EXISTS
+lib/contracts/preview.contracts.ts             ✓ EXISTS
+
+=== STEP 4: Git Log — Preview-Related Commits ===
+Result: 10 PREVIEW COMMITS FOUND — PASS (≥10 required)
+
+822fd96 feat(preview): add concurrency guard to prevent overlapping downloads
+d3a28e3 test(preview): add unit tests for file-type resolver and download-blob utility
+a4ee99d feat(preview): add i18n message keys for all preview UI states
+52e896e feat(preview): wire preview overlay into FileGrid and VaultClient
+3c96b14 feat(preview): add GoogleRedirect and OfficeFallback renderers
+3255100 feat(preview): add PreviewOverlay shell and all renderer components (image, pdf, audio, video)
+67b97ec feat(preview): add RawPreview renderer with embedded JPEG extraction
+86a2d7c feat(preview): add RAW embedded JPEG extraction utility using exifr
+116e5d7 feat(preview): add download-to-blob utility with progress and abort support
+718b9cb feat(preview): add webViewLink and thumbnailLink to Drive browse metadata
+
+=== FINAL VERDICT ===
+VERDICT: APPROVE
+All checks passed: build ✓, tests ✓, files ✓, commits ✓

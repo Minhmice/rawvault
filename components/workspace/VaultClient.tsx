@@ -32,8 +32,10 @@ import type {
   ListFoldersResponse,
   UnifiedExplorerListResponse,
 } from "@/lib/contracts";
+import type { UnifiedExplorerItem } from "@/lib/contracts/explorer-list.contracts";
 import type { PreviewModel } from "@/lib/contracts/preview.contracts";
-import { buildPreviewModel } from "@/lib/preview/build-preview-model";
+import { buildPreviewModel, buildPreviewModelFromUnified } from "@/lib/preview/build-preview-model";
+import { classifyFileKind } from "@/lib/preview/file-type-resolver";
 
 type ApiErrorEnvelope = {
   error?: {
@@ -44,6 +46,21 @@ type ApiErrorEnvelope = {
 };
 
 type PreviewFilter = FilePreviewStatus | "all";
+
+const THUMB_REQUIRED_IMAGE_EXTENSIONS = new Set(["psd", "psb", "ai", "eps", "tga", "jxl"]);
+
+function getExtension(name: string): string {
+  const idx = name.lastIndexOf(".");
+  return idx === -1 ? "" : name.slice(idx + 1).toLowerCase();
+}
+
+function classifyUnifiedFileKind(file: UnifiedExplorerItem) {
+  const baseKind = classifyFileKind(file.mimeType, file.name);
+  if (baseKind !== "image") return baseKind;
+  const ext = getExtension(file.name);
+  if (THUMB_REQUIRED_IMAGE_EXTENSIONS.has(ext) && !file.thumbnailUrl) return "unsupported";
+  return baseKind;
+}
 
 function formatErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error) {
@@ -181,7 +198,9 @@ export function VaultClient() {
     id: string;
     name: string;
   } | null>(null);
-  const [previewModel, setPreviewModel] = useState<PreviewModel | null>(null);
+  const [previewModels, setPreviewModels] = useState<PreviewModel[]>([]);
+  const [previewIdx, setPreviewIdx] = useState(-1);
+  const previewModel = previewIdx >= 0 ? previewModels[previewIdx] ?? null : null;
   const [connectBanner, setConnectBanner] = useState<ConnectBanner | null>(null);
 
   const refreshAllData = useCallback(
@@ -380,12 +399,48 @@ export function VaultClient() {
   };
 
   const handlePreview = useCallback((file: ExplorerFile) => {
-    // null first → renderer unmounts → useEffect cleanup aborts fetch + revokes blob URL
-    setPreviewModel(null);
-    requestAnimationFrame(() => {
-      setPreviewModel(buildPreviewModel(file));
+    const clickedKind = classifyFileKind(file.mime, file.name);
+    if (clickedKind === "unsupported" || clickedKind === "google_redirect") return;
+
+    const navigable = files.filter((f) => {
+      const kind = classifyFileKind(f.mime, f.name);
+      return kind !== "google_redirect" && kind !== "unsupported";
     });
+    const models = navigable.map((f) => buildPreviewModel(f));
+    const idx = navigable.findIndex((f) => f.id === file.id);
+    if (idx === -1) return;
+    setPreviewModels(models);
+    setPreviewIdx(idx);
+  }, [files]);
+
+  const handlePreviewUnified = useCallback(
+    (file: UnifiedExplorerItem) => {
+      const clickedKind = classifyUnifiedFileKind(file);
+      if (clickedKind === "unsupported" || clickedKind === "google_redirect") return;
+
+      const navigable = unifiedFiles.filter((f) => {
+        const kind = classifyUnifiedFileKind(f);
+        return kind !== "google_redirect" && kind !== "unsupported";
+      });
+      const models = navigable.map((f) => {
+        const acct = accounts.find((a) => a.id === f.accountId);
+        const provider = acct?.provider === "gdrive" || acct?.provider === "onedrive" ? acct.provider : undefined;
+        return buildPreviewModelFromUnified(f, provider);
+      });
+      const idx = navigable.findIndex((f) => f.accountId === file.accountId && f.providerId === file.providerId);
+      if (idx === -1) return;
+      setPreviewModels(models);
+      setPreviewIdx(idx);
+    },
+    [unifiedFiles, accounts],
+  );
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewIdx(-1);
+    setPreviewModels([]);
   }, []);
+  const handlePrevPreview = useCallback(() => setPreviewIdx((i) => Math.max(0, i - 1)), []);
+  const handleNextPreview = useCallback(() => setPreviewIdx((i) => Math.min(previewModels.length - 1, i + 1)), [previewModels.length]);
 
   const previewDownload = previewModel?.source.downloadUrl;
 
@@ -427,7 +482,7 @@ export function VaultClient() {
         signOutLoading={signOutLoading}
       >
         <div className="w-full rounded-[var(--radius)] border border-border bg-card p-6">
-          {t("vault.checkingSession")}
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" aria-label={t("workspace.loading")} />
         </div>
       </DashboardLayout>
     );
@@ -575,6 +630,7 @@ export function VaultClient() {
             onOpenFolderUnified={handleOpenFolderUnified}
             onOpenFileUnified={undefined}
             onPreview={handlePreview}
+            onPreviewUnified={handlePreviewUnified}
             onShare={handleShare}
             onRenameFile={handleRenameFile}
             onRenameFolder={handleRenameFolder}
@@ -624,24 +680,24 @@ export function VaultClient() {
 
         <PreviewOverlay
           open={previewModel !== null}
-          onClose={() => setPreviewModel(null)}
+          onClose={handleClosePreview}
           model={previewModel}
           onDownload={
             previewDownload
-              ? () => {
-                  window.location.href = previewDownload;
-                }
+              ? () => { window.location.href = previewDownload; }
               : undefined
           }
+          onPrev={handlePrevPreview}
+          onNext={handleNextPreview}
+          hasPrev={previewIdx > 0}
+          hasNext={previewIdx < previewModels.length - 1}
         >
           {previewModel && (
             <PreviewRouter
               model={previewModel}
               onDownload={
                 previewDownload
-                  ? () => {
-                      window.location.href = previewDownload;
-                    }
+                  ? () => { window.location.href = previewDownload; }
                   : undefined
               }
             />

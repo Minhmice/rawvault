@@ -1,0 +1,21 @@
+├ ƒ /api/storage/accounts/connect/callback
+├ ƒ /api/storage/accounts/default-write
+├ ƒ /api/storage/accounts/link
+├ ƒ /api/storage/accounts/overflow-priority
+├ ƒ /api/storage/accounts/set-active
+├ ƒ /api/storage/accounts/unlink
+├ ƒ /api/storage/drive/browse
+├ ƒ /api/storage/drive/import
+├ ƒ /api/uploads/dispatch
+├ ƒ /api/uploads/execute
+├ ƒ /api/workspace/preferences
+├ ○ /login
+├ ƒ /s/[token]
+├ ○ /shared
+└ ○ /signup
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+exit:0

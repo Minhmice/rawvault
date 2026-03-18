@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RawVault Dashboard - Dark Glassmorphism</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F46E5",
+                        "background-light": "#0F1117",
+                        "background-dark": "#0F1117",
+                        "sidebar-dark": "#080B12",
+                        "glass": "rgba(255, 255, 255, 0.06)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0F1117;
+            color: #F9FAFB;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .glass-card:hover {
+            box-shadow: 0 0 24px rgba(79, 70, 229, 0.25);
+            border-color: rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        .sidebar-item-active {
+            background: rgba(79, 70, 229, 0.2);
+            border-right: 3px solid #4F46E5;
+            color: #F9FAFB;
+        }
+        .btn-primary {
+            background: #4F46E5;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(79, 70, 229, 0.7);
+            transform: scale(1.02);
+        }
+        .donut-ring {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 30; /* 70% used */
+        }
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer {
+            from { background-position: 200% 0; }
+            to { background-position: -200% 0; }
+        }
+        .glow-cyan { filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.6)); }
+        .glow-violet { filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.6)); }
+        .glow-orange { filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.6)); }
+        .glow-red { filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.6)); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-64 bg-sidebar-dark border-r border-glass-border flex flex-col fixed h-full z-20">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.4)]">
+<span class="material-symbols-outlined text-white">cloud_done</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-100">RawVault</h1>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<div class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer group">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-slate-400 hover:text-slate-100 hover:bg-glass transition-all">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="text-sm font-medium">My Files</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-slate-400 hover:text-slate-100 hover:bg-glass transition-all">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Shared</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-slate-400 hover:text-slate-100 hover:bg-glass transition-all">
+<span class="material-symbols-outlined">history</span>
+<span class="text-sm font-medium">Recents</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-slate-400 hover:text-slate-100 hover:bg-glass transition-all">
+<span class="material-symbols-outlined">delete</span>
+<span class="text-sm font-medium">Trash</span>
+</div>
+</nav>
+<div class="p-4 mt-auto">
+<div class="glass-card p-4 rounded-xl space-y-3 mb-6 border-primary/20 bg-primary/5">
+<p class="text-xs font-semibold uppercase tracking-widest text-primary">Storage Plan</p>
+<div class="flex justify-between items-end">
+<span class="text-lg font-bold">1.4 TB <span class="text-xs text-slate-400 font-normal">/ 2 TB</span></span>
+</div>
+<div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary glow-violet w-[70%]"></div>
+</div>
+<button class="w-full py-2 text-xs font-bold btn-primary rounded-lg text-white">Upgrade Plan</button>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer text-slate-400 hover:text-slate-100 transition-all">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-64 p-8">
+<!-- Header -->
+<header class="flex justify-between items-center mb-10">
+<div>
+<nav class="flex text-xs text-slate-500 mb-2 gap-2 uppercase tracking-widest font-bold">
+<span>Home</span>
+<span>/</span>
+<span class="text-primary">Dashboard</span>
+</nav>
+<h2 class="text-3xl font-bold text-slate-100">Storage Overview</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+<input class="bg-glass border-glass-border rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary outline-none w-64 text-slate-100" placeholder="Search files..." type="text"/>
+</div>
+<button class="p-2 glass-card rounded-xl text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-glass-border">
+<div class="text-right">
+<p class="text-sm font-bold">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Pro Member</p>
+</div>
+<img class="rounded-full ring-2 ring-primary/30" data-alt="User profile avatar with glow effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYZ8vPFRG9atsL3cwJ0ak0s9xqloc5N39K3iwhZt72IwUk7n4fDjOcaVRwL05emtcFYhB1uLEvNuxRxfywEZPFR6X3H_1mCbD-ovwAV_xumw8R8iIl86QT6T5n9BbRJ_BHabHjDWCqVrtfIP5X4j8WpO5-dUe1OC4bfdqq_ISYYJeIT84L-Zk34TryNsa0jAHkGd3n0ZdGr5qF823vL-P9gyDHbqrAwE_7gQ_vf3DEXvefC1EKdKbmhWHvuiLcGltTlIAAdjLtvpt0"/>
+</div>
+</div>
+</header>
+<!-- Top Section: Main Chart & Provider Cards -->
+<div class="grid grid-cols-12 gap-6 mb-8">
+<!-- Storage Donut -->
+<div class="col-span-12 lg:col-span-4 glass-card p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Total Usage</h3>
+<div class="relative size-48">
+<svg class="size-full -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-slate-800" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-primary donut-ring glow-violet" cx="18" cy="18" fill="none" r="16" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-bold">70%</span>
+<span class="text-[10px] text-slate-500 font-bold uppercase">1.4 TB Used</span>
+</div>
+</div>
+<p class="mt-4 text-xs text-slate-500 leading-relaxed">You have 600 GB of free space left. Your usage increased by <span class="text-emerald-400">+5.2%</span> this month.</p>
+</div>
+<!-- Provider Cards -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="glass-card p-6 rounded-2xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="size-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+<span class="material-symbols-outlined size-8 text-center !leading-[32px]">folder_shared</span>
+</div>
+<span class="text-[10px] font-bold py-1 px-2 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Google Drive</span>
+</div>
+<h4 class="text-xl font-bold mb-1">840 GB</h4>
+<p class="text-xs text-slate-500 mb-4 tracking-wide">Syncing active • 2 mins ago</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold uppercase text-slate-400">
+<span>Usage</span>
+<span>84%</span>
+</div>
+<div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)] w-[84%]"></div>
+</div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div class="size-12 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400">
+<span class="material-symbols-outlined size-8 text-center !leading-[32px]">cloud_upload</span>
+</div>
+<span class="text-[10px] font-bold py-1 px-2 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Dropbox</span>
+</div>
+<h4 class="text-xl font-bold mb-1">560 GB</h4>
+<p class="text-xs text-slate-500 mb-4 tracking-wide">Paused • 1 hour ago</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-bold uppercase text-slate-400">
+<span>Usage</span>
+<span>56%</span>
+</div>
+<div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.5)] w-[56%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Categories Grid -->
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 px-1">Categories</h3>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-cyan-500/20 rounded-xl flex items-center justify-center text-cyan-400 glow-cyan">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Images</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">412 GB</p>
+</div>
+</div>
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 glow-violet">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Docs</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">128 GB</p>
+</div>
+</div>
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-orange-400 glow-orange">
+<span class="material-symbols-outlined">movie</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Videos</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">680 GB</p>
+</div>
+</div>
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-400 glow-red">
+<span class="material-symbols-outlined">music_note</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Music</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">92 GB</p>
+</div>
+</div>
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Apps</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">45 GB</p>
+</div>
+</div>
+<div class="glass-card p-4 rounded-2xl flex flex-col items-center gap-3">
+<div class="size-12 bg-slate-500/20 rounded-xl flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">more_horiz</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold">Other</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase">83 GB</p>
+</div>
+</div>
+</div>
+<!-- Recent Files Table -->
+<div class="glass-card rounded-2xl overflow-hidden">
+<div class="p-6 border-b border-glass-border flex justify-between items-center">
+<h3 class="text-lg font-bold">Recent Files</h3>
+<button class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase font-bold text-slate-500 tracking-widest border-b border-glass-border">
+<th class="px-6 py-4">Name</th>
+<th class="px-6 py-4">Size</th>
+<th class="px-6 py-4">Last Modified</th>
+<th class="px-6 py-4">Storage</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-glass-border/30">
+<tr class="hover:bg-glass/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-cyan-500/10 rounded flex items-center justify-center text-cyan-400">
+<span class="material-symbols-outlined text-xl">image</span>
+</div>
+<div>
+<p class="text-sm font-medium">Summer_Trip_2023.zip</p>
+<p class="text-[10px] text-slate-500">Archive File</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-300">2.4 GB</td>
+<td class="px-6 py-4 text-sm text-slate-300">May 12, 2024</td>
+<td class="px-6 py-4">
+<span class="text-[10px] py-0.5 px-2 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/10 uppercase font-bold">G-Drive</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-glass/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-violet-500/10 rounded flex items-center justify-center text-violet-400">
+<span class="material-symbols-outlined text-xl">description</span>
+</div>
+<div>
+<p class="text-sm font-medium">Product_Requirements_v2.pdf</p>
+<p class="text-[10px] text-slate-500">Document</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-300">14.2 MB</td>
+<td class="px-6 py-4 text-sm text-slate-300">May 10, 2024</td>
+<td class="px-6 py-4">
+<span class="text-[10px] py-0.5 px-2 rounded-full border border-indigo-500/30 text-indigo-400 bg-indigo-500/10 uppercase font-bold">Dropbox</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-glass/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-orange-500/10 rounded flex items-center justify-center text-orange-400">
+<span class="material-symbols-outlined text-xl">movie</span>
+</div>
+<div>
+<p class="text-sm font-medium">Brand_Video_Final.mp4</p>
+<p class="text-[10px] text-slate-500">MPEG Video</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-300">842 MB</td>
+<td class="px-6 py-4 text-sm text-slate-300">Yesterday, 14:20</td>
+<td class="px-6 py-4">
+<span class="text-[10px] py-0.5 px-2 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/10 uppercase font-bold">G-Drive</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Skeleton Shimmer Example Row -->
+<tr class="opacity-40">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-slate-800 rounded relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+<div class="space-y-2">
+<div class="h-3 w-32 bg-slate-800 rounded relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+<div class="h-2 w-16 bg-slate-800 rounded relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="h-3 w-12 bg-slate-800 rounded relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="h-3 w-24 bg-slate-800 rounded relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="h-5 w-16 bg-slate-800 rounded-full relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="h-6 w-6 bg-slate-800 rounded-full inline-block relative overflow-hidden">
+<div class="shimmer absolute inset-0"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Mobile/Contextual) -->
+<div class="fixed bottom-8 right-8 z-30">
+<button class="size-14 btn-primary rounded-full flex items-center justify-center text-white shadow-2xl scale-110">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+</body></html>

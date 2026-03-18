@@ -40,6 +40,7 @@
   "/api/uploads/dispatch/route": "app/api/uploads/dispatch/route.js",
   "/api/uploads/execute/route": "app/api/uploads/execute/route.js",
   "/api/workspace/preferences/route": "app/api/workspace/preferences/route.js",
+  "/example/page": "app/example/page.js",
   "/page": "app/page.js",
   "/recent/page": "app/recent/page.js",
   "/s/[token]/page": "app/s/[token]/page.js",

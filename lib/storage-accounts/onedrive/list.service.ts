@@ -26,15 +26,22 @@ function toBrowseItem(
     size?: number;
     file?: { mimeType?: string };
     folder?: Record<string, unknown>;
+    thumbnails?: Array<{
+      medium?: { url?: string };
+      small?: { url?: string };
+      large?: { url?: string };
+    }>;
   },
 ): DriveBrowseItem {
   const isFolder = "folder" in item && item.folder != null;
+  const thumb = item.thumbnails?.[0];
   return {
     id: item.id ?? "",
     name: item.name ?? "Untitled",
     isFolder,
     mimeType: item.file?.mimeType ?? null,
     sizeBytes: item.size ?? null,
+    thumbnailLink: thumb?.medium?.url ?? thumb?.small?.url ?? thumb?.large?.url,
   };
 }
 
@@ -50,7 +57,7 @@ export async function listOneDrive(
     ? `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(effectiveFolderId)}`
     : "https://graph.microsoft.com/v1.0/me/drive/root";
 
-  const url = `${base}/children?$top=100&$orderby=name`;
+  const url = `${base}/children?$top=100&$orderby=name&$select=id,name,size,file,folder&$expand=thumbnails($select=small,medium,large)`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -84,6 +91,11 @@ export async function listOneDrive(
     size?: number;
     file?: { mimeType?: string };
     folder?: Record<string, unknown>;
+    thumbnails?: Array<{
+      medium?: { url?: string };
+      small?: { url?: string };
+      large?: { url?: string };
+    }>;
   }>;
 
   const folders: DriveBrowseItem[] = [];

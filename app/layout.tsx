@@ -6,6 +6,7 @@ import {
   Playfair_Display,
   Source_Serif_4,
   JetBrains_Mono,
+  Manrope,
   Space_Grotesk,
 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider/ThemeProvider";
@@ -57,6 +58,14 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+// ── RawVault HTML fonts ──────────────────────────
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "RawVault - Workspace",
   description: "A digital workspace for RAW photographers",
@@ -70,6 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     sourceSerif.variable,
     jetbrainsMono.variable,
     spaceGrotesk.variable,
+    manrope.variable,
   ].join(" ");
 
   return (

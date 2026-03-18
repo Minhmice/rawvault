@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Storage UI - Brand Showcase UI Kit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F46E5",
+                        "background-light": "#F2F4F8",
+                        "background-dark": "#121121",
+                        "surface": "#FFFFFF",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 2px 8px rgba(27,33,48,0.05)",
+                        "heavy": "0 10px 25px -5px rgba(27,33,48,0.1), 0 8px 10px -6px rgba(27,33,48,0.1)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F2F4F8;
+        }
+        .transition-standard {
+            transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-slate-900 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-screen w-72 bg-surface border-r border-slate-200/60 p-6 flex flex-col z-50">
+<div class="mb-10 px-2">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">database</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900">Storage UI</h1>
+</div>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-widest">Design System v1.0</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-primary/10 text-primary font-semibold transition-standard group" href="#overview">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-600 hover:bg-slate-100 transition-standard group" href="#forms">
+<span class="material-symbols-outlined text-[22px]">edit_note</span>
+<span>Forms &amp; Inputs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-600 hover:bg-slate-100 transition-standard group" href="#layout">
+<span class="material-symbols-outlined text-[22px]">view_quilt</span>
+<span>Layout &amp; Nav</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-600 hover:bg-slate-100 transition-standard group" href="#overlays">
+<span class="material-symbols-outlined text-[22px]">layers</span>
+<span>Overlays</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-600 hover:bg-slate-100 transition-standard group" href="#data">
+<span class="material-symbols-outlined text-[22px]">analytics</span>
+<span>Data Display</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-slate-100">
+<button class="w-full bg-primary text-white py-3 px-4 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-standard flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">auto_stories</span>
+                    Docs
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-72 flex-1 p-8 lg:p-12 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12" id="overview">
+<div class="flex justify-between items-end mb-4">
+<div>
+<span class="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">Comprehensive Showcase</span>
+<h2 class="text-5xl font-black text-slate-900 tracking-tight">UI Kit Library</h2>
+</div>
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-white bg-cyan-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-background-light">JS</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-indigo-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-background-light">AD</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-violet-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-background-light">RK</div>
+</div>
+</div>
+<p class="text-slate-500 text-lg max-w-2xl leading-relaxed">
+                    A premium design system built for performance and elegance. Following strict modern standards with smooth transitions and pill-shaped aesthetics.
+                </p>
+</header>
+<!-- 1. Forms & Inputs Section -->
+<section class="mb-16 scroll-mt-8" id="forms">
+<div class="flex items-center gap-2 mb-8">
+<h3 class="text-2xl font-bold text-slate-900">Forms &amp; Inputs</h3>
+<div class="h-[1px] flex-1 bg-slate-200/60 ml-4"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Buttons Card -->
+<div class="bg-surface p-8 rounded-xl shadow-soft card-hover transition-standard">
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">Button Variations</h4>
+<div class="flex flex-wrap gap-4">
+<button class="px-8 py-3 bg-primary text-white rounded-full font-bold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-standard">Solid Pill</button>
+<button class="px-8 py-3 border-2 border-primary text-primary rounded-full font-bold hover:bg-primary/5 active:scale-95 transition-standard">Outline Pill</button>
+<button class="px-8 py-3 text-primary rounded-full font-bold hover:bg-slate-100 active:scale-95 transition-standard">Ghost Pill</button>
+</div>
+</div>
+<!-- Inputs Card -->
+<div class="bg-surface p-8 rounded-xl shadow-soft card-hover transition-standard">
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">Text Fields</h4>
+<div class="space-y-4">
+<div class="relative">
+<label class="text-xs font-bold text-slate-500 mb-1 block ml-4">Email Address</label>
+<input class="w-full px-6 py-3 rounded-full border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-standard shadow-sm placeholder:text-slate-300" placeholder="name@company.com" type="email"/>
+</div>
+<div class="relative">
+<label class="text-xs font-bold text-slate-500 mb-1 block ml-4">Select Option</label>
+<select class="w-full px-6 py-3 rounded-full border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-standard shadow-sm bg-white appearance-none cursor-pointer">
+<option>Standard Storage</option>
+<option>Cold Storage</option>
+<option>Archive Tier</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Controls Card -->
+<div class="bg-surface p-8 rounded-xl shadow-soft card-hover transition-standard">
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">Toggles &amp; Sliders</h4>
+<div class="space-y-8">
+<div class="flex items-center justify-between">
+<span class="text-sm font-medium text-slate-700">Auto-scaling enabled</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary transition-standard"></div>
+</label>
+</div>
+<div>
+<input class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+<span>0 GB</span>
+<span>500 GB</span>
+<span>1 TB</span>
+</div>
+</div>
+<div class="flex p-1 bg-slate-100 rounded-full w-fit">
+<button class="px-6 py-2 bg-white rounded-full text-xs font-bold text-slate-900 shadow-sm transition-standard">Grid</button>
+<button class="px-6 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition-standard">List</button>
+</div>
+</div>
+</div>
+<!-- Radio Card -->
+<div class="bg-surface p-8 rounded-xl shadow-soft card-hover transition-standard">
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">Choice Groups</h4>
+<div class="grid grid-cols-2 gap-3">
+<label class="flex items-center gap-3 p-4 rounded-xl border-2 border-primary/20 bg-primary/5 cursor-pointer">
+<input checked="" class="w-4 h-4 text-primary focus:ring-primary border-slate-300" name="plan" type="radio"/>
+<span class="text-sm font-bold text-slate-900">Personal</span>
+</label>
+<label class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-primary/20 cursor-pointer transition-standard">
+<input class="w-4 h-4 text-primary focus:ring-primary border-slate-300" name="plan" type="radio"/>
+<span class="text-sm font-bold text-slate-600">Business</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Layout & Navigation Section -->
+<section class="mb-16 scroll-mt-8" id="layout">
+<div class="flex items-center gap-2 mb-8">
+<h3 class="text-2xl font-bold text-slate-900">Layout &amp; Navigation</h3>
+<div class="h-[1px] flex-1 bg-slate-200/60 ml-4"></div>
+</div>
+<div class="space-y-8">
+<!-- Tabs and Breadcrumbs -->
+<div class="bg-surface p-8 rounded-xl shadow-soft">
+<div class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-8 uppercase tracking-widest">
+<span>Project</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary">User Interface</span>
+</div>
+<div class="flex gap-4 border-b border-slate-100 mb-8">
+<button class="pb-4 px-2 border-b-2 border-primary text-primary font-bold text-sm transition-standard">Active View</button>
+<button class="pb-4 px-2 border-b-2 border-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-standard">Analytics</button>
+<button class="pb-4 px-2 border-b-2 border-transparent text-slate-400 font-bold text-sm hover:text-slate-600 transition-standard">Settings</button>
+</div>
+<!-- Accordion -->
+<div class="space-y-2">
+<details class="group bg-slate-50/50 rounded-xl overflow-hidden border border-slate-100 transition-standard" open="">
+<summary class="flex items-center justify-between p-4 cursor-pointer list-none font-bold text-slate-700">
+<span>Advanced System Configuration</span>
+<span class="material-symbols-outlined transition-transform duration-500 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-sm text-slate-500 leading-relaxed">
+                                    Configure global variables and API endpoints for your cloud storage clusters. Ensure SSL certificates are valid for all nodes before proceeding.
+                                </div>
+</details>
+<details class="group bg-white rounded-xl overflow-hidden border border-slate-100 transition-standard">
+<summary class="flex items-center justify-between p-4 cursor-pointer list-none font-bold text-slate-700">
+<span>Database Maintenance Schedule</span>
+<span class="material-symbols-outlined transition-transform duration-500 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-sm text-slate-500 leading-relaxed">
+                                    Automated backups occur every 24 hours at 03:00 UTC. Check logs for consistency.
+                                </div>
+</details>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-center gap-2">
+<button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-standard">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</button>
+<button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:border-primary hover:text-primary transition-standard">2</button>
+<button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:border-primary hover:text-primary transition-standard">3</button>
+<button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary transition-standard">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 3. Overlays & Feedback Section -->
+<section class="mb-16 scroll-mt-8" id="overlays">
+<div class="flex items-center gap-2 mb-8">
+<h3 class="text-2xl font-bold text-slate-900">Overlays &amp; Feedback</h3>
+<div class="h-[1px] flex-1 bg-slate-200/60 ml-4"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Progress and Skeletons -->
+<div class="bg-surface p-8 rounded-xl shadow-soft space-y-8">
+<div>
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">System Health</h4>
+<div class="space-y-4">
+<div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
+<div class="h-full bg-cyan-400" style="width: 20%"></div>
+<div class="h-full bg-indigo-500" style="width: 30%"></div>
+<div class="h-full bg-violet-500" style="width: 15%"></div>
+<div class="h-full bg-orange-400" style="width: 10%"></div>
+<div class="h-full bg-red-500" style="width: 5%"></div>
+</div>
+<div class="flex flex-wrap gap-4">
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Images</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> Apps</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase"><span class="w-2 h-2 rounded-full bg-violet-500"></span> Docs</span>
+<span class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase"><span class="w-2 h-2 rounded-full bg-orange-400"></span> Other</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider">Skeleton Loading</h4>
+<div class="flex items-center gap-4 animate-pulse">
+<div class="w-12 h-12 bg-slate-100 rounded-full"></div>
+<div class="flex-1 space-y-2">
+<div class="h-3 bg-slate-100 rounded-full w-3/4"></div>
+<div class="h-2 bg-slate-100 rounded-full w-1/2"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dialog Simulation -->
+<div class="bg-slate-900 p-8 rounded-xl shadow-heavy relative overflow-hidden group">
+<div class="relative z-10">
+<div class="bg-white rounded-xl p-6 shadow-2xl max-w-sm mx-auto">
+<div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<h5 class="text-xl font-bold text-slate-900 mb-2">Confirm Deletion</h5>
+<p class="text-slate-500 text-sm mb-6">Are you sure you want to permanently delete this volume? This action cannot be undone.</p>
+<div class="flex gap-3">
+<button class="flex-1 py-2 rounded-full font-bold text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-standard">Cancel</button>
+<button class="flex-1 py-2 rounded-full font-bold text-sm bg-red-600 text-white shadow-lg shadow-red-200 transition-standard">Delete</button>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 bg-primary/20 opacity-50"></div>
+</div>
+</div>
+<!-- Badges and Tooltips -->
+<div class="mt-8 flex flex-wrap gap-4 items-center">
+<span class="px-3 py-1 bg-cyan-100 text-cyan-700 text-[10px] font-black uppercase tracking-widest rounded-full">New Feature</span>
+<span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-[10px] font-black uppercase tracking-widest rounded-full">Pro Account</span>
+<span class="px-3 py-1 bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-widest rounded-full">Beta Access</span>
+<div class="relative group">
+<button class="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-sm">help</span>
+</button>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-standard pointer-events-none text-center">
+                            Helper tooltip with pill-shaped rounding for the UI.
+                        </div>
+</div>
+</div>
+</section>
+<!-- 4. Data Display Section -->
+<section class="mb-16 scroll-mt-8" id="data">
+<div class="flex items-center gap-2 mb-8">
+<h3 class="text-2xl font-bold text-slate-900">Data Display</h3>
+<div class="h-[1px] flex-1 bg-slate-200/60 ml-4"></div>
+</div>
+<div class="bg-surface rounded-xl shadow-soft overflow-hidden border border-slate-100">
+<table class="w-full text-left">
+<thead class="bg-slate-50/50 border-b border-slate-100">
+<tr>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Client</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Resource</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Usage</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50 transition-standard group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full ring-2 ring-primary/20 p-0.5">
+<img alt="Profile" class="w-full h-full rounded-full" data-alt="Avatar of user profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPrzT4AWdedHKXrz1QuQpmp-Hx2-NqjPyVtZBfOJrBciqE-LBQj4cpllTYYTtV603LuUuR-fSbx5Aq5nYeaIE7OyjOZpptXJiWKGuaGFq6SFbEveJ80qXNMmK4-gwm4kXYCEHKYRqUKlEYl7QCye6kNrtqm1_g-dhQKWAncnkEPwsSKb9D_Zy4X9qGra9jTF1W2qV_Ru_R2Ah5RCe4MLXezBObI2z3E_-h5iC0Ah8EkSIVA4EFrYymiFRTnAsWYQ_dXe3itI13ezCB"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-900">Acme Cloud</p>
+<p class="text-xs text-slate-500">acme-corp.s3</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-medium text-slate-700 uppercase">US-East-1 Cluster</p>
+</td>
+<td class="px-6 py-4">
+<div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%"></div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                        Healthy
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-standard">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-standard group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full ring-2 ring-violet-500/20 p-0.5">
+<img alt="Profile" class="w-full h-full rounded-full" data-alt="Avatar of secondary user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtGunYPBt-cXQcgKa0dbkAL9VOnCKj99H4k6Ym0IJoDTpBjDfiXOiJ6IgIvx6LFGxGP0jjquC4PckDN6KBwBo8p-_bMAxt56oPUbJ6gD3G-_8Ue48n35vfCTOuBDXSak96_Oxhh4VaVW7AyNQwU2QKhJZPdg0qr0zv9S_G9R7ESphUVL9lZ7_18SvZ95pFFv2waiA08F6Zc84pH9_zeTWW7Nj1bjVGYJ3rTUcqWQfjBSzQGKvlJdLsZxGXcdRXUYUNA788jMIrDrqH"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-900">Globex Inc</p>
+<p class="text-xs text-slate-500">globex-cdn.local</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm font-medium text-slate-700 uppercase">EU-West-2 Node</p>
+</td>
+<td class="px-6 py-4">
+<div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-orange-400" style="width: 89%"></div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-[10px] font-black text-orange-600 uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                                        Near Limit
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-primary transition-standard">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Chart Representation -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface p-6 rounded-xl shadow-soft">
+<h5 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-tighter">Throughput</h5>
+<div class="flex items-end gap-1 h-24">
+<div class="flex-1 bg-cyan-400 rounded-t-full" style="height: 40%"></div>
+<div class="flex-1 bg-cyan-400/60 rounded-t-full" style="height: 60%"></div>
+<div class="flex-1 bg-cyan-400 rounded-t-full" style="height: 30%"></div>
+<div class="flex-1 bg-cyan-400/80 rounded-t-full" style="height: 80%"></div>
+<div class="flex-1 bg-cyan-400 rounded-t-full" style="height: 50%"></div>
+<div class="flex-1 bg-cyan-400 rounded-t-full" style="height: 70%"></div>
+</div>
+<p class="mt-4 text-2xl font-black text-slate-900">4.2 GB/s</p>
+</div>
+<div class="bg-surface p-6 rounded-xl shadow-soft">
+<h5 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-tighter">Active Nodes</h5>
+<div class="flex items-end gap-1 h-24">
+<div class="flex-1 bg-indigo-500/40 rounded-t-full" style="height: 20%"></div>
+<div class="flex-1 bg-indigo-500 rounded-t-full" style="height: 45%"></div>
+<div class="flex-1 bg-indigo-500/60 rounded-t-full" style="height: 90%"></div>
+<div class="flex-1 bg-indigo-500 rounded-t-full" style="height: 55%"></div>
+<div class="flex-1 bg-indigo-500/80 rounded-t-full" style="height: 40%"></div>
+<div class="flex-1 bg-indigo-500 rounded-t-full" style="height: 65%"></div>
+</div>
+<p class="mt-4 text-2xl font-black text-slate-900">128 Nodes</p>
+</div>
+<div class="bg-surface p-6 rounded-xl shadow-soft">
+<h5 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-tighter">Error Rate</h5>
+<div class="flex items-end gap-1 h-24">
+<div class="flex-1 bg-red-500 rounded-t-full" style="height: 10%"></div>
+<div class="flex-1 bg-red-500/40 rounded-t-full" style="height: 5%"></div>
+<div class="flex-1 bg-red-500/60 rounded-t-full" style="height: 15%"></div>
+<div class="flex-1 bg-red-500 rounded-t-full" style="height: 8%"></div>
+<div class="flex-1 bg-red-500/80 rounded-t-full" style="height: 12%"></div>
+<div class="flex-1 bg-red-500 rounded-t-full" style="height: 4%"></div>
+</div>
+<p class="mt-4 text-2xl font-black text-slate-900">0.02%</p>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="mt-24 pt-12 border-t border-slate-200 text-center pb-12">
+<p class="text-slate-400 text-sm font-medium">© 2024 Storage UI Design System. All Rights Reserved.</p>
+<div class="flex justify-center gap-6 mt-6">
+<a class="text-slate-400 hover:text-primary transition-standard text-xs font-bold uppercase tracking-widest" href="#">Privacy</a>
+<a class="text-slate-400 hover:text-primary transition-standard text-xs font-bold uppercase tracking-widest" href="#">Terms</a>
+<a class="text-slate-400 hover:text-primary transition-standard text-xs font-bold uppercase tracking-widest" href="#">Status</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

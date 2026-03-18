@@ -48,6 +48,15 @@ RawVault proves that:
 
 ---
 
+## E2E / Visual Regression (Playwright)
+
+- **Run tests**: `npm run test:e2e`
+- **Update visual baselines**: `npm run test:e2e:update`
+- **Where snapshots live**: `e2e/__screenshots__` (commit these for deterministic comparisons)
+- **Optional Vault screenshots**: set `RAWVAULT_QA_EMAIL` and `RAWVAULT_QA_PASSWORD` to enable the authenticated vault visual test
+
+---
+
 ## Cursor / MCP
 
 For Cursor MCP (e.g. Stitch), see [.cursor/README.md](.cursor/README.md). Copy `.cursor/mcp.json.example` to `.cursor/mcp.json` and set your API key; do not commit `mcp.json`.

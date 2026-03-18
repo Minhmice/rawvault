@@ -29,6 +29,7 @@ export async function getUnifiedExplorerList(
         isFolder: f.isFolder,
         mimeType: f.mimeType,
         sizeBytes: f.sizeBytes,
+        thumbnailUrl: f.thumbnailLink,
       })),
       files: result.files.map((f) => ({
         accountId,
@@ -37,6 +38,7 @@ export async function getUnifiedExplorerList(
         isFolder: f.isFolder,
         mimeType: f.mimeType,
         sizeBytes: f.sizeBytes,
+        thumbnailUrl: f.thumbnailLink,
       })),
     };
   }
@@ -68,6 +70,7 @@ export async function getUnifiedExplorerList(
           isFolder: f.isFolder,
           mimeType: f.mimeType,
           sizeBytes: f.sizeBytes,
+          thumbnailUrl: f.thumbnailLink,
         })),
       );
       allFiles.push(
@@ -78,6 +81,7 @@ export async function getUnifiedExplorerList(
           isFolder: f.isFolder,
           mimeType: f.mimeType,
           sizeBytes: f.sizeBytes,
+          thumbnailUrl: f.thumbnailLink,
         })),
       );
     } catch {

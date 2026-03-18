@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { useThemeComponents } from "../themes";
 import { useTheme } from "@/components/theme-provider/ThemeProvider";
 import type { BreadcrumbItem, ExplorerFile, ExplorerFolder, LinkedAccount, UnifiedExplorerItem } from "@/lib/contracts";
+import { classifyFileKind } from "@/lib/preview/file-type-resolver";
 
 /** App file with optional list response fields for split/download-only (backend may add later). */
 type ExplorerFileWithViewerFlags = ExplorerFile & {
@@ -34,6 +35,13 @@ type ExplorerFileWithViewerFlags = ExplorerFile & {
 };
 
 type ThemeName = "vivid" | "monochrome" | "bauhaus" | "linear";
+
+const THUMB_REQUIRED_IMAGE_EXTENSIONS = new Set(["psd", "psb", "ai", "eps", "tga", "jxl"]);
+
+function getExtension(name: string): string {
+  const idx = name.lastIndexOf(".");
+  return idx === -1 ? "" : name.slice(idx + 1).toLowerCase();
+}
 
 const FOLDER_CARD_HOVER: Record<ThemeName, string> = {
   vivid:
@@ -74,6 +82,7 @@ type FileGridProps = {
   onDeleteFile?: (id: string, name: string) => void;
   onDeleteFolder?: (id: string, name: string) => void;
   onPreview?: (file: ExplorerFile) => void;
+  onPreviewUnified?: (file: UnifiedExplorerItem) => void;
 };
 
 function formatBytes(bytes: number) {
@@ -150,6 +159,7 @@ export function FileGrid({
   onDeleteFile,
   onDeleteFolder,
   onPreview,
+  onPreviewUnified,
 }: FileGridProps) {
   const { t } = useLocale();
   const { ThemeCard, ThemeButton: Button } = useThemeComponents();
@@ -164,7 +174,7 @@ export function FileGrid({
   const isEmpty = !loading && !error && displayFolders.length === 0 && displayFiles.length === 0;
 
   const getAccountProvider = (accountId: string) =>
-    accounts.find((a) => a.id === accountId)?.provider ?? "gdrive";
+    accounts.find((a) => a.id === accountId)?.provider;
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -180,20 +190,44 @@ export function FileGrid({
     }
   };
 
+  const classifyUnifiedFileKind = (file: UnifiedExplorerItem) => {
+    const baseKind = classifyFileKind(file.mimeType, file.name);
+    if (baseKind !== "image") return baseKind;
+    const ext = getExtension(file.name);
+    if (THUMB_REQUIRED_IMAGE_EXTENSIONS.has(ext) && !file.thumbnailUrl) return "unsupported";
+    return baseKind;
+  };
+
+  const loadingCard = (key: string) => (
+    <ThemeCard key={key} glass className="overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col p-2">
+        <div className="flex items-center gap-2 border-b border-border bg-card p-2">
+          <div className="h-5 w-10 animate-pulse rounded bg-muted" />
+          <div className="h-4 flex-1 animate-pulse rounded bg-muted" />
+          <div className="h-6 w-6 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-muted/50">
+          <div className="h-full w-full animate-pulse bg-muted" />
+        </div>
+      </div>
+    </ThemeCard>
+  );
+
   if (loading) {
     return (
-      <div className="space-y-8 animate-fade-in" aria-busy="true" aria-live="polite">
-        <div className="rounded-lg border border-border bg-muted/20 p-8 text-center" role="status">
-          <RefreshCcw className="mx-auto h-10 w-10 animate-spin text-muted-foreground" aria-hidden />
-          <p className="mt-4 text-sm font-medium text-foreground">{t("workspace.loading")}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("workspace.loadingHint")}</p>
+      <div className="space-y-8" aria-busy="true" aria-live="polite">
+        <div className="rounded-lg border border-border bg-muted/20 p-3" role="status">
+          <RefreshCcw className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden />
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
+          {Array.from({ length: 10 }, (_, idx) => loadingCard(`skeleton-${idx}`))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {error ? (
         <ThemeCard className="border border-destructive/40 bg-destructive/10 p-4" role="alert">
           <div className="flex items-center justify-between gap-4">
@@ -213,7 +247,7 @@ export function FileGrid({
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           {t("workspace.folders")}
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {useUnified
             ? (displayFolders as UnifiedExplorerItem[]).map((folder) => (
                 <ThemeCard
@@ -340,28 +374,46 @@ export function FileGrid({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {useUnified
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
+           {useUnified
             ? (displayFiles as UnifiedExplorerItem[]).map((file) => {
-                const typeLabel = file.mimeType?.startsWith("image/")
-                  ? t("workspace.fileTypeImg")
-                  : file.mimeType?.startsWith("video/")
-                    ? t("workspace.fileTypeVideo")
-                    : file.name.toLowerCase().endsWith(".pdf")
-                      ? t("workspace.fileTypePdf")
-                      : t("workspace.fileTypeDoc");
+                const fileKind = classifyUnifiedFileKind(file);
+                const typeLabel =
+                  fileKind === "image" || fileKind === "raw_embedded"
+                    ? t("workspace.fileTypeImg")
+                    : fileKind === "video"
+                      ? t("workspace.fileTypeVideo")
+                      : fileKind === "pdf"
+                        ? t("workspace.fileTypePdf")
+                        : t("workspace.fileTypeDoc");
                 const streamUrl = `/api/explorer/stream?accountId=${encodeURIComponent(file.accountId)}&providerFileId=${encodeURIComponent(file.providerId)}&name=${encodeURIComponent(file.name)}`;
                 const downloadUrl = `${streamUrl}&download=1`;
+                const isImage = fileKind === "image" || fileKind === "raw_embedded";
+                const previewImageUrl = file.thumbnailUrl ?? streamUrl;
+                const providerLabel =
+                  getAccountProvider(file.accountId) === "gdrive"
+                    ? t("vault.googleDrive")
+                    : getAccountProvider(file.accountId) === "onedrive"
+                      ? t("vault.oneDrive")
+                      : "Storage";
                 return (
                   <ThemeCard
                     key={`${file.accountId}:${file.providerId}`}
                     glass
-                    className={`group flex cursor-pointer flex-col overflow-hidden ${folderHoverClass}`}
-                    onClick={() => {
-                      if (onOpenFileUnified) onOpenFileUnified(file.accountId, file.providerId, file.name);
-                      else window.open(streamUrl, "_blank");
-                    }}
-                  >
+                  className={`group flex cursor-pointer flex-col overflow-hidden ${folderHoverClass}`}
+                  onClick={() => {
+                    if (fileKind === "google_redirect") {
+                      window.open(`https://drive.google.com/open?id=${encodeURIComponent(file.providerId)}`, "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                    if (fileKind === "unsupported") return;
+                    if (onPreviewUnified) {
+                      onPreviewUnified(file);
+                    } else if (onOpenFileUnified) {
+                      onOpenFileUnified(file.accountId, file.providerId, file.name);
+                    }
+                  }}
+                >
                     <div className="flex min-h-0 flex-1 flex-col p-2">
                       <div className="flex items-center gap-2 border-b border-border bg-card p-2">
                         <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -402,7 +454,18 @@ export function FileGrid({
                             <DropdownMenuItem
                               onSelect={(e) => {
                                 e.preventDefault();
-                                window.open(streamUrl, "_blank");
+                                if (fileKind === "google_redirect") {
+                                  window.open(`https://drive.google.com/open?id=${encodeURIComponent(file.providerId)}`, "_blank", "noopener,noreferrer");
+                                  return;
+                                }
+                                if (fileKind === "unsupported") return;
+                                if (onPreviewUnified) {
+                                  onPreviewUnified(file);
+                                  return;
+                                }
+                                if (onOpenFileUnified) {
+                                  onOpenFileUnified(file.accountId, file.providerId, file.name);
+                                }
                               }}
                             >
                               <FileText className="h-4 w-4" />
@@ -423,15 +486,74 @@ export function FileGrid({
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      <div className="flex h-36 flex-col items-center justify-center bg-muted/50">
-                        {getIcon(file.mimeType?.startsWith("image/") ? "image" : file.mimeType?.startsWith("video/") ? "video" : "doc")}
+              <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-muted/50">
+                {isImage ? (
+                  <>
+                    <div className="z-0 flex flex-col items-center gap-2 text-muted-foreground">
+                      {getIcon("image")}
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-sans normal-case">
+                        {providerLabel}
+                      </span>
+                    </div>
+                    <img
+                      src={previewImageUrl}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 z-10 h-full w-full object-cover rounded-md"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <div className="absolute bottom-1 right-1 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white font-mono">
+                      {formatBytes(file.sizeBytes ?? 0)}
+                    </div>
+                  </>
+                ) : file.mimeType?.startsWith("video/") ? (
+                  <>
+                    <div className="z-0 flex flex-col items-center gap-2 text-muted-foreground">
+                      {getIcon("video")}
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-sans normal-case">
+                        {providerLabel}
+                      </span>
+                    </div>
+                    {file.thumbnailUrl ? (
+                      <>
+                        <img
+                          src={file.thumbnailUrl}
+                          alt=""
+                          loading="lazy"
+                          className="absolute inset-0 z-10 h-full w-full object-cover rounded-md"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                        <div className="absolute bottom-1 right-1 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white font-mono">
+                          {formatBytes(file.sizeBytes ?? 0)}
+                        </div>
+                      </>
+                    ) : (
+                      <>
                         <div className="mt-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                           {formatBytes(file.sizeBytes ?? 0)}
                         </div>
                         <span className="mt-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-sans normal-case">
-                          {getAccountProvider(file.accountId) === "gdrive" ? t("vault.googleDrive") : t("vault.oneDrive")}
+                          {providerLabel}
                         </span>
-                      </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {getIcon("doc")}
+                    <div className="mt-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                      {formatBytes(file.sizeBytes ?? 0)}
+                    </div>
+                    <span className="mt-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-sans normal-case">
+                      {providerLabel}
+                    </span>
+                  </>
+                )}
+              </div>
                     </div>
                   </ThemeCard>
                 );
@@ -441,6 +563,9 @@ export function FileGrid({
             const isSplit = fileWithFlags.is_split === true;
             const isDownloadOnly = fileWithFlags.viewer_mode === "download_only";
             const downloadOnlyClick = isSplit || isDownloadOnly;
+            const explorerFileKind = classifyFileKind(file.mime, file.name);
+            const explorerIsImage = explorerFileKind === "image" || explorerFileKind === "raw_embedded";
+            const previewUrl = `/api/files/${file.id}/stream`;
             const typeKey = fileTypeLabel(file);
             const typeLabel = t(typeKey);
             return (
@@ -448,7 +573,12 @@ export function FileGrid({
               key={file.id}
               glass
               className={`group flex cursor-pointer flex-col overflow-hidden ${folderHoverClass}`}
-               onClick={() => {
+                onClick={() => {
+                 if (explorerFileKind === "google_redirect" && file.providerFileId) {
+                    window.open(`https://drive.google.com/open?id=${encodeURIComponent(file.providerFileId)}`, "_blank", "noopener,noreferrer");
+                    return;
+                  }
+                  if (explorerFileKind === "unsupported") return;
                  if (downloadOnlyClick) {
                    const a = document.createElement("a");
                    a.href = `/api/files/${file.id}/download`;
@@ -568,33 +698,52 @@ export function FileGrid({
                 </DropdownMenu>
               </div>
               {/* Preview area */}
-              <div className="flex h-36 flex-col items-center justify-center bg-muted/50">
-                {getIcon(fileTypeFromRecord(file))}
-                <div className="mt-2 flex items-center gap-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                  <span>{formatBytes(file.sizeBytes)}</span>
-                  <span>{formatDate(file.updatedAt)}</span>
-                  <span
-                    className="rounded bg-muted px-1.5 py-0.5 font-sans normal-case tracking-normal"
-                    title={file.provider === "gdrive" ? t("vault.googleDrive") : file.provider === "onedrive" ? t("vault.oneDrive") : file.provider}
-                  >
-                    {file.provider === "gdrive"
-                      ? t("vault.googleDrive")
-                      : file.provider === "onedrive"
-                        ? t("vault.oneDrive")
-                        : file.provider}
-                  </span>
-                </div>
-                <span className={cn("mt-1 text-[10px] font-mono uppercase tracking-wider", getPreviewTone(file.previewStatus))}>
-                  {file.previewStatus === "ready"
-                    ? t("vault.readyPreviews")
-                    : file.previewStatus === "pending"
-                      ? t("vault.pending")
-                      : file.previewStatus === "processing"
-                        ? t("vault.processing")
-                        : file.previewStatus === "failed"
-                          ? t("vault.failed")
-                          : file.previewStatus ?? ""}
-                </span>
+              <div className="relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden bg-muted/50">
+                {explorerIsImage ? (
+                  <>
+                    <img
+                      src={previewUrl}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover rounded-md"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <div className="absolute bottom-1 right-1 rounded bg-black/50 px-1.5 py-0.5 text-[10px] font-mono text-white">
+                      {formatBytes(file.sizeBytes)}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {getIcon(fileTypeFromRecord(file))}
+                    <div className="mt-2 flex items-center gap-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                      <span>{formatBytes(file.sizeBytes)}</span>
+                      <span>{formatDate(file.updatedAt)}</span>
+                    </div>
+                    <span
+                      className="mt-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-sans normal-case tracking-normal"
+                      title={file.provider === "gdrive" ? t("vault.googleDrive") : file.provider === "onedrive" ? t("vault.oneDrive") : file.provider}
+                    >
+                      {file.provider === "gdrive"
+                        ? t("vault.googleDrive")
+                        : file.provider === "onedrive"
+                          ? t("vault.oneDrive")
+                          : file.provider}
+                    </span>
+                    <span className={cn("mt-1 text-[10px] font-mono uppercase tracking-wider", getPreviewTone(file.previewStatus))}>
+                      {file.previewStatus === "ready"
+                        ? t("vault.readyPreviews")
+                        : file.previewStatus === "pending"
+                          ? t("vault.pending")
+                          : file.previewStatus === "processing"
+                            ? t("vault.processing")
+                            : file.previewStatus === "failed"
+                              ? t("vault.failed")
+                              : file.previewStatus ?? ""}
+                    </span>
+                  </>
+                )}
               </div>
             </ThemeCard>
           );

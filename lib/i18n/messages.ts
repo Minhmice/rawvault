@@ -17,6 +17,16 @@ export type MessageKey =
   | "topbar.notifications"
   | "topbar.language"
   | "topbar.languageCurrent"
+  | "comingSoon.titleRecent"
+  | "comingSoon.titleStarred"
+  | "comingSoon.titleTrash"
+  | "comingSoon.titleSettings"
+  | "comingSoon.descRecent"
+  | "comingSoon.descStarred"
+  | "comingSoon.descTrash"
+  | "comingSoon.descSettings"
+  | "comingSoon.description"
+  | "comingSoon.backToVault"
   | "sidebar.myVault"
   | "sidebar.sharedByMe"
   | "sidebar.recent"
@@ -285,6 +295,16 @@ export const messages: Record<Locale, Messages> = {
     "topbar.notifications": "Notifications",
     "topbar.language": "Choose language",
     "topbar.languageCurrent": "Current language",
+    "comingSoon.titleRecent": "Recent",
+    "comingSoon.titleStarred": "Starred",
+    "comingSoon.titleTrash": "Trash",
+    "comingSoon.titleSettings": "Settings",
+    "comingSoon.descRecent": "Your latest files and activity will show up here soon.",
+    "comingSoon.descStarred": "Your saved favorites will appear here soon.",
+    "comingSoon.descTrash": "Deleted items you can restore will be available here soon.",
+    "comingSoon.descSettings": "Tune your preferences and storage options here soon.",
+    "comingSoon.description": "This page is coming soon.",
+    "comingSoon.backToVault": "Back to Vault",
     "sidebar.myVault": "My Vault",
     "sidebar.sharedByMe": "Shared by me",
     "sidebar.recent": "Recent",
@@ -550,6 +570,16 @@ export const messages: Record<Locale, Messages> = {
     "topbar.notifications": "Thông báo",
     "topbar.language": "Chọn ngôn ngữ",
     "topbar.languageCurrent": "Ngôn ngữ hiện tại",
+    "comingSoon.titleRecent": "Gần đây",
+    "comingSoon.titleStarred": "Đã gắn sao",
+    "comingSoon.titleTrash": "Thùng rác",
+    "comingSoon.titleSettings": "Cài đặt",
+    "comingSoon.descRecent": "Các file và hoạt động gần đây sẽ sớm hiển thị tại đây.",
+    "comingSoon.descStarred": "Các mục bạn đã lưu (gắn sao) sẽ sớm hiển thị tại đây.",
+    "comingSoon.descTrash": "Các mục đã xoá (có thể khôi phục) sẽ sớm hiển thị tại đây.",
+    "comingSoon.descSettings": "Bạn sẽ sớm có thể tuỳ chỉnh tuỳ chọn và thiết lập lưu trữ tại đây.",
+    "comingSoon.description": "Trang này sẽ sớm ra mắt.",
+    "comingSoon.backToVault": "Quay lại Kho",
     "sidebar.myVault": "Kho của tôi",
     "sidebar.sharedByMe": "Chia sẻ bởi tôi",
     "sidebar.recent": "Gần đây",

@@ -32,6 +32,8 @@ const eslintConfig = [
       "**/.cursor/**",
     ],
   },
+  ...nextVitals,
+  ...nextTs,
   {
     rules: {
       // These rules are noisy/false-positive for our current patterns.
@@ -41,8 +43,6 @@ const eslintConfig = [
       "react-hooks/incompatible-library": "off",
     },
   },
-  ...nextVitals,
-  ...nextTs,
 ];
 
 export default eslintConfig;
