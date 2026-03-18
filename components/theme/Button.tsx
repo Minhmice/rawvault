@@ -11,8 +11,8 @@ export interface ThemeButtonProps
 
 const ThemeButton = React.forwardRef<HTMLButtonElement, ThemeButtonProps>(
   ({ className, variant = "default", size, ...props }, ref) => {
-    const { theme } = useTheme();
-    const isMonochrome = theme.name === "monochrome";
+    const { themeName } = useTheme();
+    const isMonochrome = themeName === "monochrome";
 
     // Monochrome specific overrides
     const monochromeClasses = isMonochrome

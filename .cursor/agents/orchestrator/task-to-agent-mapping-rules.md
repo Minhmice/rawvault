@@ -2,15 +2,17 @@
 
 **Purpose**: Remove ambiguity in how tasks map to agents. Enforce precise routing for backend/frontend paired work and targeted fixes.
 
-**Core rule**: When the orchestrator is called, **ALL selected agents run at the same time (in parallel)**. No sequential chains. Saves time.
+**Core rule**: When the orchestrator is called, **agents run in parallel within a phase**. If the work is split into **multiple sub-phases**, those sub-phases run **sequentially**, and each sub-phase may run multiple agents in parallel. This preserves speed while avoiding dependency deadlocks.
 
-**Post-implementation gate (mandatory)**: After implementation agents finish and their output is merged, the orchestrator **must** run **code-reviewer** and **qa-tester** in parallel before declaring the task complete. Do not skip this step unless the user explicitly asks to skip review/QA or the task is non-code.
+**Post-implementation gate (mandatory)**: After implementation agents finish and their output is merged, the orchestrator **must** run **code-reviewer** and **qa-tester** in parallel before declaring the task complete. Do not skip this step unless the user explicitly asks to skip review/QA or the task is non-code. For **low-risk** (single-file, docs-only, or user said "quick fix"/"skip review"), Phase 2 may be reduced or skipped if the user agreed (see `PERFORMANCE.md`).
 
-**Registry agents**: orchestrator, planner, product-manager, research-analyst, frontend-developer, backend-developer, typescript-specialist, database-specialist, google-cli-specialist, debugger, code-reviewer, qa-tester, documentation-writer, devops-engineer
+**Registry agents**: orchestrator, planner, product-manager, research-analyst, frontend-developer, backend-developer, typescript-specialist, database-specialist, google-cli-specialist, debugger, code-reviewer, qa-tester, documentation-writer, devops-engineer, rule-skill-ingestor
 
 ### Execution sequence (for implementation tasks)
 
-1. **Phase 1 — Implement**: Run selected implementation agents in parallel (e.g. frontend-developer + backend-developer). Merge their outputs.
+1. **Phase 1 — Implement**: Either:
+   - **Single phase**: Run selected implementation agents in parallel (e.g. frontend-developer + backend-developer). Merge their outputs.
+   - **Multi-subphase** (heavy work): Use `SKILL-DETAILS.md` § Heavy phase expansion to create sub-phases. Execute sub-phases **sequentially**, with parallel agents inside each sub-phase; merge after each sub-phase.
 2. **Phase 2 — Review & QA**: Run **code-reviewer** and **qa-tester** in parallel on the merged scope. No exception unless user asks to skip or task is non-code.
 3. **Synthesize**: Combine implementation + review + QA; list residual risks; present as complete.
 
@@ -40,6 +42,20 @@
 - **Task touches**: `app/**/*.tsx`, `components/**`, `pages/**`, layout, design tokens, client state, a11y  
   → **Select**: `frontend-developer`
 
+- **Task touches**: translations, i18n keys, locale, localized text, `src/locales/**`, react-i18next
+  → **Select**: `frontend-developer`; attach `.cursor/agents/skills/i18n.md` in handoff
+- **Task touches**: Minimalist Monochrome, editorial B&W, `components/themes/monochrome/**`, inversion hover, zero-radius editorial UI
+  → **Select**: `frontend-developer`; attach `.cursor/agents/skills/minimalist-monochrome.md` in handoff
+- **Task touches**: theme preset, add theme, `data-theme`, ThemeProvider, `useThemeComponents`, globals.css theme blocks, theme switch behavior
+  → **Select**: `frontend-developer`; attach `.cursor/agents/skills/theme-instructions.md` in handoff
+- **Task touches**: Bauhaus, constructivist UI, hard-shadow buttons, R/Y/B color blocks, `components/themes/bauhaus/**`
+  → **Select**: `frontend-developer`; attach `.cursor/agents/skills/bauhaus-theme.md` in handoff
+- **Task touches**: Linear-style dark, cinematic UI, indigo accent, spotlight cards, ambient blobs, `components/themes/linear/**`
+  → **Select**: `frontend-developer`; attach `.cursor/agents/skills/linear-modern-dark.md` in handoff
+
+- **Task touches**: shadcn/ui, adding or customizing shadcn component, `components.json`, `components/theme/shadcn/**`  
+  → **Select**: `frontend-developer` (shadcn guidance is in `.cursor/agents/skills/frontend.md` § Shadcn/ui)
+
 - **Task touches both** (API + UI in same flow)  
   → **Select**: `backend-developer` + `frontend-developer` in parallel
 
@@ -63,6 +79,15 @@ All agents run **in parallel** (at the same time). Merge owner combines outputs 
 | **Full flow (FE+BE)** | frontend-developer | backend-developer | orchestrator |
 | **Contract-heavy** | typescript-specialist | backend-developer OR frontend-developer | typescript-specialist |
 | **DB-heavy** | database-specialist | backend-developer | database-specialist |
+
+### 2.3 Fan-out (same-skill parallel, large task)
+
+When the task is **large** and **single-domain** (e.g. add theme across app, redesign many components), and the specialist has **max_parallel** in `registry.yaml` (e.g. frontend-developer, backend-developer):
+
+- **Use**: 2 or 3 **instances** of the **same** specialist in parallel, each with a disjoint scope (split by UI layer or feature slice).
+- **Trigger**: Scope ≥ 4 independent file groups/components, or user says "theme", "redesign", "multi-component", "large scope".
+- **Cap**: Max 3 instances. One specialist type only per fan-out. Merge all instance outputs, then run Phase 2 once.
+- **Details**: `SKILL-DETAILS.md` § Fan-out pattern; handoff template § Fan-out handoff.
 
 ---
 
@@ -156,3 +181,10 @@ For focused fixes, default to exactly 2 parallel agents.
 | "DTO doesn't match API response" | typescript-specialist | backend-developer or frontend-developer |
 | "Small lint/type cleanup" | owning specialist | code-reviewer |
 | "Add gws service" / "Fix gws validation" / "gws discovery bug" | google-cli-specialist | typescript-specialist or code-reviewer |
+| "Add theme" / "Redesign components" / "Large UI scope" | frontend-developer × 2–3 (fan-out) | — Merge then Phase 2 |
+| "Add translations" / "i18n keys" / "locale" / "localized text" | frontend-developer (+ i18n skill) | Attach skills/i18n.md |
+| "Monochrome theme" / "editorial B&W" / "minimalist monochrome" | frontend-developer | Attach skills/minimalist-monochrome.md |
+| "Add theme" / "new preset" / "theme broken" / "data-theme" | frontend-developer | Attach skills/theme-instructions.md |
+| "Bauhaus" / "constructivist" / "hard shadow primary colors" | frontend-developer | Attach skills/bauhaus-theme.md |
+| "Linear dark" / "cinematic" / "modern dark premium" / "spotlight card" | frontend-developer | Attach skills/linear-modern-dark.md |
+| "Add shadcn component" / "customize shadcn" / "components.json" | frontend-developer | Shadcn in frontend.md |

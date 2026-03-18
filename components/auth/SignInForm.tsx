@@ -141,12 +141,12 @@ export function SignInForm() {
         </div>
 
         {error ? (
-          <div className="rounded-[var(--radius-sm)] border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
+          <div className="rounded-[var(--radius-sm)] border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         ) : null}
         {successMessage ? (
-          <div className="rounded-[var(--radius-sm)] border border-green-400/40 bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-400">
+          <div className="rounded-[var(--radius-sm)] border border-rv-success/40 bg-rv-success/10 p-3 text-sm text-rv-success">
             {successMessage}
           </div>
         ) : null}
@@ -191,7 +191,7 @@ export function SignInForm() {
                 }
               }}
               disabled={loading}
-              className="font-mono text-primary underline underline-offset-2 hover:text-primary/80"
+              className="rounded-sm font-mono text-primary underline underline-offset-2 outline-none hover:text-primary/80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {t("auth.qaSignIn")}
             </button>

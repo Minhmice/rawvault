@@ -1,10 +1,7 @@
 version: 1
 default:
   primary_agent: orchestrator
-  direct_answer_when:
-    - single_step
-    - low_risk
-    - no_specialist_advantage
+  direct_answer_when: []
   stop_delegation_when:
     - repeated_outputs_without_new_evidence
     - contract_complete_and_quality_gates_passed
@@ -26,7 +23,7 @@ signals:
   research-analyst:
     keywords: ["compare", "evaluate", "unknown", "best practice", "tradeoff"]
   frontend-developer:
-    keywords: ["ui", "component", "page", "layout", "a11y", "render"]
+    keywords: ["ui", "component", "page", "layout", "a11y", "render", "translation", "i18n", "locale", "localized", "shadcn", "components.json", "radix", "add button", "add dialog"]
   backend-developer:
     keywords: ["api", "route", "auth", "service", "server", "endpoint"]
   typescript-specialist:

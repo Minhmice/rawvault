@@ -24,6 +24,25 @@ SKILL_FINDER_PATH = AGENTS_DIR / "mappings" / "skill-finder.csv"
 
 SKILL_FINDER_SEARCH_COLS = ["keywords", "examples", "notes", "field_id", "specialist_id"]
 
+ALLOWED_FIELDS = {
+    "orchestrator",
+    "frontend",
+    "backend",
+    "typescript",
+    "database",
+    "devops",
+    "documentation",
+    "qa",
+    "code-review",
+    "agent-system",
+    "planner",
+    "product-manager",
+    "research",
+    "debugger",
+    "google-cli",
+    "external",
+}
+
 
 def tokenize(text: str) -> list[str]:
     normalized = re.sub(r"[^a-z0-9+/-]+", " ", str(text).lower())

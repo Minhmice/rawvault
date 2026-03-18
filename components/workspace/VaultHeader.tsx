@@ -30,7 +30,7 @@ export function VaultHeader({
   const { t } = useLocale();
 
   return (
-    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div className="flex w-full shrink-0 flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
         <h1 className="animate-enter text-3xl font-heading font-bold uppercase tracking-widest text-foreground">
           {t("vault.myVault")}

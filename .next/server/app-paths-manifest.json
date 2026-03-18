@@ -41,6 +41,10 @@
   "/api/uploads/execute/route": "app/api/uploads/execute/route.js",
   "/api/workspace/preferences/route": "app/api/workspace/preferences/route.js",
   "/page": "app/page.js",
+  "/recent/page": "app/recent/page.js",
   "/s/[token]/page": "app/s/[token]/page.js",
-  "/shared/page": "app/shared/page.js"
+  "/settings/page": "app/settings/page.js",
+  "/shared/page": "app/shared/page.js",
+  "/starred/page": "app/starred/page.js",
+  "/trash/page": "app/trash/page.js"
 }

@@ -19,25 +19,25 @@ export interface BauhausButtonProps
 const BauhausButton = React.forwardRef<HTMLButtonElement, BauhausButtonProps>(
   ({ className, variant = "default", size, ...props }, ref) => {
     const bauhausBase = [
-      "rounded-none border-2 border-[#121212]",
+      "rounded-none border-2 border-rv-text",
       "font-bold uppercase tracking-wider text-xs",
       // Mechanical: 150ms ease-out, shadows change via transitions
-      "shadow-[4px_4px_0px_0px_#121212]",
+      "shadow-[4px_4px_0px_0px_var(--rv-border)]",
       "[transition:transform_150ms_ease-out,box-shadow_150ms_ease-out,background-color_150ms_ease-out]",
       // Hover: lift up + shadow grows
-      "hover:-translate-y-[2px] hover:shadow-[4px_6px_0px_0px_#121212]",
+      "hover:-translate-y-[2px] hover:shadow-[4px_6px_0px_0px_var(--rv-border)]",
       // Active: press down + shadow collapses — instant (50ms)
       "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none active:[transition-duration:50ms]",
       "animate-enter",
     ].join(" ")
 
     const variantMap: Record<string, string> = {
-      default:     "bg-[#D02020] text-white hover:bg-[#C01818]",
-      secondary:   "bg-[#1040C0] text-white hover:bg-[#0D35A8]",
-      outline:     "bg-white text-[#121212] hover:bg-[#F0F0F0]",
-      ghost:       "border-none shadow-none hover:shadow-none hover:bg-[#E0E0E0] text-[#121212]",
-      destructive: "bg-[#D02020] text-white hover:bg-[#C01818]",
-      link:        "border-none shadow-none hover:shadow-none text-[#1040C0] underline-offset-4 hover:underline",
+      default:     "bg-rv-primary text-white hover:bg-rv-primary-hover",
+      secondary:   "bg-secondary text-secondary-foreground hover:bg-secondary/90",
+      outline:     "bg-rv-surface text-rv-text hover:bg-rv-surface-muted",
+      ghost:       "border-none shadow-none hover:shadow-none hover:bg-rv-surface-muted text-rv-text",
+      destructive: "bg-rv-danger text-white hover:bg-rv-danger/90",
+      link:        "border-none shadow-none hover:shadow-none text-secondary underline-offset-4 hover:underline",
     }
 
     const variantClass = variantMap[variant ?? "default"] ?? variantMap.default

@@ -1,9 +1,13 @@
-import { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
+import { BottomTabBar } from "@/components/mobile/BottomTabBar";
+import { MobileSheet } from "@/components/mobile/MobileSheet";
+import { SidebarMobileSheetBody } from "@/components/workspace/SidebarAccountsPanel";
+import { useLocale } from "@/components/i18n/LocaleProvider";
 import type { AuthUser, BreadcrumbItem, LinkedAccount } from "@/lib/contracts";
-
-// Dashboard layout: sidebar + topbar + main. Overlays (ThemePanel) live at root layout.
 
 export type UnlinkAccountResult =
   | { ok: true }
@@ -40,8 +44,11 @@ export function DashboardLayout({
   accountActionId,
   signOutLoading = false,
 }: DashboardLayoutProps) {
+  const { t } = useLocale();
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+
   return (
-    <div className="flex h-screen w-full bg-background overflow-hidden text-foreground">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-background text-foreground">
       <Sidebar
         user={user}
         accounts={accounts}
@@ -52,7 +59,7 @@ export function DashboardLayout({
         signOutLoading={signOutLoading}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col relative overflow-hidden">
+      <div className="relative flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden">
         <Topbar
           breadcrumb={breadcrumb}
           search={search}
@@ -60,12 +67,31 @@ export function DashboardLayout({
           onOpenRoot={onOpenRoot}
           onBreadcrumbSegment={onBreadcrumbSegment}
         />
-        <main className="flex min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-6 lg:p-8" role="main">
-          <div className="mx-auto max-w-7xl h-full min-h-0">
-            {children}
-          </div>
+        <main
+          className="box-border flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-background p-4 pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:p-6 md:pb-6 lg:p-8"
+          role="main"
+        >
+          <div className="box-border flex min-h-min w-full min-w-0 flex-1 flex-col">{children}</div>
         </main>
       </div>
+
+      <MobileSheet
+        open={mobileSheetOpen}
+        onOpenChange={setMobileSheetOpen}
+        title={t("mobile.accounts")}
+      >
+        <SidebarMobileSheetBody
+          user={user}
+          accounts={accounts}
+          onSetActiveAccount={onSetActiveAccount}
+          onUnlinkAccount={onUnlinkAccount}
+          accountActionId={accountActionId}
+          onSignOut={onSignOut}
+          signOutLoading={signOutLoading}
+        />
+      </MobileSheet>
+
+      <BottomTabBar onMorePress={() => setMobileSheetOpen(true)} />
     </div>
   );
 }

@@ -51,10 +51,10 @@ const THEME_CARDS: {
 export function ThemePanel() {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLocale();
-  const { theme, setTheme, applyPreset } = useTheme();
+  const { themeName, mode, primaryColor, borderRadius, setTheme, applyPreset, setMode } = useTheme();
 
-  const palette = ACCENT_PALETTES[theme.name] ?? ACCENT_PALETTES.vivid;
-  const borderRadius = typeof theme.borderRadius === "number" ? theme.borderRadius : 12;
+  const palette = ACCENT_PALETTES[themeName] ?? ACCENT_PALETTES.vivid;
+  const r = typeof borderRadius === "number" ? borderRadius : 12;
 
   useEffect(() => {
     const handleToggle = () => setIsOpen((prev) => !prev);
@@ -73,7 +73,7 @@ export function ThemePanel() {
       />
 
       {/* Panel */}
-      <aside className="fixed right-0 top-0 h-full w-80 bg-card border-l border-border shadow-2xl z-50 flex flex-col overflow-hidden">
+      <aside className="fixed right-0 top-0 z-50 flex h-full w-80 max-w-[100vw] flex-col overflow-hidden border-l border-border bg-card shadow-2xl max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:top-auto max-md:h-[min(88dvh,100%)] max-md:w-full max-md:rounded-t-2xl max-md:border-b-0 max-md:border-l-0 max-md:border-t">
 
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
@@ -101,9 +101,9 @@ export function ThemePanel() {
             </h3>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setTheme({ mode: "light" })}
+                onClick={() => setMode("light")}
                 className={`flex items-center justify-center gap-2 h-9 px-3 text-sm font-medium border rounded transition-all
-                  ${theme.mode === "light"
+                  ${mode === "light"
                     ? "bg-foreground text-background border-foreground"
                     : "bg-background text-foreground border-border hover:border-foreground/40"}`}
               >
@@ -111,9 +111,9 @@ export function ThemePanel() {
                 {t("theme.light")}
               </button>
               <button
-                onClick={() => setTheme({ mode: "dark" })}
+                onClick={() => setMode("dark")}
                 className={`flex items-center justify-center gap-2 h-9 px-3 text-sm font-medium border rounded transition-all
-                  ${theme.mode === "dark"
+                  ${mode === "dark"
                     ? "bg-foreground text-background border-foreground"
                     : "bg-background text-foreground border-border hover:border-foreground/40"}`}
               >
@@ -135,7 +135,7 @@ export function ThemePanel() {
                   key={c.value}
                   onClick={() => setTheme({ primaryColor: c.value })}
                   className={`flex flex-col items-center gap-2 p-2 border rounded transition-all text-xs font-medium
-                    ${theme.primaryColor === c.value
+                    ${primaryColor === c.value
                       ? "border-foreground shadow-sm"
                       : "border-border hover:border-foreground/40"}`}
                 >
@@ -159,18 +159,18 @@ export function ThemePanel() {
                 <span>{t("theme.sharp")}</span>
                 <span
                   className="rounded px-1.5 py-0.5 border border-border text-foreground font-mono"
-                  style={{ borderRadius: `${borderRadius}px` }}
+                  style={{ borderRadius: `${r}px` }}
                 >
-                  {borderRadius}px
+                  {r}px
                 </span>
                 <span>{t("theme.rounded")}</span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={theme.name === "vivid" ? 24 : 16}
+                max={themeName === "vivid" ? 24 : 16}
                 step={1}
-                value={borderRadius}
+                value={r}
                 onChange={(e) => setTheme({ borderRadius: Number(e.target.value) })}
                 className="w-full accent-foreground cursor-pointer"
               />
@@ -185,7 +185,7 @@ export function ThemePanel() {
             </h3>
             <div className="space-y-2">
               {THEME_CARDS.map((tc) => {
-                const isActive = theme.name === tc.name;
+                const isActive = themeName === tc.name;
                 return (
                   <button
                     key={tc.name}
@@ -194,7 +194,7 @@ export function ThemePanel() {
                       ${isActive
                         ? "border-foreground bg-foreground/5 shadow-sm"
                         : "border-border hover:border-foreground/40"}`}
-                    style={{ borderRadius: `${borderRadius}px` }}
+                    style={{ borderRadius: `${r}px` }}
                   >
                     <div className="flex flex-col gap-0.5">
                       <span className="text-sm font-semibold text-foreground">{t(tc.labelKey)}</span>
@@ -221,7 +221,7 @@ export function ThemePanel() {
           <button
             onClick={() => applyPreset("vivid")}
             className="w-full h-9 text-sm font-medium border border-border bg-muted/30 text-muted-foreground transition-all hover:bg-muted hover:text-foreground hover:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            style={{ borderRadius: `${borderRadius}px` }}
+            style={{ borderRadius: `${r}px` }}
           >
             {t("theme.resetToDefault")}
           </button>

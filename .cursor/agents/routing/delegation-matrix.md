@@ -6,6 +6,8 @@
 | Solution planning | `planner` | `orchestrator` | feature spans FE/BE/DB and has rollout risk | one-file or one-module change |
 | External or unknown research | `research-analyst` | domain specialist | independent research questions can run in parallel | one narrow question |
 | Frontend implementation | `frontend-developer` | `typescript-specialist` or `code-reviewer` | API contract also changes → add `backend-developer` in parallel | API contract is frozen |
+| Translations / i18n / locale | `frontend-developer` | — | — | Attach `.cursor/agents/skills/i18n.md` in handoff |
+| shadcn/ui (add/customize component, components.json) | `frontend-developer` | — | — | Shadcn in `frontend.md` § Shadcn/ui |
 | Backend implementation | `backend-developer` | `typescript-specialist` | DB migration or FE integration → add `database-specialist` or `frontend-developer` | API-only internal change |
 | Typing and contract hardening | `typescript-specialist` | `backend-developer` + `frontend-developer` (follow-up) | contracts affect FE and BE together | localized type fix |
 | Schema, migration, RLS | `database-specialist` | `backend-developer` (sequential follow-up) | migration needs compatibility sequencing | no schema impact |

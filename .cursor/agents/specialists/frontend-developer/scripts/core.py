@@ -64,6 +64,11 @@ CSV_CONFIG = {
         "file": "web-interface.csv",
         "search_cols": ["Category", "Issue", "Keywords", "Description"],
         "output_cols": ["Category", "Issue", "Platform", "Description", "Do", "Don't", "Code Example Good", "Code Example Bad", "Severity"]
+    },
+    "responsive": {
+        "file": "responsive-design.csv",
+        "search_cols": ["Category", "Issue", "Keywords", "Description", "Do", "Don't"],
+        "output_cols": ["Category", "Issue", "Platform", "Description", "Do", "Don't", "Code Example Good", "Code Example Bad", "Severity"]
     }
 }
 
@@ -201,7 +206,12 @@ def detect_domain(query):
         "typography": ["font", "typography", "heading", "serif", "sans"],
         "icons": ["icon", "icons", "lucide", "heroicons", "symbol", "glyph", "pictogram", "svg icon"],
         "react": ["react", "next.js", "nextjs", "suspense", "memo", "usecallback", "useeffect", "rerender", "bundle", "waterfall", "barrel", "dynamic import", "rsc", "server component"],
-        "web": ["aria", "focus", "outline", "semantic", "virtualize", "autocomplete", "form", "input type", "preconnect"]
+        "web": ["aria", "focus", "outline", "semantic", "virtualize", "autocomplete", "form", "input type", "preconnect"],
+        "responsive": [
+            "responsive", "breakpoint", "mobile-first", "container query", "@container", "cqi", "cqw",
+            "fluid", "clamp", "viewport", "dvh", "svh", "auto-fit", "minmax", "srcset", "picture",
+            "responsive table", "hamburger", "touch target", "overflow-x", "horizontal scroll"
+        ]
     }
 
     scores = {domain: sum(1 for kw in keywords if kw in query_lower) for domain, keywords in domain_keywords.items()}

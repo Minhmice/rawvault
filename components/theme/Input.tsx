@@ -11,8 +11,8 @@ export interface ThemeInputProps
 
 const ThemeInput = React.forwardRef<HTMLInputElement, ThemeInputProps>(
   ({ className, error, ...props }, ref) => {
-    const { theme } = useTheme();
-    const isMonochrome = theme.name === "monochrome";
+    const { themeName } = useTheme();
+    const isMonochrome = themeName === "monochrome";
 
     const monochromeClasses = isMonochrome
       ? "rounded-none border-0 border-b-2 border-border bg-transparent px-0 py-2 shadow-none focus-visible:ring-0 focus-visible:border-b-4 focus-visible:border-foreground"

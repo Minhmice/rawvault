@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Search, Palette, Bell, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/theme-provider/ThemeProvider";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useThemeComponents } from "../themes";
@@ -13,22 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/theme/shadcn/dropdown-menu";
-
-type ThemeName = "vivid" | "monochrome" | "bauhaus" | "linear";
-
-const TOPBAR_BUTTON: Record<ThemeName, string> = {
-  vivid: "rounded-xl border border-transparent hover:bg-muted/80 hover:border-primary/30 transition-all duration-200",
-  monochrome: "rounded-none border-2 border-transparent hover:border-foreground hover:bg-foreground/5 transition-colors duration-100",
-  bauhaus: "rounded-none border-2 border-transparent hover:border-foreground hover:bg-accent transition-all duration-150",
-  linear: "rounded-lg border border-transparent hover:bg-white/5 hover:border-white/10 transition-all duration-250",
-};
-
-const TOPBAR_SEARCH: Record<ThemeName, string> = {
-  vivid: "rounded-xl border border-input focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40",
-  monochrome: "rounded-none border-b-2 border-foreground/30 focus-within:border-foreground",
-  bauhaus: "rounded-none border-2 border-foreground/50 focus-within:border-foreground",
-  linear: "rounded-lg border border-white/10 focus-within:ring-1 focus-within:ring-primary/40 focus-within:border-primary/50",
-};
 
 type TopbarProps = {
   breadcrumb: BreadcrumbItem[];
@@ -46,12 +31,10 @@ export function Topbar({
   onOpenRoot,
   onBreadcrumbSegment,
 }: TopbarProps) {
-  const { theme } = useTheme();
+  const { themeName } = useTheme();
   const { locale, setLocale, t, localeLabel } = useLocale();
   const { ThemeButton: Button, ThemeInput: Input } = useThemeComponents();
-  const name = (theme.name ?? "vivid") as ThemeName;
-  const btnClass = TOPBAR_BUTTON[name] ?? TOPBAR_BUTTON.vivid;
-  const searchClass = TOPBAR_SEARCH[name] ?? TOPBAR_SEARCH.vivid;
+  void themeName; // theme selected via CSS (data-theme selectors)
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -72,16 +55,21 @@ export function Topbar({
 
   const locales: Locale[] = ["en", "vi"];
 
+  const mobileCrumb =
+    breadcrumb.length === 0
+      ? t("topbar.myVault")
+      : breadcrumb[breadcrumb.length - 1]?.name ?? t("topbar.myVault");
+
   return (
     <header
-      className={`
-        h-16 flex items-center justify-between px-4 md:px-6 z-10
-        transition-colors duration-100
-        ${scrolled ? "bg-background border-b border-border" : "bg-transparent"}
-      `}
+      className={cn(
+        "z-10 flex w-full shrink-0 flex-col transition-colors duration-100",
+        scrolled ? "border-b border-border bg-background" : "bg-transparent"
+      )}
     >
-      <div className="flex-1 flex items-center">
-        <div className="hidden md:flex items-center gap-2 text-sm font-medium font-mono uppercase tracking-wider text-muted-foreground">
+      <div className="flex h-16 items-center justify-between px-3 md:px-6">
+      <div className="hidden min-w-0 flex-1 items-center md:flex">
+        <div className="flex items-center gap-2 text-sm font-medium font-mono uppercase tracking-wider text-muted-foreground">
           <button type="button" onClick={onOpenRoot} className="hover:text-foreground">
             {t("topbar.myVault")}
           </button>
@@ -112,29 +100,39 @@ export function Topbar({
         </div>
       </div>
 
-      <div className="flex-1 max-w-md mx-4">
-        <div className={`relative group transition-all duration-200 ${searchClass}`}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 stroke-[1.5px] text-muted-foreground group-focus-within:text-foreground transition-colors duration-100" />
+      <div className="min-w-0 flex-1 md:hidden">
+        <button
+          type="button"
+          onClick={onOpenRoot}
+          className="max-w-full truncate text-left text-sm font-medium text-foreground"
+        >
+          {mobileCrumb}
+        </button>
+      </div>
+
+      <div className="mx-4 hidden max-w-md flex-1 md:block">
+        <div className="rv-topbar-search relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 stroke-[1.5px] text-muted-foreground transition-colors duration-100 group-focus-within:text-foreground" />
           <Input
             placeholder={t("topbar.searchPlaceholder")}
-            className="pl-9 font-mono uppercase tracking-wider text-xs border-0 focus:ring-0 focus:shadow-none"
+            className="border-0 pl-9 font-mono text-xs uppercase tracking-wider focus:shadow-none focus:ring-0"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
           />
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-end gap-2 md:gap-4">
+      <div className="flex flex-1 items-center justify-end gap-1 md:gap-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleThemePanel}
           title={t("topbar.customizeWorkspace")}
-          className={btnClass}
+          className="rv-topbar-btn"
         >
           <Palette className="h-5 w-5 stroke-[1.5px]" />
         </Button>
-        <Button variant="ghost" size="icon" className={btnClass} title={t("topbar.notifications")}>
+        <Button variant="ghost" size="icon" className="rv-topbar-btn" title={t("topbar.notifications")}>
           <Bell className="h-5 w-5 stroke-[1.5px]" />
         </Button>
         <DropdownMenu>
@@ -143,7 +141,7 @@ export function Topbar({
               <Button
                 variant="ghost"
                 size="sm"
-                className={`${btnClass} font-mono uppercase tracking-wider text-xs min-w-[4rem]`}
+                className={cn("rv-topbar-btn min-w-[4rem] font-mono text-xs uppercase tracking-wider")}
                 aria-label={`${t("topbar.language")} (${t("topbar.languageCurrent")}: ${localeLabel(locale)})`}
                 aria-haspopup="listbox"
               >
@@ -164,6 +162,19 @@ export function Topbar({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+      </div>
+
+      <div className="border-t border-border/40 px-3 pb-2 pt-2 md:hidden">
+        <div className="rv-topbar-search relative group">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 stroke-[1.5px] text-muted-foreground" />
+          <Input
+            placeholder={t("topbar.searchPlaceholder")}
+            className="border-0 pl-9 font-mono text-xs uppercase tracking-wider focus:shadow-none focus:ring-0"
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+          />
+        </div>
       </div>
     </header>
   );

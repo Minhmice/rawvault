@@ -153,8 +153,8 @@ export function FileGrid({
 }: FileGridProps) {
   const { t } = useLocale();
   const { ThemeCard, ThemeButton: Button } = useThemeComponents();
-  const { theme } = useTheme();
-  const name = (theme.name ?? "vivid") as ThemeName;
+  const { themeName } = useTheme();
+  const name = (themeName ?? "vivid") as ThemeName;
   const getPreviewTone = (s: ExplorerFile["previewStatus"]) => previewTone(s, name);
 
   const folderHoverClass = FOLDER_CARD_HOVER[name];

@@ -6,6 +6,7 @@ from __future__ import annotations
 import csv
 
 from search_core import (
+    ALLOWED_FIELDS,
     ORCHESTRATOR_SKILL,
     RULES_DIR,
     SKILLS_DIR,
@@ -19,23 +20,6 @@ from search_core import (
     specialist_search_script_path,
     specialist_dir,
 )
-
-ALLOWED_FIELDS = {
-    "orchestrator",
-    "frontend",
-    "backend",
-    "typescript",
-    "database",
-    "devops",
-    "documentation",
-    "qa",
-    "code-review",
-    "planner",
-    "product-manager",
-    "research",
-    "debugger",
-    "google-cli",
-}
 
 
 def count_rows(path):
@@ -122,6 +106,8 @@ def main() -> int:
         seen_route_fields.add(row["field_id"])
 
     for field_id in ALLOWED_FIELDS:
+        if field_id == "external":
+            continue
         if field_id not in seen_route_fields:
             errors.append(f"skill-finder.csv has no route for field: {field_id}")
 

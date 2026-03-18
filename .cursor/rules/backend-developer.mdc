@@ -1,6 +1,8 @@
 ---
 description: Implement API routes, server logic, auth checks, and service integration. Use for route handlers, server actions, and backend workflows.
-globs: "**/api/**/*.ts,**/app/api/**/*"
+globs:
+  - "app/api/**/*.ts"
+  - "app/api/**"
 alwaysApply: false
 ---
 

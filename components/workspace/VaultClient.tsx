@@ -426,7 +426,7 @@ export function VaultClient() {
         accountActionId={accountActionId}
         signOutLoading={signOutLoading}
       >
-        <div className="rounded-[var(--radius)] border border-border bg-card p-6">
+        <div className="w-full rounded-[var(--radius)] border border-border bg-card p-6">
           {t("vault.checkingSession")}
         </div>
       </DashboardLayout>
@@ -488,7 +488,7 @@ export function VaultClient() {
       accountActionId={accountActionId}
       signOutLoading={signOutLoading}
     >
-      <div className="flex h-full min-h-0 flex-col space-y-6">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col space-y-6">
         {authError ? (
           <ThemeCard className="border border-destructive/40 bg-destructive/10 p-4">
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -511,14 +511,14 @@ export function VaultClient() {
           <ThemeCard
             className={
               connectBanner.type === "success"
-                ? "border border-emerald-500/40 bg-emerald-500/10 p-4"
+                ? "border border-rv-success/40 bg-rv-success/10 p-4"
                 : "border border-destructive/40 bg-destructive/10 p-4"
             }
           >
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 {connectBanner.type === "success" ? (
-                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-rv-success" />
                 ) : (
                   <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
                 )}
@@ -558,7 +558,7 @@ export function VaultClient() {
 
         <VaultFilterBar value={providerFilter} onChange={setProviderFilter} />
 
-        <div className="flex-1 min-h-0">
+        <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
           <FileGrid
             folders={folders}
             files={files}

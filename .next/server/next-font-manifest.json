@@ -32,6 +32,14 @@
       "static/media/051742360c26797e-s.p.102b7f24.woff2",
       "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
     ],
+    "[project]/app/recent/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
+      "static/media/2a65768255d6b625-s.p.d19752fb.woff2",
+      "static/media/68d403cf9f2c68c5-s.p.f9f15f61.woff2",
+      "static/media/051742360c26797e-s.p.102b7f24.woff2",
+      "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
+    ],
     "[project]/app/s/[token]/page": [
       "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
@@ -40,7 +48,31 @@
       "static/media/051742360c26797e-s.p.102b7f24.woff2",
       "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
     ],
+    "[project]/app/settings/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
+      "static/media/2a65768255d6b625-s.p.d19752fb.woff2",
+      "static/media/68d403cf9f2c68c5-s.p.f9f15f61.woff2",
+      "static/media/051742360c26797e-s.p.102b7f24.woff2",
+      "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
+    ],
     "[project]/app/shared/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
+      "static/media/2a65768255d6b625-s.p.d19752fb.woff2",
+      "static/media/68d403cf9f2c68c5-s.p.f9f15f61.woff2",
+      "static/media/051742360c26797e-s.p.102b7f24.woff2",
+      "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
+    ],
+    "[project]/app/starred/page": [
+      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
+      "static/media/2a65768255d6b625-s.p.d19752fb.woff2",
+      "static/media/68d403cf9f2c68c5-s.p.f9f15f61.woff2",
+      "static/media/051742360c26797e-s.p.102b7f24.woff2",
+      "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
+    ],
+    "[project]/app/trash/page": [
       "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2",
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2",
       "static/media/2a65768255d6b625-s.p.d19752fb.woff2",

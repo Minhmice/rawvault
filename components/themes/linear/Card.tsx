@@ -56,7 +56,7 @@ const LinearCard = React.forwardRef<HTMLDivElement, LinearCardProps>(
           // Multi-layer base shadow
           "shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_2px_20px_rgba(0,0,0,0.4),0_0_40px_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.05)]",
           // Hover shadow with accent glow
-          "hover:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_8px_40px_rgba(0,0,0,0.5),0_0_80px_rgba(94,106,210,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]",
+          "hover:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_8px_40px_rgba(0,0,0,0.5),0_0_80px_color-mix(in_oklab,var(--rv-primary),transparent_90%),inset_0_1px_0_0_rgba(255,255,255,0.1)]",
           "animate-enter",
           className
         )}
@@ -67,14 +67,14 @@ const LinearCard = React.forwardRef<HTMLDivElement, LinearCardProps>(
           className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-300"
           style={{
             opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(300px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(94,106,210,0.08), transparent 40%)`
+            background: `radial-gradient(300px circle at ${mousePosition.x}px ${mousePosition.y}px, color-mix(in_oklab,var(--rv-primary),transparent 92%), transparent 40%)`
           }}
         />
         
         {/* Inner Card content container */}
         <div className={cn(
           "relative z-10 w-full h-full bg-[var(--rv-surface)] p-0 m-0 border-none transition-colors duration-300 group-hover:bg-[var(--rv-surface-hover)]",
-          glass && "backdrop-blur-xl bg-white/[0.03] group-hover:bg-white/[0.06]"
+          glass && "backdrop-blur-xl bg-rv-surface/60 group-hover:bg-rv-surface-hover/70"
         )}>
           {children}
         </div>

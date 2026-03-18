@@ -300,6 +300,18 @@
       "namedRegex": "^/login(?:/)?$"
     },
     {
+      "page": "/recent",
+      "regex": "^/recent(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/recent(?:/)?$"
+    },
+    {
+      "page": "/settings",
+      "regex": "^/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/settings(?:/)?$"
+    },
+    {
       "page": "/shared",
       "regex": "^/shared(?:/)?$",
       "routeKeys": {},
@@ -310,6 +322,18 @@
       "regex": "^/signup(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/signup(?:/)?$"
+    },
+    {
+      "page": "/starred",
+      "regex": "^/starred(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/starred(?:/)?$"
+    },
+    {
+      "page": "/trash",
+      "regex": "^/trash(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/trash(?:/)?$"
     }
   ],
   "dataRoutes": [],

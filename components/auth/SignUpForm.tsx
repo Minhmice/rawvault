@@ -168,7 +168,7 @@ export function SignUpForm() {
         </div>
 
         {error ? (
-          <div className="rounded-[var(--radius-sm)] border border-red-400/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
+          <div className="rounded-[var(--radius-sm)] border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             {error}
           </div>
         ) : null}

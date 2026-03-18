@@ -71,11 +71,17 @@ Rules auto-apply when you open a file that matches their `globs`. Agents are inv
 
 ---
 
-### 2.3 Backend Architect (`backend-architect.mdc`)
+### 2.3 Architecture / contracts (no Cursor rule)
 
-**Purpose**: Design architecture, schema, and API contracts; do not implement details.
+For architecture decisions and contract/schema planning, use the **multi-agent layer**:
 
-**Use when**: Designing system architecture, schema, API contract, service decomposition, or reliability/security strategy.
+- Planning/decomposition → `planner`
+- API/service architecture → `backend-developer` (design + implementation ownership)
+- Contracts/types → `typescript-specialist`
+- Schema/RLS/migrations → `database-specialist`
+- Multi-domain end-to-end → `orchestrator` (routes to the right specialists)
+
+Cursor rules are kept minimal (frontend/backend) and are mainly for **auto-context** when you open files.
 
 ---
 
@@ -166,10 +172,8 @@ Search helpers:
 │   └── compat/                 # External skill compatibility
 └── rules/                      # Cursor rules
     ├── always-orchestrator-skill.mdc  # Orchestrator always on
-    ├── agents-orchestrator.mdc
     ├── frontend-developer.mdc
-    ├── backend-developer.mdc
-    └── backend-architect.mdc
+    └── backend-developer.mdc
 ```
 
 Frontend keeps its existing specialist-local UI search system. Other specialists use one `data/catalog.csv` and one local `scripts/search.py`.

@@ -12,26 +12,11 @@ import {
   Video,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/i18n/LocaleProvider";
 import { useTheme } from "@/components/theme-provider/ThemeProvider";
 import { useThemeComponents } from "@/components/themes";
 import type { ResolveShareResponse } from "@/lib/contracts";
-
-type ThemeName = "vivid" | "monochrome" | "bauhaus" | "linear";
-
-const SHARE_VIEW_HEADER_THEME: Record<ThemeName, string> = {
-  vivid: "border-b border-border bg-muted/20 px-4 py-4",
-  monochrome: "border-b-4 border-foreground bg-card px-4 py-4",
-  bauhaus: "border-b-4 border-foreground bg-card px-4 py-4",
-  linear: "border-b border-border bg-card/50 px-4 py-4",
-};
-
-const SHARE_VIEW_TITLE_CLASS: Record<ThemeName, string> = {
-  vivid: "text-center text-lg font-heading font-bold uppercase tracking-widest text-foreground",
-  monochrome: "text-center text-lg font-heading font-bold uppercase tracking-wider text-foreground",
-  bauhaus: "text-center text-lg font-heading font-black uppercase tracking-tighter text-foreground",
-  linear: "text-center text-lg font-heading font-semibold tracking-wide text-foreground",
-};
 
 type ResolveShareLink = ResolveShareResponse["shareLink"];
 
@@ -291,11 +276,8 @@ export default function ShareViewPage() {
   const params = useParams();
   const token = typeof params.token === "string" ? params.token : "";
   const { t } = useLocale();
-  const { theme } = useTheme();
+  useTheme();
   const { ThemeButton: RetryButton } = useThemeComponents();
-  const themeName = (theme?.name ?? "vivid") as ThemeName;
-  const headerClass = SHARE_VIEW_HEADER_THEME[themeName] ?? SHARE_VIEW_HEADER_THEME.vivid;
-  const titleClass = SHARE_VIEW_TITLE_CLASS[themeName] ?? SHARE_VIEW_TITLE_CLASS.vivid;
 
   const [shareLink, setShareLink] = useState<ResolveShareLink | null>(null);
   const [status, setStatus] = useState<"loading" | "success" | "404" | "410" | "error">("loading");
@@ -347,6 +329,7 @@ export default function ShareViewPage() {
   }, [token, t]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchResolve();
   }, [fetchResolve]);
 
@@ -368,7 +351,7 @@ export default function ShareViewPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4">
         <header className="text-center">
-          <h1 className={titleClass}>{t("s.sharedWithYou")}</h1>
+          <h1 className="rv-share-title">{t("s.sharedWithYou")}</h1>
         </header>
         <div
           className="flex max-w-md flex-col items-center gap-4 rounded-[var(--radius)] border border-destructive/40 bg-destructive/10 p-8 text-center animate-enter"
@@ -392,11 +375,11 @@ export default function ShareViewPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <header className={headerClass}>
-        <h1 className={titleClass}>{t("s.sharedWithYou")}</h1>
+    <div className="flex min-h-[100dvh] flex-col bg-background pb-[env(safe-area-inset-bottom)]">
+      <header className="rv-share-header">
+        <h1 className={cn("rv-share-title px-2 text-base sm:text-lg")}>{t("s.sharedWithYou")}</h1>
       </header>
-      <main className="flex-1 px-4 py-8 animate-enter" role="main">
+      <main className="flex-1 px-3 py-6 animate-enter sm:px-4 sm:py-8" role="main">
         {shareLink && <ShareViewContent token={token} shareLink={shareLink} />}
       </main>
     </div>

@@ -1,9 +1,12 @@
 ---
 description: Implement frontend UI behavior, state, and accessibility. Use for pages, components, client-side interactions, and user-facing flows.
-globs: "**/*.tsx,**/app/**/*.ts,**/components/**/*"
+globs:
+  - "app/**/*.tsx"
+  - "app/**/*.ts"
+  - "components/**/*.tsx"
+  - "components/**/*.ts"
 alwaysApply: false
 ---
-
 # Frontend Developer
 
 ## Mission

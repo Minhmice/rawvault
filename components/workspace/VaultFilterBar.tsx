@@ -15,7 +15,7 @@ export function VaultFilterBar({ value, onChange }: VaultFilterBarProps) {
 
   return (
     <div
-      className="flex flex-wrap items-center gap-3 border-b border-border pb-4"
+      className="flex w-full shrink-0 flex-wrap items-center gap-3 border-b border-border pb-4"
       role="group"
       aria-label={t("workspace.filterByProviderAndPreview")}
     >

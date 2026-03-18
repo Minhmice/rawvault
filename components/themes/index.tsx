@@ -27,8 +27,8 @@ import { LinearCard } from "./linear/Card"
 import { LinearInput } from "./linear/Input"
 
 export function useThemeComponents() {
-  const { theme } = useTheme()
-  switch (theme.name) {
+  const { themeName } = useTheme()
+  switch (themeName) {
     case "monochrome":
       return { ThemeButton: MonochromeButton, ThemeCard: MonochromeCard, ThemeInput: MonochromeInput }
     case "bauhaus":

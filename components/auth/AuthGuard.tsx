@@ -47,6 +47,7 @@ export function AuthGuard({ children, mode }: AuthGuardProps) {
   useEffect(() => {
     let cancelled = false;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     checkSession().then((u) => {
       if (cancelled) return;
 

@@ -41,6 +41,7 @@ agents:
     enabled: true
     auto_routable: true
     model_tier: balanced
+    max_parallel: 3
   - id: backend-developer
     type: specialist
     field_id: backend
@@ -48,6 +49,7 @@ agents:
     enabled: true
     auto_routable: true
     model_tier: balanced
+    max_parallel: 3
   - id: typescript-specialist
     type: specialist
     field_id: typescript
@@ -101,6 +103,13 @@ agents:
     type: specialist
     field_id: google-cli
     skill: .cursor/agents/specialists/google-cli-specialist/SKILL.md
+    enabled: true
+    auto_routable: true
+    model_tier: balanced
+  - id: rule-skill-ingestor
+    type: specialist
+    field_id: agent-system
+    skill: .cursor/agents/specialists/rule-skill-ingestor/SKILL.md
     enabled: true
     auto_routable: true
     model_tier: balanced

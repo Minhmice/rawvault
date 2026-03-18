@@ -268,27 +268,12 @@ export type MessageKey =
   | "s.ariaFile"
   | "s.ariaFolder"
   | "s.ariaDownload"
-  | "preview.loading"
-  | "preview.downloading"
-  | "preview.extracting"
-  | "preview.cancelled"
-  | "preview.close"
-  | "preview.download"
-  | "preview.openInGoogle"
-  | "preview.unavailable"
-  | "preview.tooLarge"
-  | "preview.noEmbeddedPreview"
-  | "preview.unsupportedType"
-  | "preview.htmlBlocked"
-  | "preview.splitFile"
-  | "preview.failed"
-  | "preview.pdfFailed"
-  | "preview.imageFailed"
-  | "preview.audioFailed"
-  | "preview.videoFailed"
-  | "preview.rawFailed"
-  | "preview.officeUnsupported"
-  | "preview.openInGoogleDesc";
+  | "mobile.accounts"
+  | "mobile.more"
+  | "mobile.cancel"
+  | "mobile.actions"
+  | "topbar.openSearch"
+  | "topbar.closeSearch";
 
 export type Messages = Record<MessageKey, string>;
 
@@ -551,27 +536,12 @@ export const messages: Record<Locale, Messages> = {
     "s.ariaFile": "File: {name}",
     "s.ariaFolder": "Folder: {name}",
     "s.ariaDownload": "Download {name}",
-    "preview.loading": "Loading preview…",
-    "preview.downloading": "Downloading…",
-    "preview.extracting": "Extracting preview…",
-    "preview.cancelled": "Download cancelled",
-    "preview.close": "Close preview",
-    "preview.download": "Download",
-    "preview.openInGoogle": "Open in Google",
-    "preview.unavailable": "Preview unavailable",
-    "preview.tooLarge": "File too large to preview in-app. Please download instead.",
-    "preview.noEmbeddedPreview": "This RAW file does not contain an embedded JPEG preview.",
-    "preview.unsupportedType": "This file type is not supported for in-app preview.",
-    "preview.htmlBlocked": "HTML and SVG files are not previewed for security reasons.",
-    "preview.splitFile": "Split files cannot be previewed.",
-    "preview.failed": "Preview failed",
-    "preview.pdfFailed": "PDF preview failed",
-    "preview.imageFailed": "Image preview failed",
-    "preview.audioFailed": "Audio preview failed",
-    "preview.videoFailed": "Video preview failed",
-    "preview.rawFailed": "RAW preview failed",
-    "preview.officeUnsupported": "In-app preview is not supported for this file type yet.",
-    "preview.openInGoogleDesc": "This file opens in Google's editor.",
+    "mobile.accounts": "Accounts & storage",
+    "mobile.more": "More",
+    "mobile.cancel": "Cancel",
+    "mobile.actions": "Actions",
+    "topbar.openSearch": "Open search",
+    "topbar.closeSearch": "Close search",
   },
   vi: {
     "topbar.myVault": "Kho của tôi",
@@ -831,27 +801,12 @@ export const messages: Record<Locale, Messages> = {
     "s.ariaFile": "Tệp: {name}",
     "s.ariaFolder": "Thư mục: {name}",
     "s.ariaDownload": "Tải xuống {name}",
-    "preview.loading": "Đang tải xem trước…",
-    "preview.downloading": "Đang tải xuống…",
-    "preview.extracting": "Đang trích xuất xem trước…",
-    "preview.cancelled": "Đã hủy tải xuống",
-    "preview.close": "Đóng xem trước",
-    "preview.download": "Tải xuống",
-    "preview.openInGoogle": "Mở trong Google",
-    "preview.unavailable": "Không thể xem trước",
-    "preview.tooLarge": "Tệp quá lớn để xem trước trong ứng dụng. Vui lòng tải xuống.",
-    "preview.noEmbeddedPreview": "Tệp RAW này không chứa ảnh xem trước JPEG nhúng.",
-    "preview.unsupportedType": "Loại tệp này không được hỗ trợ xem trước trong ứng dụng.",
-    "preview.htmlBlocked": "Tệp HTML và SVG không được xem trước vì lý do bảo mật.",
-    "preview.splitFile": "Không thể xem trước tệp phân mảnh.",
-    "preview.failed": "Xem trước thất bại",
-    "preview.pdfFailed": "Xem trước PDF thất bại",
-    "preview.imageFailed": "Xem trước ảnh thất bại",
-    "preview.audioFailed": "Xem trước âm thanh thất bại",
-    "preview.videoFailed": "Xem trước video thất bại",
-    "preview.rawFailed": "Xem trước RAW thất bại",
-    "preview.officeUnsupported": "Xem trước trong ứng dụng chưa được hỗ trợ cho loại tệp này.",
-    "preview.openInGoogleDesc": "Tệp này mở trong trình chỉnh sửa của Google.",
+    "mobile.accounts": "Tài khoản & lưu trữ",
+    "mobile.more": "Thêm",
+    "mobile.cancel": "Hủy",
+    "mobile.actions": "Thao tác",
+    "topbar.openSearch": "Mở tìm kiếm",
+    "topbar.closeSearch": "Đóng tìm kiếm",
   },
 };
 

@@ -1,8 +1,20 @@
-# .cursor/rules — Consolidated into skills
+# `.cursor/rules` — Minimal auto-context only
 
-Rules (`.mdc` files) have been **removed**. Guidance is now in **one skill per field** under `.cursor/agents/skills/`.
+This folder is intentionally **small**. Rules exist only to provide **automatic context** based on opened files (via `globs`) and to keep the **orchestrator always-on**.
 
-- **Field skills**: `.cursor/agents/skills/*.md` (frontend, backend, typescript, database, devops, documentation, qa, code-review, planner, product-manager, research, debugger, google-cli).
-- **Orchestrator**: `.cursor/agents/orchestrator/SKILL.md` — routing, delegation, and always-on behavior.
+## What should live here
 
-To apply orchestrator behavior in Cursor (e.g. always-on), use Cursor rules/settings to reference the orchestrator SKILL or create a single minimal rule that points to it.
+- **Always-on orchestrator**: `always-orchestrator-skill.mdc` (points to `.cursor/agents/orchestrator/SKILL.md`)
+- **Core file-context rules**:
+  - `frontend-developer.mdc`
+  - `backend-developer.mdc`
+
+## What should *not* live here
+
+- Large persona libraries or specialist playbooks. Those belong under `.cursor/agents/` (specialists + field skills + curated data).
+
+## Source of truth
+
+- **Orchestrator**: `.cursor/agents/orchestrator/SKILL.md`
+- **Task mapping**: `.cursor/agents/orchestrator/task-to-agent-mapping-rules.md`
+- **Field skills**: `.cursor/agents/skills/*.md`

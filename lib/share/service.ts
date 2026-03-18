@@ -132,6 +132,7 @@ export async function listShareLinks(
     .from("share_links")
     .select("id, resource_type, resource_id, token, expires_at, allow_download, revoked_at, created_at")
     .eq("user_id", userId)
+    .is("revoked_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -140,40 +141,38 @@ export async function listShareLinks(
     });
   }
 
-  const shareLinks: ListShareLinksResponse["shareLinks"] = [];
+  const rows = links ?? [];
 
-  for (const link of links ?? []) {
-    let resourceName = "Unknown";
-    if (link.resource_type === "folder") {
-      const { data: folder } = await supabase
-        .from("folders")
-        .select("name")
-        .eq("id", link.resource_id)
-        .eq("user_id", userId)
-        .maybeSingle();
-      resourceName = folder?.name ?? "Deleted folder";
-    } else {
-      const { data: file } = await supabase
-        .from("files")
-        .select("name")
-        .eq("id", link.resource_id)
-        .eq("user_id", userId)
-        .maybeSingle();
-      resourceName = file?.name ?? "Deleted file";
-    }
+  // Batch name lookups: 2 queries max regardless of how many links exist
+  const fileIds = rows.filter((l) => l.resource_type === "file").map((l) => l.resource_id);
+  const folderIds = rows.filter((l) => l.resource_type === "folder").map((l) => l.resource_id);
 
-    shareLinks.push({
-      id: link.id,
-      resourceType: link.resource_type,
-      resourceId: link.resource_id,
-      resourceName,
-      token: link.token,
-      expiresAt: link.expires_at ? normalizeTimestamp(link.expires_at) : null,
-      allowDownload: link.allow_download,
-      revokedAt: link.revoked_at ? normalizeTimestamp(link.revoked_at) : null,
-      createdAt: normalizeTimestamp(link.created_at),
-    });
-  }
+  const [filesResult, foldersResult] = await Promise.all([
+    fileIds.length > 0
+      ? supabase.from("files").select("id, name").in("id", fileIds).eq("user_id", userId)
+      : Promise.resolve({ data: [] as { id: string; name: string }[], error: null }),
+    folderIds.length > 0
+      ? supabase.from("folders").select("id, name").in("id", folderIds).eq("user_id", userId)
+      : Promise.resolve({ data: [] as { id: string; name: string }[], error: null }),
+  ]);
+
+  const fileMap = new Map((filesResult.data ?? []).map((f) => [f.id, f.name]));
+  const folderMap = new Map((foldersResult.data ?? []).map((f) => [f.id, f.name]));
+
+  const shareLinks: ListShareLinksResponse["shareLinks"] = rows.map((link) => ({
+    id: link.id,
+    resourceType: link.resource_type,
+    resourceId: link.resource_id,
+    resourceName:
+      link.resource_type === "file"
+        ? (fileMap.get(link.resource_id) ?? "Deleted file")
+        : (folderMap.get(link.resource_id) ?? "Deleted folder"),
+    token: link.token,
+    expiresAt: link.expires_at ? normalizeTimestamp(link.expires_at) : null,
+    allowDownload: link.allow_download,
+    revokedAt: link.revoked_at ? normalizeTimestamp(link.revoked_at) : null,
+    createdAt: normalizeTimestamp(link.created_at),
+  }));
 
   return listShareLinksResponseSchema.parse({
     success: true,
@@ -233,24 +232,13 @@ export async function resolveShareByToken(
     throw new ApiError(410, "SHARE_LINK_EXPIRED", "This share link has expired.");
   }
 
-  let resourceName = "Unknown";
-  if (link.resource_type === "folder") {
-    const { data: folder } = await supabase
-      .from("folders")
-      .select("name")
-      .eq("id", link.resource_id)
-      .is("deleted_at", null)
-      .maybeSingle();
-    resourceName = folder?.name ?? "Deleted folder";
-  } else {
-    const { data: file } = await supabase
-      .from("files")
-      .select("name")
-      .eq("id", link.resource_id)
-      .is("deleted_at", null)
-      .maybeSingle();
-    resourceName = file?.name ?? "Deleted file";
-  }
+  // Fetch resource name in parallel with expiry/revoke checks already done above
+  const { data: resource } = await (
+    link.resource_type === "folder"
+      ? supabase.from("folders").select("name").eq("id", link.resource_id).is("deleted_at", null).maybeSingle()
+      : supabase.from("files").select("name").eq("id", link.resource_id).is("deleted_at", null).maybeSingle()
+  );
+  const resourceName = resource?.name ?? (link.resource_type === "folder" ? "Deleted folder" : "Deleted file");
 
   return resolveShareResponseSchema.parse({
     success: true,
@@ -381,18 +369,21 @@ export async function verifyFileInSharedFolder(
   shareRootFolderId: string,
   fileId: string,
 ): Promise<void> {
-  const { data: file, error: fileError } = await supabase
-    .from("files")
-    .select("id, folder_id")
-    .eq("id", fileId)
-    .is("deleted_at", null)
-    .maybeSingle();
+  // Fetch file and root folder in parallel — root fetch doesn't depend on file result
+  const [fileResult, rootFolderResult] = await Promise.all([
+    supabase.from("files").select("id, folder_id").eq("id", fileId).is("deleted_at", null).maybeSingle(),
+    supabase.from("folders").select("path").eq("id", shareRootFolderId).is("deleted_at", null).maybeSingle(),
+  ]);
 
-  if (fileError || !file) {
+  if (fileResult.error || !fileResult.data) {
     throw new ApiError(404, "FILE_NOT_FOUND", "File not found.");
   }
 
-  const folderId = (file as { folder_id: string | null }).folder_id;
+  if (!rootFolderResult.data) {
+    throw new ApiError(404, "SHARE_ROOT_NOT_FOUND", "Shared folder no longer exists.");
+  }
+
+  const folderId = (fileResult.data as { folder_id: string | null }).folder_id;
   if (!folderId) {
     throw new ApiError(403, "ACCESS_DENIED", "File is not in a folder.");
   }
@@ -408,16 +399,7 @@ export async function verifyFileInSharedFolder(
     throw new ApiError(404, "FOLDER_NOT_FOUND", "File folder not found.");
   }
 
-  const { data: rootFolder } = await supabase
-    .from("folders")
-    .select("path")
-    .eq("id", shareRootFolderId)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (!rootFolder) {
-    throw new ApiError(404, "SHARE_ROOT_NOT_FOUND", "Shared folder no longer exists.");
-  }
+  const rootFolder = rootFolderResult.data;
 
   const rootPath = (rootFolder as { path: string }).path;
   const childPath = (folder as { path: string }).path;

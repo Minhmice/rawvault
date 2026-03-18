@@ -97,19 +97,6 @@ function getShareUrl(token: string): string {
   return `${window.location.origin}/s/${encodeURIComponent(token)}`;
 }
 
-type ThemeName = "vivid" | "monochrome" | "bauhaus" | "linear";
-
-const SHARE_LINK_CARD_THEME: Record<ThemeName, string> = {
-  vivid:
-    "hover:-translate-y-1 hover:shadow-lg [transition:transform_350ms_cubic-bezier(0.34,1.56,0.64,1),box-shadow_350ms_ease-out]",
-  monochrome:
-    "hover:bg-foreground hover:text-background [transition:background-color_60ms_steps(1),color_60ms_steps(1)]",
-  bauhaus:
-    "hover:-translate-y-[3px] hover:shadow-[4px_8px_0px_0px_#121212] active:translate-y-[2px] active:shadow-none [transition:transform_150ms_ease-out,box-shadow_150ms_ease-out]",
-  linear:
-    "[transition:transform_250ms_cubic-bezier(0.16,1,0.3,1),box-shadow_250ms_cubic-bezier(0.16,1,0.3,1),border-color_250ms_ease] hover:-translate-y-1 hover:border-white/10 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5),0_0_40px_rgba(94,106,210,0.08),inset_0_1px_0_0_rgba(255,255,255,0.1)]",
-};
-
 function formatDate(value: string | null, neverLabel: string): string {
   if (!value) return neverLabel;
   const date = new Date(value);
@@ -130,10 +117,10 @@ export function SharedClient() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { t } = useLocale();
-  const { theme } = useTheme();
+  const { themeName } = useTheme();
   const { ThemeCard, ThemeButton: Button } = useThemeComponents();
-  const themeName = (theme.name ?? "vivid") as ThemeName;
-  const shareCardHover = SHARE_LINK_CARD_THEME[themeName] ?? SHARE_LINK_CARD_THEME.vivid;
+  void themeName; // share card hover themed via CSS
+  const shareCardHover = "rv-share-link-card-hover";
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
@@ -379,7 +366,7 @@ export function SharedClient() {
     return null;
   }
 
-  const activeLinks = links.filter((l) => !l.revokedAt);
+  const activeLinks = links; // server already excludes revoked links
 
   return (
     <DashboardLayout
@@ -395,10 +382,10 @@ export function SharedClient() {
       accountActionId={accountActionId}
       signOutLoading={signOutLoading}
     >
-      <div className="flex h-full min-h-0 flex-col space-y-6">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col space-y-6">
         {authError ? (
           <ThemeCard className="border border-destructive/40 bg-destructive/10 p-4">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex w-full items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-destructive">
                 <AlertCircle className="h-5 w-5" />
                 <p className="text-sm">{authError}</p>
@@ -418,14 +405,14 @@ export function SharedClient() {
           <ThemeCard
             className={
               connectBanner.type === "success"
-                ? "border border-emerald-500/40 bg-emerald-500/10 p-4"
+                ? "border border-rv-success/40 bg-rv-success/10 p-4"
                 : "border border-destructive/40 bg-destructive/10 p-4"
             }
           >
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 {connectBanner.type === "success" ? (
-                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-rv-success" />
                 ) : (
                   <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
                 )}
@@ -537,7 +524,7 @@ export function SharedClient() {
                         onClick={() => handleCopyLink(link)}
                       >
                         {copiedId === link.id ? (
-                          <Check className="h-4 w-4 text-emerald-600" />
+                          <Check className="h-4 w-4 text-rv-success" />
                         ) : (
                           <Copy className="h-4 w-4" />
                         )}

@@ -34,6 +34,14 @@ When you assign a task to a field, use the skill file below so the executor know
 | Research | [research.md](research.md) | `research-analyst` |
 | Debug | [debugger.md](debugger.md) | `debugger` |
 | Google CLI (gws) | [google-cli.md](google-cli.md) | `google-cli-specialist` |
+| i18n | [i18n.md](i18n.md) | `frontend-developer` |
+| shadcn/ui | In [frontend.md](frontend.md) § Shadcn/ui; optional [shadcn.md](shadcn.md) | `frontend-developer` |
+| Responsive | [frontend.md](frontend.md) § Responsive design; search `-d responsive` | `frontend-developer` |
+| Stitch MCP | [stitch.md](stitch.md) — **only when user asks for Stitch** | `frontend-developer` |
+| Minimalist Monochrome | [minimalist-monochrome.md](minimalist-monochrome.md) | `frontend-developer` |
+| Theme system (presets, tokens, wiring) | [theme-instructions.md](theme-instructions.md) | `frontend-developer` |
+| Bauhaus (constructivist) | [bauhaus-theme.md](bauhaus-theme.md) | `frontend-developer` |
+| Linear / modern dark (cinematic) | [linear-modern-dark.md](linear-modern-dark.md) | `frontend-developer` |
 | **Orchestrator** | — | See `.cursor/agents/orchestrator/SKILL.md` |
 
 ## Using a skill in a handoff

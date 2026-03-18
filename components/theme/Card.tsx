@@ -17,8 +17,8 @@ export interface ThemeCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
   ({ className, glass, ...props }, ref) => {
-    const { theme } = useTheme();
-    const isMonochrome = theme.name === "monochrome";
+    const { themeName } = useTheme();
+    const isMonochrome = themeName === "monochrome";
 
     const monochromeClasses = isMonochrome
       ? "rounded-none border-2 border-border shadow-none"
