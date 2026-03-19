@@ -1,0 +1,100 @@
+/* ═══════════════════════════════════════════
+   THEME: MINIMALIST MONOCHROME
+   Fonts: Playfair Display (headings) + Source Serif 4 (body) + JetBrains Mono (labels)
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root[data-theme="monochrome-light"] {
+    --rv-bg: #ffffff;
+    --rv-surface: #ffffff;
+    --rv-surface-muted: #f5f5f5;
+    --rv-border: #000000;
+    --rv-text: #000000;
+    --rv-text-muted: #525252;
+    --rv-primary: #000000;
+    --rv-primary-hover: #ffffff;
+    --rv-danger: #000000;
+
+    --rv-radius-lg: 0px;
+    --rv-radius-md: 0px;
+    --rv-radius-sm: 0px;
+    --radius: 0px;
+
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, oklch(1 0 0));
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.145 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.145 0 0);
+    --accent-foreground: oklch(1 0 0);
+    --destructive: oklch(0.145 0 0);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.145 0 0);
+    --input: oklch(0.145 0 0);
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--foreground);
+    --chart-2: var(--muted-foreground);
+    --chart-3: var(--border);
+    --chart-4: var(--foreground);
+    --chart-5: var(--muted-foreground);
+
+    /* Monochrome font stack: editorial serif */
+    --font-heading: var(--font-playfair, 'Playfair Display', Georgia, serif);
+    --font-sans:    var(--font-source-serif, 'Source Serif 4', Georgia, serif);
+    --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.145 0 0);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.145 0 0);
+    --sidebar-border: oklch(0.145 0 0);
+    --sidebar-ring: oklch(0.145 0 0);
+  }
+
+  :root[data-theme="monochrome-dark"] {
+    --rv-bg: #000000;
+    --rv-surface: #000000;
+    --rv-surface-muted: #111111;
+    --rv-border: #ffffff;
+    --rv-text: #ffffff;
+    --rv-text-muted: #a3a3a3;
+    --rv-primary: #ffffff;
+    --rv-primary-hover: #000000;
+    --rv-danger: #ffffff;
+
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(1 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(1 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(1 0 0);
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, oklch(0.145 0 0));
+    --secondary: oklch(0.145 0 0);
+    --secondary-foreground: oklch(1 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(1 0 0);
+    --accent-foreground: oklch(0.145 0 0);
+    --destructive: oklch(1 0 0);
+    --destructive-foreground: oklch(0.145 0 0);
+    --border: oklch(1 0 0);
+    --input: oklch(1 0 0);
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--foreground);
+    --chart-2: var(--muted-foreground);
+    --chart-3: var(--border);
+    --chart-4: var(--foreground);
+    --chart-5: var(--muted-foreground);
+  }
+}

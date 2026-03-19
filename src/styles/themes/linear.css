@@ -1,0 +1,82 @@
+/* ═══════════════════════════════════════════
+   THEME: LINEAR / MODERN
+   Cinematic dark theme with deep space background and animated ambient light
+   Fonts: Inter (primary) + Geist or system-ui fallback
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root[data-theme="linear-dark"],
+  :root[data-theme="linear-light"] {
+    /* Base dark canvas */
+    --rv-bg: #050506;
+    --rv-surface: rgba(255,255,255,0.05); /* Cards */
+    --rv-surface-hover: rgba(255,255,255,0.08);
+    --rv-border: rgba(255,255,255,0.06);
+    
+    --rv-text: #EDEDEF;
+    --rv-text-muted: #8A8F98;
+    --rv-text-subtle: rgba(255,255,255,0.60);
+    
+    --rv-primary: #5E6AD2;
+    --rv-primary-hover: #6872D9;
+    --rv-danger: #e5484d; /* Radix red 9 */
+
+    /* Typography */
+    --font-heading: var(--font-inter, sans-serif);
+    --font-sans: var(--font-inter, sans-serif);
+    --font-mono: var(--font-jetbrains-mono, monospace);
+
+    --rv-radius-lg: 16px;
+    --rv-radius-md: 8px;
+    --rv-radius-sm: 6px;
+    --radius: 8px;
+
+    /* Semantic Mappings for Shadcn (using HSL as fallback but mapping to hex visually) */
+    --background: oklch(0.18 0 0); /* #050506 approx */
+    --foreground: oklch(0.96 0 0);
+    --card: oklch(0.2 0 0 / 5%);
+    --card-foreground: oklch(0.96 0 0);
+    --popover: oklch(0.18 0 0);
+    --popover-foreground: oklch(0.96 0 0);
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, oklch(0.98 0 0));
+    --secondary: oklch(1 0 0 / 5%);
+    --secondary-foreground: oklch(0.96 0 0);
+    --muted: oklch(1 0 0 / 5%);
+    --muted-foreground: oklch(0.65 0 0);
+    --accent: oklch(0.55 0.16 260);
+    --accent-foreground: oklch(0.98 0 0);
+    --destructive: oklch(0.6 0.2 20);
+    --destructive-foreground: oklch(0.98 0 0);
+    --border: oklch(1 0 0 / 6%);
+    --input: oklch(1 0 0 / 10%);
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--primary);
+    --chart-2: #a06edc;
+    --chart-3: var(--rv-danger);
+    --chart-4: var(--foreground);
+    --chart-5: var(--muted-foreground);
+
+    --sidebar: oklch(0.18 0 0);
+    --sidebar-foreground: oklch(0.96 0 0);
+    --sidebar-primary: oklch(0.55 0.16 260);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(1 0 0 / 5%);
+    --sidebar-accent-foreground: oklch(0.96 0 0);
+    --sidebar-border: oklch(1 0 0 / 6%);
+    --sidebar-ring: oklch(0.55 0.16 260 / 50%);
+
+    /* Cinematic Background System (Linear specific) */
+    background-color: #020203; /* Absolute darkest base */
+    background-image: 
+      /* Grid overlay */
+      linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px),
+      /* Radial depth from top center */
+      radial-gradient(ellipse at top, #0a0a0f 0%, #050506 50%, #020203 100%);
+    background-size: 64px 64px, 64px 64px, 100% 100%;
+    background-position: center top, center top, center top;
+    background-attachment: fixed;
+    position: relative;
+  }
+}

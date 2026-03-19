@@ -7,13 +7,13 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    setupFiles: ["./lib/test-setup.ts"],
+    setupFiles: ["./src/lib/test-setup.ts"],
     // Keep test discovery scoped to product tests only.
     // This avoids picking up tests from vendored worktrees (e.g. `.claude/worktrees/**`).
     include: [
-      "./lib/**/*.test.{ts,tsx}",
-      "./hooks/**/*.test.{ts,tsx}",
-      "./components/**/*.test.{ts,tsx}",
+      "./src/lib/**/*.test.{ts,tsx}",
+      "./src/hooks/**/*.test.{ts,tsx}",
+      "./src/components/**/*.test.{ts,tsx}",
     ],
     exclude: [
       "node_modules",
@@ -28,7 +28,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "."),
+      "@": path.resolve(__dirname, "src"),
     },
   },
 });

@@ -78,6 +78,13 @@ agents:
     enabled: true
     auto_routable: true
     model_tier: balanced
+  - id: security-specialist
+    type: specialist
+    field_id: security
+    skill: .cursor/agents/specialists/security-specialist/SKILL.md
+    enabled: true
+    auto_routable: true
+    model_tier: high
   - id: qa-tester
     type: specialist
     field_id: qa

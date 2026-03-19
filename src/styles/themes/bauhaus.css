@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════
+   THEME: BAUHAUS
+   Fonts: Space Grotesk (headings + body) — geometric sans
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root[data-theme="bauhaus-light"] {
+    --rv-bg: #F0F0F0;
+    --rv-surface: #ffffff;
+    --rv-surface-muted: #E0E0E0;
+    --rv-border: #121212;
+    --rv-text: #121212;
+    --rv-text-muted: #555555;
+    --rv-primary: #D02020;
+    --rv-primary-hover: #b01818;
+    --rv-danger: #D02020;
+
+    --rv-radius-lg: 0px;
+    --rv-radius-md: 0px;
+    --rv-radius-sm: 0px;
+    --radius: 0px;
+
+    --background: #F0F0F0;
+    --foreground: #121212;
+    --card: #ffffff;
+    --card-foreground: #121212;
+    --popover: #ffffff;
+    --popover-foreground: #121212;
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, #ffffff);
+    --secondary: #1040C0;
+    --secondary-foreground: #ffffff;
+    --muted: #E0E0E0;
+    --muted-foreground: #555555;
+    --accent: #F0C020;
+    --accent-foreground: #121212;
+    --destructive: #D02020;
+    --destructive-foreground: #ffffff;
+    --border: #121212;
+    --input: #121212;
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--primary);
+    --chart-2: var(--secondary);
+    --chart-3: var(--accent);
+    --chart-4: var(--foreground);
+    --chart-5: var(--destructive);
+
+    /* Bauhaus font stack: Space Grotesk — geometric, constructed */
+    --font-heading: var(--font-space-grotesk, 'Space Grotesk', 'Outfit', sans-serif);
+    --font-sans:    var(--font-space-grotesk, 'Space Grotesk', 'Outfit', sans-serif);
+    --font-mono:    var(--font-space-grotesk, 'Space Grotesk', monospace);
+
+    --sidebar: #F0F0F0;
+    --sidebar-foreground: #121212;
+    --sidebar-primary: #D02020;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #E0E0E0;
+    --sidebar-accent-foreground: #121212;
+    --sidebar-border: #121212;
+    --sidebar-ring: #D02020;
+  }
+
+  :root[data-theme="bauhaus-dark"] {
+    /* Dark Bauhaus: same primary accents, deep neutral surfaces */
+    --rv-bg: #09090b;
+    --rv-surface: #18181b;
+    --rv-surface-muted: #27272a;
+    --rv-border: #f4f4f5;
+    --rv-text: #f4f4f5;
+    --rv-text-muted: #a1a1aa;
+    --rv-primary: #D02020;
+    --rv-primary-hover: #ff3b30;
+    --rv-danger: #D02020;
+
+    --background: #09090b;
+    --foreground: #f4f4f5;
+    --card: #18181b;
+    --card-foreground: #f4f4f5;
+    --popover: #18181b;
+    --popover-foreground: #f4f4f5;
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, #ffffff);
+    --secondary: #1040C0;
+    --secondary-foreground: #ffffff;
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+    --accent: #F0C020;
+    --accent-foreground: #121212;
+    --destructive: #D02020;
+    --destructive-foreground: #ffffff;
+    --border: #f4f4f5;
+    --input: #f4f4f5;
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--primary);
+    --chart-2: var(--secondary);
+    --chart-3: var(--accent);
+    --chart-4: var(--foreground);
+    --chart-5: var(--destructive);
+
+    --sidebar: #09090b;
+    --sidebar-foreground: #f4f4f5;
+    --sidebar-primary: #D02020;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #27272a;
+    --sidebar-accent-foreground: #f4f4f5;
+    --sidebar-border: #f4f4f5;
+    --sidebar-ring: #D02020;
+  }
+}

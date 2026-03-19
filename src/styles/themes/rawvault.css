@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════
+   THEME: RAWVAULT (from HTML Example)
+   Fonts: Manrope (headings) + Inter (body)
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root[data-theme="rawvault-light"],
+  [data-theme="rawvault-light"] {
+    --rv-bg: #f7f9fb;
+    --rv-surface: #ffffff;
+    --rv-surface-muted: #f2f4f6;
+    --rv-border: #c7c4d7;
+    --rv-text: #191c1e;
+    --rv-text-muted: #464554;
+    --rv-primary: #4648d4;
+    --rv-primary-hover: #3323cc;
+    --rv-danger: #ba1a1a;
+
+    --background: #f7f9fb;
+    --foreground: #191c1e;
+    --card: #ffffff;
+    --card-foreground: #191c1e;
+    --popover: #ffffff;
+    --popover-foreground: #191c1e;
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, #ffffff);
+    --secondary: #3fe1fd;
+    --secondary-foreground: #00616f;
+    --muted: #f2f4f6;
+    --muted-foreground: #464554;
+    --accent: #645efb;
+    --accent-foreground: #fffbff;
+    --destructive: #ba1a1a;
+    --destructive-foreground: #ffffff;
+    --border: #c7c4d7;
+    --input: #e0e3e5;
+    --ring: var(--rv-primary);
+
+    --chart-1: var(--rv-primary);
+    --chart-2: var(--rv-success);
+    --chart-3: var(--rv-warning);
+    --chart-4: var(--rv-file-video);
+    --chart-5: var(--rv-danger);
+
+    --font-heading: 'Manrope', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+
+    --sidebar: #f7f9fb;
+    --sidebar-foreground: #191c1e;
+    --sidebar-primary: #4648d4;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f2f4f6;
+    --sidebar-accent-foreground: #191c1e;
+    --sidebar-border: #c7c4d7;
+    --sidebar-ring: #4648d4;
+  }
+}

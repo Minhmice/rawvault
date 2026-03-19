@@ -13,6 +13,7 @@
 | Schema, migration, RLS | `database-specialist` | `backend-developer` (sequential follow-up) | migration needs compatibility sequencing | no schema impact |
 | Bug triage and fix | `debugger` | owning specialist | flaky or cross-layer issue | deterministic single-layer defect |
 | Code quality review | `code-reviewer` | `orchestrator` | high-risk changes need QA pairing | low-risk documentation-only change |
+| Security review / audit | `security-specialist` | `code-reviewer` | when security findings affect multiple components (FE, BE, DB) → add respective developers | isolated security fix can be handled by `code-reviewer` alone
 | QA validation | `qa-tester` | implementer (smoke only) | staging or deploy checks are needed | local behavior smoke test only |
 | Release and deployment | `devops-engineer` | `orchestrator` | go/no-go decision requires QA evidence | no deploy impact |
 | Documentation | `documentation-writer` | owning specialist | API docs, runbook, and changelog all changed | tiny inline doc adjustment |

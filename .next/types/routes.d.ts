@@ -4,7 +4,7 @@
 type AppRoutes = "/" | "/example" | "/login" | "/recent" | "/s/[token]" | "/settings" | "/shared" | "/signup" | "/starred" | "/trash"
 type AppRouteHandlerRoutes = "/api/auth/dev/seeded-signin" | "/api/auth/session" | "/api/auth/session/persist" | "/api/auth/signin" | "/api/auth/signout" | "/api/auth/signup" | "/api/auth/user" | "/api/explorer/folder" | "/api/explorer/list" | "/api/explorer/stream" | "/api/files" | "/api/files/[id]" | "/api/files/[id]/download" | "/api/files/[id]/restore" | "/api/files/[id]/stream" | "/api/folders" | "/api/folders/[id]" | "/api/folders/[id]/breadcrumb" | "/api/folders/[id]/restore" | "/api/share" | "/api/share/[id]" | "/api/share/resolve/[token]" | "/api/share/v/[token]/folder" | "/api/share/v/[token]/stream" | "/api/storage/accounts" | "/api/storage/accounts/connect" | "/api/storage/accounts/connect/callback" | "/api/storage/accounts/default-write" | "/api/storage/accounts/link" | "/api/storage/accounts/overflow-priority" | "/api/storage/accounts/set-active" | "/api/storage/accounts/unlink" | "/api/storage/drive/browse" | "/api/storage/drive/import" | "/api/uploads/dispatch" | "/api/uploads/execute" | "/api/workspace/preferences"
 type PageRoutes = never
-type LayoutRoutes = "/"
+type LayoutRoutes = "/" | "/s"
 type RedirectRoutes = never
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
@@ -52,6 +52,7 @@ interface ParamMap {
   "/example": {}
   "/login": {}
   "/recent": {}
+  "/s": {}
   "/s/[token]": { "token": string; }
   "/settings": {}
   "/shared": {}
@@ -65,6 +66,7 @@ export type ParamsOf<Route extends Routes> = ParamMap[Route]
 
 interface LayoutSlotMap {
   "/": never
+  "/s": never
 }
 
 

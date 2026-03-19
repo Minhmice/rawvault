@@ -34,6 +34,8 @@ signals:
     keywords: ["bug", "repro", "regression", "flaky", "trace", "root cause"]
   code-reviewer:
     keywords: ["review", "risk", "security", "maintainability", "correctness"]
+  security-specialist:
+    keywords: ["security", "vulnerability", "audit", "risk", "xss", "sql injection", "auth", "access control", "secret", "csp"]
   qa-tester:
     keywords: ["test plan", "verify", "pass/fail", "edge case", "coverage"]
   documentation-writer:

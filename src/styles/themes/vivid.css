@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════
+   THEME: VIVID
+   Fonts: Outfit (headings) + Inter (body)
+   shadcn: Uses default tokens + sidebar overrides
+   ═══════════════════════════════════════════ */
+@layer base {
+  :root[data-theme="vivid-light"] {
+    --font-heading: var(--font-outfit, 'Outfit', sans-serif);
+    --font-sans:    var(--font-inter, 'Inter', sans-serif);
+    --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+
+    /* Ensure shadcn token completeness (light defaults) */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, oklch(0.98 0 0));
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.98 0 0);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: var(--rv-primary);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+
+    --chart-1: var(--rv-primary);
+    --chart-2: var(--rv-success);
+    --chart-3: var(--rv-warning);
+    --chart-4: var(--rv-file-video);
+    --chart-5: var(--rv-danger);
+
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.205 0 0);
+    --sidebar-primary: oklch(0.55 0.2 250);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.55 0.2 250 / 50%);
+  }
+
+  :root[data-theme="vivid-dark"] {
+    --font-heading: var(--font-outfit, 'Outfit', sans-serif);
+    --font-sans:    var(--font-inter, 'Inter', sans-serif);
+    --font-mono:    var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+
+    /* Ensure shadcn token completeness (dark defaults) */
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --primary: var(--rv-primary);
+    --primary-foreground: var(--rv-primary-foreground, oklch(0.98 0 0));
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.985 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: var(--rv-primary);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+
+    --chart-1: var(--rv-primary);
+    --chart-2: var(--rv-success);
+    --chart-3: var(--rv-warning);
+    --chart-4: var(--rv-file-video);
+    --chart-5: var(--rv-danger);
+
+    /* Sidebar keeps vivid accent, dark surfaces */
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.55 0.2 250);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.55 0.2 250 / 50%);
+  }
+}
